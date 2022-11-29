@@ -1,0 +1,28 @@
+{
+    "name": "shiyun/php-think",
+    "type": "library",
+    "license": "MIT",
+    "description": "thinkphp extend shiyun/php-think",
+    "version": "1.0.1",
+    "authors": [
+        {
+            "name": "ctocode",
+            "email": "343196936@qq.com"
+        }
+    ],
+    "require": {
+        "php": "^7.4 || ^8"
+    },
+    "require-dev": {},
+    "autoload": {
+        "psr-4": {
+            "shiyun\\": "src/"
+        },
+        "files": [
+            "./src/helpers.php"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {}
+    }
+}

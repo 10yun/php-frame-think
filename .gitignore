@@ -1,0 +1,17 @@
+/.project
+/.idea
+.idea
+.git
+/.git
+/.buildpath
+composer.lock
+composer.phar
+.php_cs.cache
+.phpunit.result.cache
+vendor
+vendor/*
+/vendor
+/vendor/
+
+logs
+/runtime
