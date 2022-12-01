@@ -16,10 +16,10 @@
     "require-dev": {},
     "autoload": {
         "psr-4": {
-            "shiyun\\": "src/"
+            "shiyun\\": "src"
         },
         "files": [
-            "./src/helpers.php"
+            "src/helpers.php"
         ]
     },
     "autoload-dev": {
