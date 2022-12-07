@@ -23,15 +23,22 @@ use think\facade\Db;
  * 对原有的 Model 验证器进行扩展
  * @author ctocode-zhw
  * @return \think\Model
+ * @method void getPrimary() 获取主键
+ * @method void setPrimary($newPrimary) 设置主键
+ * @method void setWhere($wsql) 设置参数
+ * @method void setLimit($wsql) 设置分页
+ * @method void getSelect($wsql) 获取多条
+ * @method void getCount($wsql) 获取数量
+ * @method void getFind($wsql) 获取单条
  */
 class ModelExtend extends Model
 {
     use ModelTraitsCrud, ModelTraitCheck, ModelTraitParse;
-    protected $tableType = '';
+    protected $table = ''; // 当前模型.表单名称
     protected $tabConnect = '';
+    protected $tableType = '';
     protected $tableName = ''; // 当前模型.除开后缀的名字
     protected $tablePrimary = ''; // 当前模型.表单主键
-    protected $table = ''; // 当前模型.表单名称
 
     // 是否自动解析
     protected $_autoAnalys = false;
@@ -91,23 +98,29 @@ class ModelExtend extends Model
     {
         return $this->tablePrimary;
     }
+    // 设置主键
+    public function setPrimary($newPrimary = '')
+    {
+        $this->tablePrimary = $newPrimary;
+        return $this;
+    }
     /**
      * @action 初始化
      */
     public function _initialize()
     {
     }
-    protected function exWhere($wsql = [])
-    {
-        if (is_array($this->whereArr) && !empty($this->whereArr)) {
-            foreach ($this->whereArr as $key => $val) {
-                if (!empty($wsql[$key])) {
-                    $this->exDb->where($key, $val, $wsql[$key] ?? '');
-                }
-            }
-        }
-        return $this->exDb;
-    }
+    // protected function exWhere($wsql = [])
+    // {
+    //     if (is_array($this->whereArr) && !empty($this->whereArr)) {
+    //         foreach ($this->whereArr as $key => $val) {
+    //             if (!empty($wsql[$key])) {
+    //                 $this->exDb->where($key, $val, $wsql[$key] ?? '');
+    //             }
+    //         }
+    //     }
+    //     return $this->exDb;
+    // }
     protected function exLimit($wsql = [])
     {
         $page = !empty($wsql['page']) ? $wsql['page'] : 1;

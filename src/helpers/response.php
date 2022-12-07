@@ -71,25 +71,14 @@ function sendRespError($msg = null, $code = 404, $data = null): Response
         'error' => 'Not Found',
         'msg' => $msg
     ]);
-
-    // sendRespInfo([
-    //     'status' => $status,
-    //     'error' => 'Not Found',
-    //     'msg' => $msg
-    // ]); 
 }
 /**
  * 响应码
  */
 function sendRespCode200($code = 0, $isReturn = false): Response
 {
-    $codeObj = new  \app\common\lib\ResponseCode();
+    $codeObj = new \app\common\lib\ResponseCode();
     $codeArr = $codeObj->getCodeArr();
-    // $ResponsCodeArr = Cache::get('ResponsCode');
-    // if (empty($ResponsCodeArr)) {
-    // 	$ResponsCodeArr = Db::table('base__dict_response_code_zh')->select();
-    // 	Cache::Set('ResponsCode', $ResponsCodeArr);
-    // }
     $msg = $codeArr[$code] ?? '暂无该状态码信息';
     $codeReturn = [
         'status' => $code,
@@ -105,16 +94,11 @@ function sendRespCode401($code = 0, $isReturn = false): Response
 {
     $codeObj = new \app\common\lib\ResponseCode();
     $codeArr = $codeObj->getCodeArr();
-    // $ResponsCodeArr = Cache::get('ResponsCode');
-    // if (empty($ResponsCodeArr)) {
-    // 	$ResponsCodeArr = Db::table('base__dict_response_code_zh')->select();
-    // 	Cache::Set('ResponsCode', $ResponsCodeArr);
-    // }
     $msg = $codeArr[$code] ?? '暂无该状态码信息';
     $codeReturn = [
         'status' => $code,
         'data' => [],
-        'msg' => $msg,
+        'error' => $msg,
         'msg' => $code,
     ];
     if ($isReturn) {

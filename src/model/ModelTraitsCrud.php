@@ -45,11 +45,7 @@ trait ModelTraitsCrud
     public function mCrudDel(array $requestData = [])
     {
         if (empty($this->tableName) || empty($this->tablePrimary)) {
-            return array(
-                'status' => 404,
-                'error' => 'C-m -' . get_class($this),
-                'msg' => '表单配置错误'
-            );
+            throw new ModelException('表单配置错误' . 'C-m -' . get_class($this));
         }
         if (!empty($requestData['id'])) {
             $del_result = $this->strict(false)->where([
@@ -73,18 +69,10 @@ trait ModelTraitsCrud
     {
 
         if (empty($this->tableName) || empty($this->tablePrimary)) {
-            return array(
-                'status' => 404,
-                'error' => 'C-m -' . get_class($this),
-                'msg' => '表单配置错误'
-            );
+            throw new ModelException('表单配置错误' . 'C-m -' . get_class($this));
         }
         if (empty($requestData) || !is_array($requestData) || empty($this->tablePrimary)) {
-            return [
-                'status' => '404',
-                'error' => '主键、数组、参数',
-                'msg' => '参数配置错误～'
-            ];
+            throw new ModelException('参数配置错误' . '主键、数组、参数');
         }
         // 主键不存在的时候，插入
         $_pk_id = null;
@@ -129,10 +117,7 @@ trait ModelTraitsCrud
     {
         $parseResult = $this->parseRequestData($requestData);
         if ($parseResult['state'] != 'success') {
-            return array(
-                'status' => 404,
-                'msg' => $parseResult['msg'] . '有误~'
-            );
+            throw new ModelException($parseResult['msg'] . '有误~');
         }
         $parseData = array();
         $parseData = $parseResult['data'];

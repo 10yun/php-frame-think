@@ -29,29 +29,29 @@ function frameGetSession($flag)
 {
     return Session::get($flag);
 }
-function tp6LogsDebug($info = '')
+function frameLogsDebug($info = '')
 {
     if (is_string($info)) {
-        Log::channel('debug')->write($info);
+        Log::channel('logs_channel_debug')->write($info);
     } else if (is_array($info)) {
-        Log::channel('debug')->info($info);
+        Log::channel('logs_channel_debug')->info($info);
     } else if (is_object($info)) {
-        Log::channel('debug')->info($info);
+        Log::channel('logs_channel_debug')->info($info);
     }
 }
-function tp6LogsFile($info = '')
+function frameLogsFile($info = '')
 {
     if (is_string($info)) {
-        Log::channel('file')->write($info);
+        Log::channel('logs_channel_file')->write($info);
     } else if (is_array($info)) {
-        Log::channel('file')->info($info);
+        Log::channel('logs_channel_file')->info($info);
     } else if (is_object($info)) {
-        Log::channel('file')->info($info);
+        Log::channel('logs_channel_file')->info($info);
     }
 }
 function tp6LogsPayFile($info = '')
 {
-    Log::channel('wx_pay_file')->info($info);
+    Log::channel('logs_channel_paywx')->info($info);
     // 	Log::save ();
     // 	Log::close ();
 }
@@ -75,7 +75,7 @@ function tp6RedisSet($key = '', $val = '', $time = null)
     }
 }
 
-function tp6GetDbInit($settData = [], $database = '')
+function frameGetDbInit($settData = [], $database = '')
 {
     $initData = [
         // 数据库类型

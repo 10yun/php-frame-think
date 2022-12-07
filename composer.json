@@ -24,5 +24,13 @@
     },
     "autoload-dev": {
         "psr-4": {}
+    },
+    "extra": {
+        "think": {
+            "config": {
+                "shiyun/think/annotation": "src/config/annotation.php",
+                "shiyun/think/throttle": "src/config/throttle.php"
+            }
+        }
     }
 }
