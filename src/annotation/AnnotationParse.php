@@ -47,6 +47,9 @@ abstract class AnnotationParse
         foreach ($include as $path) {
             // 2022-1128 增加支持*
             if (str_contains($path, "*")) {
+                if (!str_starts_with($path, "/")) {
+                    $path = AnnotationUtil::basePath(AnnotationUtil::replaceSeparator($path));
+                }
                 $path_arr = glob($path);
                 foreach ($path_arr as $path_item) {
                     $include_all[] = $path_item;
@@ -55,13 +58,23 @@ abstract class AnnotationParse
                 $include_all[] = $path;
             }
         }
-        foreach ($include_all as $path) {
-            // 扫描绝对路径
-            $path = AnnotationUtil::basePath(AnnotationUtil::replaceSeparator($path));
-            // 遍历获取文件
-            yield from AnnotationUtil::findDirectory($path, function (SplFileInfo $item) use ($excludeRegular) {
-                return $item->getExtension() === 'php' && !($excludeRegular && preg_match($excludeRegular, $item->getPathname()));
-            });
+
+        try {
+            //code...
+            foreach ($include_all as $path) {
+                // 扫描绝对路径
+                if (!str_starts_with($path, "/")) {
+                    $path = AnnotationUtil::basePath(AnnotationUtil::replaceSeparator($path));
+                }
+
+                // 遍历获取文件 
+                yield from AnnotationUtil::findDirectory($path, function (SplFileInfo $item) use ($excludeRegular) {
+                    return $item->getExtension() === 'php' && !($excludeRegular && preg_match($excludeRegular, $item->getPathname()));
+                });
+            }
+        } catch (\Throwable $th) {
+            var_dump($th->getMessage());
+            //throw $th;
         }
     }
 
@@ -79,7 +92,7 @@ abstract class AnnotationParse
             // 获取路径中的类名地址
             $pathname = $item->getPathname();
 
-            $className = substr($pathname, strlen(AnnotationUtil::basePath()) + 1, -4);
+            $className = substr($pathname, strlen(AnnotationUtil::basePath()) + 0, -4);
             $className = str_replace('/', '\\', $className);
 
             try {
@@ -89,6 +102,7 @@ abstract class AnnotationParse
                 // 反射类
                 $reflectionClass = new ReflectionClass($className);
             } catch (Throwable) {
+                // throw new \Exception($className . ' no class_exists', 1);
                 continue;
             }
 
@@ -120,10 +134,16 @@ abstract class AnnotationParse
         string|ReflectionClass $className
     ): Generator {
         $reflectionClass = is_string($className) ? new ReflectionClass($className) : $className;
-
-        // 获取类的注解
+        // var_dump('---', $reflectionClass);
+        // 
+        /**
+         * 获取类的注解
+         */
         yield from self::getClassAnnotations($reflectionClass);
-        // 获取所有方法的注解
+        /**
+         * TODO: 获取所有方法的注解
+         * 等待删除
+         */
         // foreach ($reflectionClass->getMethods(ReflectionMethod::IS_PUBLIC) as $reflectionMethod) {
         //     $middlewares = '';
         //     $path        = "";
@@ -149,8 +169,10 @@ abstract class AnnotationParse
         //         }
         //     }
         // }
+        /**
+         * 获取方法注解
+         */
         foreach ($reflectionClass->getMethods() as $reflectionMethod) {
-            // 获取方法注解
             $method = self::getMethodAnnotations($reflectionMethod);
             $method && (yield from $method);
             // 获取方法参数的注解
@@ -159,7 +181,9 @@ abstract class AnnotationParse
                 $parameter && (yield from $parameter);
             }
         }
-        // 获取所有属性的注解
+        /**
+         * 获取所有属性的注解
+         */
         foreach ($reflectionClass->getProperties() as $reflectionProperty) {
             $property = self::getPropertyAnnotations($reflectionClass, $reflectionProperty);
             $property && (yield from $property);
@@ -234,6 +258,12 @@ abstract class AnnotationParse
             // 扫描PHP8原生注解
             $attributes = $reflection->getAttributes();
 
+            //返回类中所有方法
+            $function_arr  = [];
+            foreach ($reflection->getMethods(ReflectionMethod::IS_PUBLIC) as $reflectionMethod) {
+                $function_arr[] = $reflectionMethod->getName();
+            }
+
             return self::buildScanAnnotationItems([
                 ...$attributes,
                 // ...self::getPhp7('class', $reflection)
@@ -241,6 +271,7 @@ abstract class AnnotationParse
                 'type' => 'class',
                 // 类名
                 'class' => $reflection->name,
+                'functions' => $function_arr,
             ]);
         });
 

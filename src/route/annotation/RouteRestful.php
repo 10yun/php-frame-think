@@ -41,5 +41,7 @@ class RouteRestful extends RouteAbstract
         // public ?array            $append = null,
         // public ?array            $pattern = null,
     ) {
+        // 解析参数
+        $this->paresArgs(func_get_args(), 'path');
     }
 }

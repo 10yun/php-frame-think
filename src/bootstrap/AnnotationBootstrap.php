@@ -6,6 +6,7 @@ namespace shiyun\bootstrap;
 
 use shiyun\annotation\AnnotationParse;
 use shiyun\route\RouteAttriLoad;
+use shiyun\route\RouteAnnotationHandle;
 
 class AnnotationBootstrap extends \think\Service
 {
@@ -23,22 +24,7 @@ class AnnotationBootstrap extends \think\Service
     //         return new CachedReader(new AnnotationReader(), $cache->store($store), $app->isDebug());
     //     });
     // }
-
-    public function boot()
-    {
-        // $this->reader = $reader;
-
-        // //注解路由
-        // $this->registerAnnotationRoute();
-
-        // //自动注入
-        // $this->autoInject();
-
-        // //模型注解方法提示
-        // $this->detectModelAnnotations();
-    }
-
-    protected static array $defaultConfig = [
+    protected array $defaultConfig = [
         'include_paths' => [
             'app',
         ],
@@ -47,45 +33,64 @@ class AnnotationBootstrap extends \think\Service
             'use_default_method' => true,
         ],
     ];
-
-    /**
-     * 进程名称
-     * @var string
-     */
-    protected static string $workerName = '';
-
     /**
      * 注解配置
      * @var array
      */
-    public static array $config = [];
-
-    /**
-     * @param $worker
-     * @return void
-     * @throws ReflectionException
-     */
-    public static function start($worker)
+    public function getConfig()
     {
-        // monitor进程不执行
-        //if ($worker?->name == 'monitor') {
-        //   return;
-        //}
+        // // 获取配置
+        $configOpt = syGetConfig('shiyun.annotation');
+        $config = array_merge($this->defaultConfig, $configOpt);
+        return $config;
+    }
+    protected function getUriFirst()
+    {
+        $requestObj = $this->app->request;
+        $requServer = $requestObj->server();
+        $request_uri = $requServer['REQUEST_URI'];
+        if ($request_uri == '/') {
+        } else {
+            $requSerArr = explode("/", $request_uri);
+            $requSerArr2 = array_filter($requSerArr);
+            $requSerArr = array_merge($requSerArr2);
+            $requFirst = $requSerArr[0];
+        }
 
-        // 跳过忽略的进程
-        // if (!$worker || self::isIgnoreProcess(self::$workerName = $worker->name)) {
-        //     return;
-        // }
+        return "addons/{$requFirst}/controller";
+    }
+    public function boot()
+    {
 
         // // 获取配置
-        // self::$config = config('plugin.shiyun.webman.annotation', []);
-        // $config = self::$config = array_merge(self::$defaultConfig, self::$config);
+        $config = $this->getConfig();
+        if (!empty($config['route']['load_type']) && $config['route']['load_type'] == 'current') {
+            //
+            $config['include_paths'] = [
+                $this->getUriFirst()
+            ];
+        }
 
         RouteAttriLoad::loader();
-
         // 注解扫描
         $generator = AnnotationParse::scanAnnotations($config['include_paths'], $config['exclude_paths']);
-        // 解析注解
-        AnnotationParse::parseAnnotations($generator);
+        // var_dump('--111--');
+        try {
+            // 解析注解
+            AnnotationParse::parseAnnotations($generator);
+            // RouteAttriLoad::register();
+            RouteAnnotationHandle::createRoute();
+        } catch (\Throwable $th) {
+            // throw $th;
+            var_dump('--解析错误-', $th->getMessage());
+        }
+
+        // $this->reader = $reader;
+
+        // //注解路由
+        // $this->registerAnnotationRoute();
+
+        // //自动注入
+        // $this->autoInject();
     }
 }

@@ -7,7 +7,7 @@ namespace shiyun\route\annotation;
 use shiyun\route\annotation\common\RouteAbstract;
 use Attribute;
 
-#[Attribute(Attribute::TARGET_METHOD | Attribute::TARGET_PARAMETER | Attribute::TARGET_PROPERTY | Attribute::IS_REPEATABLE)]
+#[Attribute(Attribute::TARGET_METHOD | Attribute::TARGET_PARAMETER | Attribute::IS_REPEATABLE)]
 class RoutePut extends RouteAbstract
 {
     protected array $attrMust = ['path'];

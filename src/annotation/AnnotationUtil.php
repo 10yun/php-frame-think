@@ -74,8 +74,10 @@ abstract class AnnotationUtil
      */
     public static function basePath(string $path = ''): string
     {
-        $path = base_path($path);
+        $path = root_path($path);
         return self::replaceSeparator($path);
+        // $path = base_path($path);
+        // return self::replaceSeparator($path);
     }
 
     /**

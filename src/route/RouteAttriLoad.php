@@ -9,6 +9,7 @@ use shiyun\annotation\IntfAnnotationLoad;
 use shiyun\route\annotation\{
     RouteFlag,
     RouteGroup,
+    RouteRestful,
     RouteGet,
     RoutePost,
     RoutePut,
@@ -33,6 +34,8 @@ class RouteAttriLoad implements IntfAnnotationLoad
         AnnotationParse::addHandle(RouteFlag::class, RouteAnnotationHandle::class);
         // 路由分组
         AnnotationParse::addHandle(RouteGroup::class, RouteAnnotationHandle::class);
+        // rest路由
+        AnnotationParse::addHandle(RouteRestful::class, RouteAnnotationHandle::class);
         // 路由-GET
         AnnotationParse::addHandle(RouteGet::class, RouteAnnotationHandle::class);
         // 路由-POST
@@ -49,5 +52,10 @@ class RouteAttriLoad implements IntfAnnotationLoad
         AnnotationParse::addHandle(RouteMiddleware::class, RouteAnnotationHandle::class);
         // 验证器注解
         AnnotationParse::addHandle(Validate::class, RouteAnnotationHandle::class);
+    }
+
+    public static function register(): void
+    {
+        RouteAnnotationHandle::createRoute();
     }
 }

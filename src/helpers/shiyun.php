@@ -1,5 +1,22 @@
 <?php
-
+function syGetConfig($get_path = '', $get_def = [])
+{
+    $configPath = root_path() . 'config/';
+    $configOpt = $get_def;
+    // $pathArr =  explode(".", $get_path);
+    // $pathAll = $configPath;
+    // foreach ($pathArr as $pathItem) {
+    //     if (is_dir($pathAll . $pathItem)) {
+    //         continue;
+    //     }
+    // }
+    $confPath = $configPath . str_replace(".", "/", $get_path);
+    $filePath = $confPath . '.php';
+    if (is_file($filePath)) {
+        $configOpt = include $filePath;
+    }
+    return $configOpt;
+}
 function syGetVersion()
 {
     return 'ctocode-v6.22.1129';
