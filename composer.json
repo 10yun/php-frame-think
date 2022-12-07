@@ -24,10 +24,5 @@
     },
     "autoload-dev": {
         "psr-4": {}
-    },
-    "scripts": {
-        "post-autoload-dump": [
-            "shiyun\\bootstrap\\FrameInit::postAutoloadDump"
-        ]
     }
 }

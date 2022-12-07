@@ -26,7 +26,6 @@ class AnnotationBootstrap extends \think\Service
 
     public function boot()
     {
-        echo '注册服务';
         // $this->reader = $reader;
 
         // //注解路由

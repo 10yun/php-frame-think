@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace shiyun\bootstrap;
 
-class FrameInit
+class FrameBootstrap extends \think\Service
 {
-    public static function postAutoloadDump()
+    public function boot()
     {
         $frame_path = preg_replace('/(\/|\\\\){1,}/', '/', __DIR__) . '/';
         $rootPath =  dirname($frame_path, 5) . '/';
@@ -26,5 +26,9 @@ class FrameInit
             }
             copy($source, $target);
         }
+
+        $this->commands([
+            'ConfigPush' => \shiyun\command\ConfigPush::class
+        ]);
     }
 }
