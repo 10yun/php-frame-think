@@ -134,8 +134,6 @@ abstract class AnnotationParse
         string|ReflectionClass $className
     ): Generator {
         $reflectionClass = is_string($className) ? new ReflectionClass($className) : $className;
-        // var_dump('---', $reflectionClass);
-        // 
         /**
          * 获取类的注解
          */

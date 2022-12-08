@@ -24,7 +24,7 @@ use shiyun\validate\annotation\ValidateMiddleware;
 use shiyun\validate\ValidateAnnotationHandle;
 
 use shiyun\support\Route as frameRoute;
-use think\route\Rule as RouteObject;
+use shiyun\support\Rule as RouteObject;
 
 abstract class RouteAnnotationHandle implements IntfAnnotationHandle
 {
@@ -38,7 +38,7 @@ abstract class RouteAnnotationHandle implements IntfAnnotationHandle
      */
     protected static array $controllers = [];
     /**
-     * restfule
+     * restful
      */
     protected static array $restArr = [];
     /**
@@ -211,7 +211,7 @@ abstract class RouteAnnotationHandle implements IntfAnnotationHandle
 
             foreach ($functions as $key => $funcName) {
                 if ($funcName == 'getById') {
-                    self::addRoute($parameters['path'] . "/:id", array_merge($item, [
+                    self::addRoute($parameters['path'] . "/<id>", array_merge($item, [
                         'method' => $funcName,
                         'methods' => 'GET',
                         'pattern' => ['id' => '\d+']
@@ -227,19 +227,19 @@ abstract class RouteAnnotationHandle implements IntfAnnotationHandle
                         'methods' => 'POST',
                     ]));
                 } else if ($funcName == 'putById') {
-                    self::addRoute($parameters['path'] . "/:id", array_merge($item, [
+                    self::addRoute($parameters['path'] . "/<id>", array_merge($item, [
                         'method' => $funcName,
                         'methods' => 'PUT',
                         'pattern' => ['id' => '\d+']
                     ]));
                 } else if ($funcName == 'patchById') {
-                    self::addRoute($parameters['path'] . "/:id", array_merge($item, [
+                    self::addRoute($parameters['path'] . "/<id>", array_merge($item, [
                         'method' => $funcName,
                         'methods' => 'PATCH',
                         'pattern' => ['id' => '\d+']
                     ]));
                 } else if ($funcName == 'deleteById') {
-                    self::addRoute($parameters['path'] . "/:id", array_merge($item, [
+                    self::addRoute($parameters['path'] . "/<id>", array_merge($item, [
                         'method' => $funcName,
                         'methods' => 'DELETE',
                         'pattern' => ['id' => '\d+']

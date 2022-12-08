@@ -1,4 +1,9 @@
 <?php
+
+// 项目路径
+$frame_path = preg_replace('/(\/|\\\\){1,}/', '/', __DIR__) . '/';
+define('_PATH_PROJECT_', dirname($frame_path, 5) . '/');
+
 function syGetConfig($get_path = '', $get_def = [])
 {
     $configPath = root_path() . 'config/';
