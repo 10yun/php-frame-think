@@ -55,18 +55,15 @@ abstract class AnnotationParse
                     $include_all[] = $path_item;
                 }
             } else {
-                $include_all[] = $path;
-            }
-        }
-
-        try {
-            //code...
-            foreach ($include_all as $path) {
-                // 扫描绝对路径
                 if (!str_starts_with($path, "/")) {
                     $path = AnnotationUtil::basePath(AnnotationUtil::replaceSeparator($path));
                 }
-
+                $include_all[] = $path;
+            }
+        }
+        try {
+            // 扫描绝对路径
+            foreach ($include_all as $path) {
                 // 遍历获取文件 
                 yield from AnnotationUtil::findDirectory($path, function (SplFileInfo $item) use ($excludeRegular) {
                     return $item->getExtension() === 'php' && !($excludeRegular && preg_match($excludeRegular, $item->getPathname()));

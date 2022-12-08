@@ -21,6 +21,7 @@ class RouteGet extends RouteAbstract
         public string|array $path = '',
         public string       $name = '',
         public array        $params = [],
+        public ?array       $pattern = null,
     ) {
         // 解析参数
         $this->paresArgs(func_get_args(), 'path');

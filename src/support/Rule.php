@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace shiyun\support;
 
-class Rule extends \think\route\Rule
+use think\Request;
+use think\Route;
+
+abstract class Rule extends \think\route\Rule
 {
 }
