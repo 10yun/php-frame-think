@@ -7,6 +7,7 @@ namespace shiyun\bootstrap;
 use shiyun\annotation\AnnotationParse;
 use shiyun\route\RouteAttriLoad;
 use shiyun\route\RouteAnnotationHandle;
+use think\Route;
 
 class AnnotationBootstrap extends \think\Service
 {
@@ -47,8 +48,8 @@ class AnnotationBootstrap extends \think\Service
     protected function getUriFirst()
     {
         $requestObj = $this->app->request;
-        $requServer = $requestObj->server();
-        $request_uri = $requServer['REQUEST_URI'];
+        $request_uri = $requestObj->baseUrl();
+        // $request_uri = $requServer['REQUEST_URI'] ?? '';
         if ($request_uri == '/') {
         } else {
             $requSerArr = explode("/", $request_uri);
@@ -59,18 +60,22 @@ class AnnotationBootstrap extends \think\Service
 
         return "addons/{$requFirst}/controller";
     }
+    function is_cli()
+    {
+        return preg_match("/cli/i", php_sapi_name()) ? true : false;
+    }
     public function boot()
     {
-
-        // // 获取配置
+        // 获取配置
         $config = $this->getConfig();
-        if (!empty($config['route']['load_type']) && $config['route']['load_type'] == 'current') {
-            //
-            $config['include_paths'] = [
-                $this->getUriFirst()
-            ];
+        if (!$this->is_cli()) {
+            if (!empty($config['route']['load_type']) && $config['route']['load_type'] == 'current') {
+                //
+                $config['include_paths'] = [
+                    $this->getUriFirst()
+                ];
+            }
         }
-
         RouteAttriLoad::loader();
         // 注解扫描
         $generator = AnnotationParse::scanAnnotations($config['include_paths'], $config['exclude_paths']);
@@ -79,7 +84,14 @@ class AnnotationBootstrap extends \think\Service
             // 解析注解
             AnnotationParse::parseAnnotations($generator);
             // RouteAttriLoad::register();
-            RouteAnnotationHandle::createRoute();
+            // RouteAnnotationHandle::createRoute();
+            /**
+             *  可能需要这么注册，才能生成缓存文件
+             */
+            $this->registerRoutes(function (Route $route) {
+                //     $route->get('captcha/[:config]', "\\think\\captcha\\CaptchaController@index");
+                RouteAnnotationHandle::createRoute($route);
+            });
         } catch (\Throwable $th) {
             // throw $th;
             var_dump('--解析错误-', $th->getMessage());

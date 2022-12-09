@@ -32,10 +32,7 @@ class SyAuthAppMiddle
         /**
          * 是否自动鉴权
          */
-        $autoSett = $this->doPassAuto($request);
-        $syAppAutoAuth = $autoSett['_tokenAutoAuth'] ?? false;
-        $syAppAutoBase = $autoSett['_tokenAutoBaseAuth'] ?? true;
-
+        // $autoSett = $this->doPassAuto($request);
 
         $reqParam = $request->param();
 
@@ -45,25 +42,27 @@ class SyAuthAppMiddle
          */
         $syOpenAppProject = $request->header('syOpenAppProject') ?: '';
         $syOpenAppProject = $syOpenAppProject ?: ($reqParam['syOpenAppProject'] ?? '');
-
+        if (empty($syOpenAppProject)) {
+            return sendRespCode401('100105');
+        }
         $maintainInfo = Cache::store('CACHE_STORES_RD2')->get($syOpenAppProject . ":Maintain");
         if (!empty($maintainInfo) && $maintainInfo['weihu_open'] == 'on') {
             return sendRespCode200('900000');
         }
-        /**
-         * 处理 syOpenAppRole
-         * 如果没有header数据，获取 $reqParam['syOpenAppRole'] 数据
-         */
-        $syOpenAppRole = $request->header('syOpenAppRole') ?: '';
-        $syOpenAppRole = $syOpenAppRole ?: ($reqParam['syOpenAppRole'] ?? '');
-
         /**
          * 处理 syOpenAppId
          * 如果没有header数据，获取 $reqParam['syOpenAppId'] 数据
          */
         $syOpenAppId = $request->header('syOpenAppId') ?: '';
         $syOpenAppId = $syOpenAppId ?: ($reqParam['syOpenAppId'] ?? '');
-        if ($syAppAutoAuth && empty($syOpenAppId)) {
+        if (empty($syOpenAppId)) {
+            return sendRespCode401('100106');
+        }
+        /**
+         * 过滤 $syOpenAppId
+         */
+        $pass_appsid = syGetAppsArr();
+        if (!in_array($syOpenAppId, $pass_appsid)) {
             return sendRespCode401('100106');
         }
         /**
@@ -72,31 +71,31 @@ class SyAuthAppMiddle
          */
         $syOpenAppKey = $request->header('syOpenAppKey') ?: '';
         $syOpenAppKey = $syOpenAppKey ?: ($reqParam['syOpenAppKey'] ?? '');
-
-        if ($syAppAutoAuth && empty($syOpenAppKey)) {
+        if (empty($syOpenAppKey)) {
             return sendRespCode401('100107');
         }
-        // syGetProjectBase($syOpenAppProject);
-        // dd($syOpenAppProject);
         /**
-         * 过滤 $syOpenAppId
+         * 处理 syOpenAppRole
+         * 如果没有header数据，获取 $reqParam['syOpenAppRole'] 数据
          */
-        if ($syAppAutoBase) {
-            $pass_appsid = syGetAppsArr();
-            if (!in_array($syOpenAppId, $pass_appsid)) {
-                return sendRespCode401('100106');
-            }
+        $syOpenAppRole = $request->header('syOpenAppRole') ?: '';
+        $syOpenAppRole = $syOpenAppRole ?: ($reqParam['syOpenAppRole'] ?? '');
+        if (empty($syOpenAppRole)) {
+            // return sendRespCode401('100107');
         }
 
         /**
          * 处理 syOpenAppToken
+         * 如果没有header数据，获取 $reqParam['syOpenAppToken'] 数据
          */
         $syOpenAppToken = $request->header('syOpenAppToken') ?: '';
-        // 如果没有header数据，获取 $reqParam['syOpenAppToken'] 数据
         $syOpenAppToken =  $syOpenAppToken ?: ($reqParam['syOpenAppToken'] ?? '');
-        if ($syAppAutoAuth && empty($syOpenAppToken)) {
-            return sendRespCode401('100101');
-            // sendRespCode200(100101, false);
+        if (empty($syOpenAppToken)) {
+            /**
+             * 这里要转移到鉴权token上
+             * 转到 SyAuthTokenMiddle 中间件处理
+             */
+            // return sendRespCode401('100101');
         }
         $fwParam = [];
         $fwParam['syOpenAppProject'] = $syOpenAppProject;
@@ -104,38 +103,12 @@ class SyAuthAppMiddle
         $fwParam['syOpenAppId'] = $syOpenAppId;
         $fwParam['syOpenAppKey'] = $syOpenAppKey;
         $fwParam['syOpenAppToken'] = $syOpenAppToken;
-        $fwParam['syAppAutoAuth'] = $syAppAutoAuth;
-        $fwParam['syAppAutoBase'] = $syAppAutoBase;
         // 设备 类型：ios、android
         $fwParam['syAppClientPlatform'] = $request->header('syOpenAppClientPlatform') ?? '';
         // 获取设备唯一标识
         $fwParam['syAppClientUUID'] = '';
         app('SyOpenAppsAuth')->setAuthData($fwParam);
 
-        $syAppsAccess = [];
-        if ($syAppAutoAuth) {
-            // 是否自动鉴权
-            $syAppsAccess =  app('SyOpenAppsAccess')->getAccessData();
-
-            // 获取全部的禁用用户名单
-            // $ucenterBlcakRpcModelObj = loadAddonRpcClass('v210916_ucenter', 'Black');
-            // $ucenterBlackDatas = $ucenterBlcakRpcModelObj->getListData(array(
-            //     'field' => 'a.account_id'
-            // ));
-            // if (!empty($ucenterBlackDatas['data'])) {
-            //     $tempArr = array();
-            //     foreach ($ucenterBlackDatas['data'] as $key => $val) {
-            //         $tempArr[$key] = $val['account_id'];
-            //     }
-            //     $wsql['ucenter_black'] = implode(',', $tempArr);
-            // }
-            if (empty($syAppsAccess)) {
-                return sendRespCode401('100109');
-            }
-        }
-        if ($syAppsAccess && $syAppsAccess['ucenter_state'] == 9) {
-            return sendRespCode200('100400');
-        }
         return $next($request);
     }
     /**
@@ -231,7 +204,7 @@ class SyAuthAppMiddle
                 ]);
             }
             $reflectObj = new \ReflectionClass($className);
-            // $reflectObj->hasProperty("_tokenAutoBaseAuth") // 是否定义
+            // $reflectObj->hasProperty("_token_") // 是否定义
             $prosArr = $reflectObj->getDefaultProperties(); // 默认的值
             return $prosArr;
         } catch (\LogicException $logicDuh) {

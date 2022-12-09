@@ -23,9 +23,10 @@ use shiyun\validate\annotation\Validate;
 use shiyun\validate\annotation\ValidateMiddleware;
 use shiyun\validate\ValidateAnnotationHandle;
 
-use shiyun\support\Route as frameRoute;
+// use shiyun\support\Route as frameRoute;
 // use shiyun\support\Rule as frameRule;
 use think\route\Rule as frameRule;
+use think\Route as frameRoute;
 
 abstract class RouteAnnotationHandle implements IntfAnnotationHandle
 {
@@ -157,7 +158,7 @@ abstract class RouteAnnotationHandle implements IntfAnnotationHandle
      * @param bool $isClear 是否清除路由
      * @return void
      */
-    public static function createRoute(bool $isClear = true)
+    public static function createRoute(frameRoute $routeObj, bool $isClear = true)
     {
         // $useDefaultMethod = AnnotationBootstrap::$config['route']['use_default_method'] ?? true;
         $useDefaultMethod = true;
@@ -261,7 +262,7 @@ abstract class RouteAnnotationHandle implements IntfAnnotationHandle
         }
 
         // var_dump(self::$routesLast);
-        self::registerRoute();
+        self::registerRoute($routeObj);
         // $all_route = frameRoute::getRoutes();
         // var_dump($all_route);
 
@@ -331,7 +332,7 @@ abstract class RouteAnnotationHandle implements IntfAnnotationHandle
      * @access public
      * @return void
      */
-    protected static function registerRoute()
+    protected static function registerRoute(frameRoute $routeObj)
     {
         foreach (self::$routesLast as $item) {
             $parameters = $item['parameters'];
@@ -351,7 +352,9 @@ abstract class RouteAnnotationHandle implements IntfAnnotationHandle
             }
             $route_addr = "{$item['class']}@{$item['method']}";
             // var_dump('----registerRoute--', $method_str, $route_addr);
-            $route = frameRoute::rule(($item['path'] ?: '/'), $route_addr, $method_str);
+            $route = $routeObj->rule(($item['path'] ?: '/'), $route_addr, $method_str);
+            // $route = frameRoute::rule(($item['path'] ?: '/'), $route_addr, $method_str);
+
             // 路由参数
             // if (!empty($parameters['params'])) {
             //     $route->setName($parameters['params']);
