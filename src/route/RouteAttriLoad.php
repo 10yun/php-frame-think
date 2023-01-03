@@ -58,6 +58,31 @@ class RouteAttriLoad implements IntfAnnotationLoad
     {
         RouteAnnotationHandle::createRoute($routeObj);
     }
+    protected function doParseStr1($oldStr)
+    {
+        $last_str = "";
+        if (is_array($oldStr)) {
+            foreach ($oldStr as $key => $val) {
+                if (is_bool($val)) {
+                    $bool_val =  $val === false ? 'false' : 'true';
+                    $last_str .= sprintf('<p>"%s" : "%s"</p>', $key, $bool_val);
+                } else {
+                    $last_str .= sprintf('<p>"%s" : "%s"</p>', $key, $val);
+                }
+            }
+        }
+        return $last_str;
+    }
+    protected function doParseStr2($oldStr)
+    {
+        $last_str = "";
+        if (is_array($oldStr)) {
+            foreach ($oldStr as $key => $val) {
+                $last_str .=  sprintf('<p>%s</p>', $val);
+            }
+        }
+        return $last_str;
+    }
     public static function debug($routeObj): void
     {
         $routeList = $routeObj->getRuleList();
@@ -67,26 +92,40 @@ class RouteAttriLoad implements IntfAnnotationLoad
             $item['rule'] = empty($item['rule']) ? '-' : htmlentities($item['rule']);
             // $str_option = "-";
             // if (!empty($item['option'])) {
-            //     $str_option = "";
-            //     if (is_array($item['option'])) {
-            //         foreach ($item['option'] as $opt_key => $opt_val) {
-            //             $str_option .= '"' . $opt_key . '":"' . $opt_val . '"';
-            //         }
-            //     }
+            //    
             // }
-            $str_option =  empty($item['option']) ? '' : json_encode($item['option']);
-            $json_pattern = empty($item['pattern']) ? '-' : json_encode($item['pattern']);
+            /** 处理中间件 */
+            $middlewareStr =  '-';
+            if (!empty($item['option']['middleware']) || array_key_exists('middleware', $item['option'])) {
+                $middlewareStr = (new self())->doParseStr2($item['option']['middleware']);
+                unset($item['option']['middleware']);
+            }
+            /** 处理追加 */
+            $appendStr = '-';
+            if (!empty($item['option']['append'])) {
+                $appendStr = (new self())->doParseStr1($item['option']['append']);
+                unset($item['option']['append']);
+            }
+            $optionStr = '-';
+            $optionStr = (new self())->doParseStr1($item['option']);
+            $patternStr = '-';
+            $patternStr = (new self())->doParseStr1($item['pattern']);
+
             $htmlTableBody .= <<<EOF
 <tr>
-    <td rowspan="2">{$item['rule']}</td>
-    <td>{$item['route']}</td>
-    <td rowspan="2">{$item['method']}</td>
-    <td rowspan="2">{$item['domain']}</td>
-    <td rowspan="2">{$str_option}</td>
-    <td rowspan="2">{$json_pattern}</td>
-</tr>
-<tr>
-    <td>{$item['name']}</td>
+    <td>{$item['rule']}</td>
+    <td>
+        <div class="debug-text">
+            <p>{$item['name']}</p>
+            <p>{$item['route']}</p>
+        </div>
+    </td>
+    <td>{$item['method']}</td>
+    <td>{$item['domain']}</td>
+    <td><div class="debug-text">{$optionStr}</div></td>
+    <td><div class="debug-text">{$appendStr}</div></td>
+    <td><div class="debug-text">{$middlewareStr}</div></td>
+    <td><div class="debug-text" >{$patternStr}</div></td>
 </tr>
 EOF;
 
@@ -95,21 +134,32 @@ EOF;
 
         $htmlTableAll = <<<EOF
 <style>
+* {
+    box-sizing: border-box;
+    font-size: 13px;
+    margin: 0;
+    padding: 0;
+}
 body {
-   
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 13px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
 }
 .debug-box{
     background: #000;
     color: #56DB3A;  
-    display: flex;
-    flex-direction: column-reverse;
-    justify-content: flex-end;
     margin: auto;
     padding: 15px;
     word-wrap: break-word;
-    font-family: Helvetica, Arial, sans-serif;
-    font-size: 14px;
-    line-height: 1.4;
+}
+.debug-text{
+    word-wrap: break-word;
+    padding: 2px;
+}
+.debug-text p{
 }
 table.debug-table{
   border: 1px solid #629755;
@@ -132,24 +182,26 @@ table.debug-table tbody td {
   padding: 5px 5px;
 }
 </style>
-<pre class="debug-box">
+<div class="debug-box">
 <table class="debug-table">
     <thead>
         <tr>
-            <td rowspan="2" align="left">Rule</td>
-            <td>Route</td>
-            <td rowspan="3">Method</td>
-            <td rowspan="3">Domain</td>
-            <td rowspan="3">Option</td>
-            <td rowspan="3">Pattern</td>
-        </tr>
-        <tr>
-            <td>Name</td>
+            <td align="left">Rule</td>
+            <td align="left">
+                <p>Route</p>
+                <p>Name</p>
+            </td>
+            <td>Method</td>
+            <td>Domain</td>
+            <td>Option</td>
+            <td>Append</td>
+            <td>Middleware</td>
+            <td>Pattern</td>
         </tr>
     </thead>
     <tbody>{$htmlTableBody}</tbody>
 </table>
-</pre>
+</div>
 EOF;
 
         // EOF 独立一行

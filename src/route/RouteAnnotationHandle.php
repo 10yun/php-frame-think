@@ -211,55 +211,71 @@ abstract class RouteAnnotationHandle implements IntfAnnotationHandle
             // 添加路由
             foreach ($functions as $key => $funcName) {
                 if ($funcName == 'getById') {
-                    $item['parameters']['methods'] = 'GET';
-                    $item['parameters']['pattern'] = ['id' => '\d+'];
                     self::addRoute($parameters['path'] . "/<id>", array_merge($item, [
+                        'parameters' => array_merge($parameters, [
+                            'methods' => 'GET',
+                            'pattern' => ['id' => '\d+'],
+                        ]),
                         'method' => $funcName,
                         'methods' => 'GET',
                     ]));
                 } else if ($funcName == 'getData') {
-                    $item['parameters']['methods'] = 'GET';
                     self::addRoute($parameters['path'], array_merge($item, [
+                        'parameters' => array_merge($parameters, [
+                            'methods' => 'GET',
+                        ]),
                         'method' => $funcName,
                         'methods' => 'GET',
                     ]));
                 } else if ($funcName == 'postData') {
-                    $item['parameters']['methods'] = 'POST';
                     self::addRoute($parameters['path'], array_merge($item, [
+                        'parameters' => array_merge($parameters, [
+                            'methods' => 'POST',
+                        ]),
                         'method' => $funcName,
                         'methods' => 'POST',
                     ]));
                 } else if ($funcName == 'postById') {
-                    $item['parameters']['methods'] = 'POST';
-                    $item['parameters']['pattern'] = ['id' => '\d+'];
                     self::addRoute($parameters['path'], array_merge($item, [
+                        'parameters' => array_merge($parameters, [
+                            'methods' => 'POST',
+                            'pattern' => ['id' => '\d+'],
+                        ]),
                         'method' => $funcName,
                         'methods' => 'POST',
                     ]));
                 } else if ($funcName == 'putById') {
-                    $item['parameters']['methods'] = 'PUT';
-                    $item['parameters']['pattern'] = ['id' => '\d+'];
                     self::addRoute($parameters['path'] . "/<id>", array_merge($item, [
+                        'parameters' => array_merge($parameters, [
+                            'methods' => 'PUT',
+                            'pattern' => ['id' => '\d+'],
+                        ]),
                         'method' => $funcName,
                         'methods' => 'PUT',
                     ]));
                 } else if ($funcName == 'patchById') {
-                    $item['parameters']['methods'] = 'PATCH';
-                    $item['parameters']['pattern'] = ['id' => '\d+'];
                     self::addRoute($parameters['path'] . "/<id>", array_merge($item, [
+                        'parameters' => array_merge($parameters, [
+                            'methods' => 'PATCH',
+                            'pattern' => ['id' => '\d+'],
+                        ]),
                         'method' => $funcName,
                         'methods' => 'PATCH',
                     ]));
                 } else if ($funcName == 'deleteById') {
-                    $item['parameters']['methods'] = 'DELETE';
-                    $item['parameters']['pattern'] = ['id' => '\d+'];
                     self::addRoute($parameters['path'] . "/<id>", array_merge($item, [
+                        'parameters' => array_merge($parameters, [
+                            'methods' => 'DELETE',
+                            'pattern' => ['id' => '\d+'],
+                        ]),
                         'method' => $funcName,
                         'methods' => 'DELETE',
                     ]));
                 } else if ($funcName == 'deleteData') {
-                    $item['parameters']['methods'] = 'DELETE';
                     self::addRoute($parameters['path'], array_merge($item, [
+                        'parameters' => array_merge($parameters, [
+                            'methods' => 'DELETE',
+                        ]),
                         'method' => $funcName,
                         'methods' => 'DELETE',
                     ]));
@@ -372,6 +388,12 @@ abstract class RouteAnnotationHandle implements IntfAnnotationHandle
             // 路由规则
             if (!empty($parameters['pattern'])) {
                 $route->pattern($parameters['pattern']);
+            }
+            if (!empty($parameters['append'])) {
+                $route->append($parameters['append']);
+            }
+            if (!empty($parameters['ext'])) {
+                $route->ext($parameters['ext']);
             }
             // 路由中间件
             self::addMiddleware($route, $item['class'], $item['method']);
