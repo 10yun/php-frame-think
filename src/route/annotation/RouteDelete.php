@@ -11,7 +11,7 @@ use Attribute;
 class RouteDelete extends RouteAbstract
 {
     protected array $attrMust = ['path'];
-    public string|array $methods = ['DELETE', 'OPTIONS'];
+    public string|array $methods = ['OPTIONS', 'DELETE'];
 
     /**
      * @param string|array $path 路由路径 使用"/"开始则忽略控制器分组路径

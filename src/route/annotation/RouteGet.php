@@ -11,8 +11,8 @@ use Attribute;
 class RouteGet extends RouteAbstract
 {
     protected array $attrMust = ['path'];
-    protected array $_defaultValues = ['methods' => ['GET', 'OPTIONS']];
-    protected string|array $methods = ['GET', 'OPTIONS'];
+    protected array $_defaultValues = ['methods' => ['OPTIONS', 'GET']];
+    protected string|array $methods = ['OPTIONS', 'GET'];
 
     /**
      * @param string|array $path 路由路径 使用"/"开始则忽略控制器分组路径

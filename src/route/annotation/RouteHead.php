@@ -10,7 +10,7 @@ use Attribute;
 #[Attribute(Attribute::TARGET_CLASS | Attribute::TARGET_METHOD)]
 class RouteHead extends RouteAbstract
 {
-    protected string|array $methods = ['HEAD', 'OPTIONS'];
+    protected string|array $methods = ['OPTIONS', 'HEAD'];
     public function __construct(
         public string|array $prefix = '',
     ) {

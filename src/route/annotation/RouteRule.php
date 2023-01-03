@@ -25,7 +25,7 @@ class RouteRule extends RouteAbstract
      */
     public function __construct(
         public string|array $path = '',
-        public string|array $methods = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS'],
+        public string|array $methods = ['OPTIONS', 'HEAD', 'GET', 'POST', 'PUT', 'DELETE', 'PATCH', '*'],
         public string       $name = '',
         public array        $params = [],
         public ?array       $pattern = null,

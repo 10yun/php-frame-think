@@ -18,7 +18,7 @@ class RouteRestful extends RouteAbstract
 
     public function __construct(
         public string|array $path = '',
-        public string|array $methods = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS'],
+        public string|array $methods = ['OPTIONS', 'HEAD', 'GET', 'POST', 'PUT', 'PATCH', 'DELETE', '*'],
         public string       $name = '',
         public array        $params = [],
         // 定义资源变量名

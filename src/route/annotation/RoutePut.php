@@ -11,7 +11,7 @@ use Attribute;
 class RoutePut extends RouteAbstract
 {
     protected array $attrMust = ['path'];
-    protected string|array $methods = ['PUT', 'OPTIONS'];
+    protected string|array $methods = ['OPTIONS', 'PUT'];
 
     /**
      * @param string|array $path 路由路径 使用"/"开始则忽略控制器分组路径

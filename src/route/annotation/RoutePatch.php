@@ -11,7 +11,7 @@ use Attribute;
 class RoutePatch extends RouteAbstract
 {
     protected array $attrMust = ['path'];
-    protected string|array $methods = ['PATCH', 'OPTIONS'];
+    protected string|array $methods = ['OPTIONS', 'PATCH'];
 
     /**
      * @param string|array $path 路由路径 使用"/"开始则忽略控制器分组路径
