@@ -2,7 +2,7 @@
 
 return [
     'include_paths' => [
-        'app',
+        'app/controller',
     ],
     'exclude_paths' => [],
     'route' => [

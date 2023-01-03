@@ -27,7 +27,7 @@ class AnnotationBootstrap extends \think\Service
     // }
     protected array $defaultConfig = [
         'include_paths' => [
-            'app',
+            'app/controller',
         ],
         'exclude_paths' => [],
         'route' => [
