@@ -225,6 +225,12 @@ abstract class RouteAnnotationHandle implements IntfAnnotationHandle
                     ]));
                 } else if ($funcName == 'postData') {
                     $item['parameters']['methods'] = 'POST';
+                    self::addRoute($parameters['path'], array_merge($item, [
+                        'method' => $funcName,
+                        'methods' => 'POST',
+                    ]));
+                } else if ($funcName == 'postById') {
+                    $item['parameters']['methods'] = 'POST';
                     $item['parameters']['pattern'] = ['id' => '\d+'];
                     self::addRoute($parameters['path'], array_merge($item, [
                         'method' => $funcName,

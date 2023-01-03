@@ -8,9 +8,8 @@ use shiyun\route\annotation\common\RouteAbstract;
 use Attribute;
 
 /**
- * 注册路由
+ * rule路由
  */
-// #[Attribute(Attribute::TARGET_CLASS )]
 #[Attribute(Attribute::TARGET_METHOD | Attribute::TARGET_PARAMETER | Attribute::IS_REPEATABLE)]
 class RouteRule extends RouteAbstract
 {
@@ -20,16 +19,19 @@ class RouteRule extends RouteAbstract
      * @param string|array $methods 请求方法 例：GET 或 ['GET', 'POST']，默认为所有方法
      * @param string $name 路由名称 用于生成url的别名
      * @param array $params 路由参数
+     * @param array $pattern 路由规则
+     * @param array $append 路由追加参数
+     * @param array $ext 路由后缀
      */
     public function __construct(
         public string|array $path = '',
         public string|array $methods = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS'],
         public string       $name = '',
         public array        $params = [],
-
+        public ?array       $pattern = null,
+        public array        $append = [],
+        public ?string      $ext = null,
         // public null|string|array $middleware = null,
-        // // 后缀
-        // public ?string           $ext = null,
         // public ?string           $deny_ext = null,
         // public ?bool             $https = null,
         // public ?string           $domain = null,
@@ -39,8 +41,6 @@ class RouteRule extends RouteAbstract
         // public ?bool             $pjax = null,
         // public ?bool             $json = null,
         // public ?array            $filter = null,
-        // public array            $append = [],
-        // public ?array            $pattern = null,
         // // 单独设置路由到特定组
         // public ?string           $setGroup = null,
     ) {

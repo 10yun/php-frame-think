@@ -6,25 +6,25 @@ namespace shiyun\bootstrap;
 
 use shiyun\annotation\AnnotationParse;
 use shiyun\route\RouteAttriLoad;
-use shiyun\route\RouteAnnotationHandle;
 use think\Route;
 
 class AnnotationBootstrap extends \think\Service
 {
     // public function register()
     // {
-    //     AnnotationReader::addGlobalIgnoredName('mixin');
+    //     // var_dump('---AnnotationBootstrap---register---');
 
-    //     // TODO: this method is deprecated and will be removed in doctrine/annotations 2.0
-    //     AnnotationRegistry::registerLoader('class_exists');
-
-    //     $this->app->bind(Reader::class, function (App $app, Config $config, Cache $cache) {
-
-    //         $store = $config->get('annotation.store');
-
-    //         return new CachedReader(new AnnotationReader(), $cache->store($store), $app->isDebug());
-    //     });
+    //     // AnnotationReader::addGlobalIgnoredName('mixin');
+    //     // // TODO: this method is deprecated and will be removed in doctrine/annotations 2.0
+    //     // AnnotationRegistry::registerLoader('class_exists');
+    //     // $this->app->bind(Reader::class, function (App $app, Config $config, Cache $cache) {
+    //     //     $store = $config->get('annotation.store');
+    //     //     return new CachedReader(new AnnotationReader(), $cache->store($store), $app->isDebug());
+    //     // });
     // }
+
+
+
     protected array $defaultConfig = [
         'include_paths' => [
             'app/controller',
@@ -66,31 +66,44 @@ class AnnotationBootstrap extends \think\Service
     }
     public function boot()
     {
-        // 获取配置
-        $config = $this->getConfig();
-        if (!$this->is_cli()) {
-            if (!empty($config['route']['load_type']) && $config['route']['load_type'] == 'current') {
-                //
-                $config['include_paths'] = [
-                    $this->getUriFirst()
-                ];
-            }
-        }
-        RouteAttriLoad::loader();
-        // 注解扫描
-        $generator = AnnotationParse::scanAnnotations($config['include_paths'], $config['exclude_paths']);
-        // var_dump('--111--');
+        // var_dump('---AnnotationBootstrap---boot---');
         try {
+            // 加载
+            RouteAttriLoad::loader();
+            // 获取配置
+            $config = $this->getConfig();
+            if (!$this->is_cli()) {
+                if (!empty($config['route']['load_type']) && $config['route']['load_type'] == 'current') {
+                    //
+                    $config['include_paths'] = [
+                        $this->getUriFirst()
+                    ];
+                }
+            }
+            // 注解扫描
+            $generator = AnnotationParse::scanAnnotations($config['include_paths'], $config['exclude_paths']);
             // 解析注解
             AnnotationParse::parseAnnotations($generator);
-            // RouteAttriLoad::register();
-            // RouteAnnotationHandle::createRoute();
             /**
-             *  可能需要这么注册，才能生成缓存文件
+             *  目前需要这么注册，才能生成缓存文件
              */
-            $this->registerRoutes(function (Route $route) {
+            $this->registerRoutes(function (Route $routeObj) use ($config) {
                 //     $route->get('captcha/[:config]', "\\think\\captcha\\CaptchaController@index");
-                RouteAnnotationHandle::createRoute($route);
+                RouteAttriLoad::register($routeObj);
+
+                if (!empty($config['route']['debug']) && $config['route']['debug'] == 'html') {
+                    /**
+                     * 调试展示 - html
+                     */
+                    RouteAttriLoad::debug($routeObj);
+                    dd();
+                } else if (!empty($config['route']['debug']) && $config['route']['debug'] == 'dump') {
+                    /**
+                     * 调试展示 - dump
+                     */
+                    $allRule = $routeObj->getRuleList();
+                    dd('----555----', $allRule);
+                }
             });
         } catch (\Throwable $th) {
             // throw $th;
