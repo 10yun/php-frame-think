@@ -70,7 +70,7 @@ abstract class AnnotationParse
                 });
             }
         } catch (\Throwable $th) {
-            var_dump($th->getMessage());
+            // var_dump('---', $th->getMessage());
             //throw $th;
         }
     }
