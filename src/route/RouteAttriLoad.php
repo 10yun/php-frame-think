@@ -87,7 +87,8 @@ class RouteAttriLoad implements IntfAnnotationLoad
     {
         $routeList = $routeObj->getRuleList();
         $htmlTableBody = '';
-        foreach ($routeList as $item) {
+        foreach ($routeList as $key_no => $item) {
+            $keyNO = $key_no + 1;
             $item['route'] = $item['route'] instanceof \Closure ? '<Closure>' : htmlentities($item['route']);
             $item['rule'] = empty($item['rule']) ? '-' : htmlentities($item['rule']);
             // $str_option = "-";
@@ -111,8 +112,10 @@ class RouteAttriLoad implements IntfAnnotationLoad
             $patternStr = '-';
             $patternStr = (new self())->doParseStr1($item['pattern']);
 
+
             $htmlTableBody .= <<<EOF
 <tr>
+    <td align="center">{$keyNO}</td>
     <td>{$item['rule']}</td>
     <td>
         <div class="debug-text">
@@ -178,14 +181,12 @@ table.debug-table td {
   border: 1px solid #629755;
   color: #56DB3A;
 }
-table.debug-table tbody td {
-  padding: 5px 5px;
-}
 </style>
 <div class="debug-box">
 <table class="debug-table">
     <thead>
         <tr>
+            <td align="center">No.</td>
             <td align="left">Rule</td>
             <td align="left">
                 <p>Route</p>
