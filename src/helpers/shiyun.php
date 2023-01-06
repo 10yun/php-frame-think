@@ -1,6 +1,10 @@
 <?php
 
 // 项目路径
+
+use shiyun\support\Response;
+use shiyun\support\Request;
+
 $frame_path = preg_replace('/(\/|\\\\){1,}/', '/', __DIR__) . '/';
 define('_PATH_PROJECT_', dirname($frame_path, 5) . '/');
 
@@ -36,6 +40,17 @@ function syGetHeader()
         'syOpenAppToken' => syOpenAppsAuth('syOpenAppToken'),
     ];
 }
+function syGetEnvironment()
+{
+    $environment = frameGetEnv('ctocode.environment');
+    if (empty($environment)) {
+        return false;
+    }
+    if ($environment !== 'development') {
+        return false;
+    }
+    return true;
+}
 /**
  * 获取项目配置
  */
@@ -49,6 +64,72 @@ function syGetProjectSett($diy_name = '')
     if (file_exists($sett_path)) {
         $settArray = include $sett_path;
     }
+    return $settArray;
+}
+/**
+ * 获取yaml的mysql配置
+ */
+function syGetProjectMysql()
+{
+    $OpenAppAuthObj = new \shiyun\connection\OpenAppAuth();
+    $OpenAppAuthObj->initAuthData();
+    $authAppData = $OpenAppAuthObj->getAuthData();
+
+    $settArray = [];
+    $yamlData = [];
+
+    if (!empty($authAppData['syOpenAppProject'])) {
+        // 是否开发环境配置
+        if (syGetEnvironment()) {
+            $pathStr = root_path() . 'project/' . $authAppData['syOpenAppProject'] . '/database.dev.yml';
+            if (!file_exists($pathStr)) {
+                $pathStr = root_path() . 'project/' . $authAppData['syOpenAppProject'] . '/database.yml';
+            }
+        } else {
+            $pathStr = root_path() . 'project/' . $authAppData['syOpenAppProject'] . '/database.yml';
+        }
+        if (file_exists($pathStr)) {
+            $yamlData = yaml_parse_file($pathStr);
+        }
+    }
+    $settArray = [
+        'hostname' => $yamlData['MYSQL_HOSTNAME'] ?? '', // 服务器地址
+        'hostport' => $yamlData['MYSQL_HOSTPORT'] ?? '3306', // 端口
+        'username' => $yamlData['MYSQL_USERNAME'] ?? '', // 用户
+        'password' => $yamlData['MYSQL_PASSWORD'] ?? '', // 密码
+        'database' =>  $yamlData['MYSQL_DATABASE'] ?? '' // 数据库名
+    ];
+    return $settArray;
+}
+
+function syGetProjectRedis()
+{
+    $OpenAppAuthObj = new \shiyun\connection\OpenAppAuth();
+    $OpenAppAuthObj->initAuthData();
+    $authAppData = $OpenAppAuthObj->getAuthData();
+
+    $settArray = [];
+    $yamlData = [];
+    if (!empty($authAppData['syOpenAppProject'])) {
+        // 是否开发环境配置
+        if (syGetEnvironment()) {
+            $pathStr = root_path() . 'project/' . $authAppData['syOpenAppProject'] . '/database.dev.yml';
+            if (!file_exists($pathStr)) {
+                $pathStr = root_path() . 'project/' . $authAppData['syOpenAppProject'] . '/database.yml';
+            }
+        } else {
+            $pathStr = root_path() . 'project/' . $authAppData['syOpenAppProject'] . '/database.yml';
+        }
+        if (file_exists($pathStr)) {
+            $yamlData = yaml_parse_file($pathStr);
+        }
+    }
+    $settArray = [
+        'host' => $yamlData['REDIS_HOST'] ?? '', // 服务器地址
+        'port' => $yamlData['REDIS_PORT'] ?? '63379', // 端口
+        'user' => $yamlData['REDIS_USER'] ?? '', // 用户
+        'password' => $yamlData['REDIS_PASSWORD'] ?? '', // 密码
+    ];
     return $settArray;
 }
 
@@ -76,7 +157,6 @@ function syGetAppsSett($diy_name = '')
     }
     $settArray = [];
     if (!empty($diy_name)) {
-
         $configPath = root_path() . '/project/*/apps/' . $diy_name . '.yml';
         $configArr = glob($configPath);
         if (!empty($configArr[0])) {

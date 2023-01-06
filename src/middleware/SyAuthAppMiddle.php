@@ -21,8 +21,9 @@ class SyAuthAppMiddle
     public function handle($request, \Closure $next)
     {
         // frameLogsFile('SyAuthAppMiddleware  ----- ');
-
-
+        $OpenAppAuthObj = new \shiyun\connection\OpenAppAuth();
+        $OpenAppAuthObj->initAuthData();
+        $authAppData = $OpenAppAuthObj->getAuthData();
         /**
          *  接收 appid + appkey
          *  验证 appsecret 
@@ -34,81 +35,53 @@ class SyAuthAppMiddle
          */
         // $autoSett = $this->doPassAuto($request);
 
-        $reqParam = $request->param();
+
 
         /**
-         * 处理 syOpenAppProject
-         * 如果没有header数据，获取 $reqParam['syOpenAppProject'] 数据
+         * 判断：项目
          */
-        $syOpenAppProject = $request->header('syOpenAppProject') ?: '';
-        $syOpenAppProject = $syOpenAppProject ?: ($reqParam['syOpenAppProject'] ?? '');
-        if (empty($syOpenAppProject)) {
+        if (empty($authAppData['syOpenAppProject'])) {
             return sendRespCode401('100105');
         }
-        $maintainInfo = Cache::store('CACHE_STORES_RD2')->get($syOpenAppProject . ":Maintain");
-        if (!empty($maintainInfo) && $maintainInfo['weihu_open'] == 'on') {
-            return sendRespCode200('900000');
-        }
+        // $maintainInfo = Cache::store('CACHE_STORES_RD2')->get($authAppData['syOpenAppProject'] . ":Maintain");
+        // if (!empty($maintainInfo) && $maintainInfo['weihu_open'] == 'on') {
+        //     return sendRespCode200('900000');
+        // }
         /**
-         * 处理 syOpenAppId
-         * 如果没有header数据，获取 $reqParam['syOpenAppId'] 数据
+         * 判断：appID
          */
-        $syOpenAppId = $request->header('syOpenAppId') ?: '';
-        $syOpenAppId = $syOpenAppId ?: ($reqParam['syOpenAppId'] ?? '');
-        if (empty($syOpenAppId)) {
+        if (empty($authAppData['syOpenAppId'])) {
             return sendRespCode401('100106');
         }
         /**
          * 过滤 $syOpenAppId
          */
         $pass_appsid = syGetAppsArr();
-        if (!in_array($syOpenAppId, $pass_appsid)) {
+        if (!in_array($authAppData['syOpenAppId'], $pass_appsid)) {
             return sendRespCode401('100106');
         }
         /**
-         * 处理 syOpenAppKey
-         * 如果没有header数据，获取 $reqParam['syOpenAppKey'] 数据
+         * appKey
          */
-        $syOpenAppKey = $request->header('syOpenAppKey') ?: '';
-        $syOpenAppKey = $syOpenAppKey ?: ($reqParam['syOpenAppKey'] ?? '');
-        if (empty($syOpenAppKey)) {
+        if (empty($authAppData['syOpenAppKey'])) {
             return sendRespCode401('100107');
         }
         /**
-         * 处理 syOpenAppRole
-         * 如果没有header数据，获取 $reqParam['syOpenAppRole'] 数据
+         * 判断：角色
          */
-        $syOpenAppRole = $request->header('syOpenAppRole') ?: '';
-        $syOpenAppRole = $syOpenAppRole ?: ($reqParam['syOpenAppRole'] ?? '');
-        if (empty($syOpenAppRole)) {
+        if (empty($authAppData['syOpenAppRole'])) {
             // return sendRespCode401('100107');
         }
-
         /**
-         * 处理 syOpenAppToken
-         * 如果没有header数据，获取 $reqParam['syOpenAppToken'] 数据
+         * 判断：token
          */
-        $syOpenAppToken = $request->header('syOpenAppToken') ?: '';
-        $syOpenAppToken =  $syOpenAppToken ?: ($reqParam['syOpenAppToken'] ?? '');
-        if (empty($syOpenAppToken)) {
+        if (empty($authAppData['syOpenAppToken'])) {
             /**
              * 这里要转移到鉴权token上
              * 转到 SyAuthTokenMiddle 中间件处理
              */
             // return sendRespCode401('100101');
         }
-        $fwParam = [];
-        $fwParam['syOpenAppProject'] = $syOpenAppProject;
-        $fwParam['syOpenAppRole'] = $syOpenAppRole;
-        $fwParam['syOpenAppId'] = $syOpenAppId;
-        $fwParam['syOpenAppKey'] = $syOpenAppKey;
-        $fwParam['syOpenAppToken'] = $syOpenAppToken;
-        // 设备 类型：ios、android
-        $fwParam['syAppClientPlatform'] = $request->header('syOpenAppClientPlatform') ?? '';
-        // 获取设备唯一标识
-        $fwParam['syAppClientUUID'] = '';
-        app('SyOpenAppsAuth')->setAuthData($fwParam);
-
         return $next($request);
     }
     /**

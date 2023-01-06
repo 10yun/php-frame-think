@@ -118,9 +118,9 @@ function frameGetDbInit($settData = [], $database = '')
     ];
     return array_merge($initData, array(
         'hostport' => $settData['hostport'] ?? '3306',
-        'hostname' => $settData['hostname'], // 服务器地
-        'username' => $settData['username'], // 用户
-        'password' => $settData['password'], // 密码
-        'database' => $database // 数据库名
+        'hostname' => $settData['hostname'] ?? '', // 服务器地
+        'username' => $settData['username'] ?? '', // 用户
+        'password' => $settData['password'] ?? '', // 密码
+        'database' => !empty($database) ? $database : ($settData['database'] ?? '') // 数据库名
     ));
 }

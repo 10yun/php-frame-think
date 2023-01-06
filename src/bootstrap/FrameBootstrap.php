@@ -8,22 +8,15 @@ class FrameBootstrap extends \think\Service
 {
     public function boot()
     {
-        /**
-         * slb 处理 无法获取是否https
-         * （注意：需要在 slb 高级配置里勾选“ 通过X-Forwarded-Proto头字段获取SLB的监听协议 ”）
-         */
-        $is = isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && 'https' == $_SERVER['HTTP_X_FORWARDED_PROTO'];
-        $this->app->request->server('HTTPS', $is ? 'on' : 'off');
-
-        //
-        $this->doConfigFile();
+        // var_dump('FrameBootstrap   boot'); 
+        $this->copyConfigFile();
         //
         $this->commands([
             'ConfigPush' => \shiyun\command\ConfigPush::class
         ]);
     }
 
-    protected function doConfigFile()
+    protected function copyConfigFile()
     {
         $frame_path = preg_replace('/(\/|\\\\){1,}/', '/', __DIR__) . '/';
         $rootPath =  dirname($frame_path, 5) . '/';

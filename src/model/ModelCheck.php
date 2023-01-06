@@ -25,7 +25,7 @@ class ModelCheck extends Model
             && !empty($this->pk)
             && !empty($this->check_exist_field)
         ) {
-            $currRole = SyOpenAppsAuth('syOpenAppRole');
+            $currRole = syOpenAppsAuth('syOpenAppRole');
             $wsqlRole = [];
             if (!empty($currRole)) {
                 if ($currRole == 'org-business') {
