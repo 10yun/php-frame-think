@@ -2,9 +2,6 @@
 
 namespace shiyun\middleware\role;
 
-use shiyun\support\Db;
-use app\common\RoleOrgLogs;
-
 /**
  * agent鉴权
  */
@@ -34,6 +31,8 @@ class AgentMiddle
     public function end(\think\Response $response)
     {
         // frameLogsDebug('执行结束了');
-        RoleOrgLogs::addEndLog('agent端');
+        event('syRoleOrgLogs', [
+            'type' => 'agent端'
+        ]);
     }
 }

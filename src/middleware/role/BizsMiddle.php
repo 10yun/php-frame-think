@@ -2,8 +2,6 @@
 
 namespace shiyun\middleware\role;
 
-use app\common\RoleOrgLogs;
-
 /**
  * 商家鉴权
  */
@@ -33,6 +31,8 @@ class BizsMiddle
     public function end(\think\Response $response)
     {
         // frameLogsDebug('执行结束了');
-        RoleOrgLogs::addEndLog('商家端');
+        event('syRoleOrgLogs', [
+            'type' => '商家端'
+        ]);
     }
 }

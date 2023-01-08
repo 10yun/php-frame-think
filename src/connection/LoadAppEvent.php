@@ -24,11 +24,13 @@ namespace shiyun\connection;
  * 鉴权的时候 获取 【apps应用独立事件配置】
  * @author ctocode
  */
-class OpenAppEvent
+class LoadAppEvent
 {
+    protected $app;
     public $eventData = [];
     public function register()
     {
+        $this->app = app();
 
         // 可以参考 tp6的加载应用相关配置
         // $appPath = $this->getAppPath();
@@ -52,16 +54,19 @@ class OpenAppEvent
         // }
 
         // if (is_file($appPath . 'event.php')) {
+        //     app()->loadEvent();
         //     $this->loadEvent(include $appPath . 'event.php');
         // }
 
         // if (is_file($appPath . 'service.php')) {
+        //     app()->register();
         //     $services = include $appPath . 'service.php';
         //     foreach ($services as $service) {
         //         $this->register($service);
         //     }
         // }
         // $this->app->event->listen('HttpRun', function () {
+        //     app()->register();
         //     $this->app->middleware->add(MultiApp::class);
         // });
 
@@ -74,10 +79,10 @@ class OpenAppEvent
         //     'think\route\Url' => Url::class,
         // ]);
 
-        bind('SyOpenAppsEve', function () {
-            $class = new \shiyun\connection\OpenAppEvent();
-            return $class;
-        });
+        // bind('SyOpenAppsEve', function () {
+        //     $class = new \shiyun\connection\OpenAppEvent();
+        //     return $class;
+        // });
         // bind('SyOpenAppsEve', 'shiyun\connection\SyOpenAppsEve');
     }
     public function boot()

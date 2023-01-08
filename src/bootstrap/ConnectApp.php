@@ -12,7 +12,7 @@ class ConnectApp extends \think\Service
 
 
         // 应用接入参数
-        $this->app->bind('SyOpenAppsAuth', \shiyun\connection\OpenAppAuth::class);
+        // $this->app->bind('SyOpenAppsAuth', \shiyun\connection\OpenAppAuth::class);
         $this->app->bind('SyOpenAppsAuth', function () {
             $class = new \shiyun\connection\OpenAppAuth();
             $class->initAuthData();

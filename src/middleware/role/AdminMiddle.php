@@ -2,8 +2,6 @@
 
 namespace shiyun\middleware\role;
 
-use app\common\RoleOrgLogs;
-
 /**
  * 超管鉴权
  */
@@ -33,6 +31,8 @@ class AdminMiddle
     public function end(\think\Response $response)
     {
         // frameLogsDebug('执行结束了');
-        RoleOrgLogs::addEndLog('超管端');
+        event('syRoleOrgLogs', [
+            'type' => '超管端'
+        ]);
     }
 }

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 use think\Response;
 use shiyunUtils\helper\HelperArr;
-use app\common\exception\ApiException;
 
 /**
  * 返回一个结果
@@ -64,7 +63,7 @@ function sendRespError($msg = null, $code = 404, $data = null): Response
         $data = $temp_msg;
     }
     // throw new ApiException($msg, $code, $data);
-    new ApiException($msg, $code, $data);
+    // throw new \app\common\exception\ApiException($msg, $code, $data);
     return sendRespInfo([
         'status' => $code,
         'success' => false,

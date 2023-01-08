@@ -8,6 +8,16 @@ use shiyun\support\Request;
 $frame_path = preg_replace('/(\/|\\\\){1,}/', '/', __DIR__) . '/';
 define('_PATH_PROJECT_', dirname($frame_path, 5) . '/');
 
+
+function sy_vendor_path()
+{
+    return root_path() . 'vendor/';
+}
+function sy_template_path()
+{
+    return root_path() . 'vendor/shiyun/template/';
+}
+
 function syGetConfig($get_path = '', $get_def = [])
 {
     $configPath = root_path() . 'config/';
@@ -60,9 +70,15 @@ function syGetProjectSett($diy_name = '')
         return [];
     }
     $settArray = [];
-    $sett_path = root_path() . '/project/' . $diy_name . '/project.php';
-    if (file_exists($sett_path)) {
-        $settArray = include $sett_path;
+    $sett_path1 = root_path() . '/project/' . $diy_name . '/project.php';
+    if (file_exists($sett_path1)) {
+        $settArray1 = include $sett_path1;
+        $settArray = array_merge($settArray, $settArray1);
+    }
+    $sett_path2 = root_path() . '/project/' . $diy_name . '/project.yml';
+    if (file_exists($sett_path2)) {
+        $settArray2 = yaml_parse_file($sett_path2);
+        $settArray = array_merge($settArray, $settArray2);
     }
     return $settArray;
 }

@@ -2,8 +2,6 @@
 
 namespace shiyun\middleware\role;
 
-use app\common\RoleOrgLogs;
-
 /**
  * 组织鉴权
  */
@@ -39,11 +37,12 @@ class OrgMiddle
      */
     public function end(\think\Response $response)
     {
+        // frameLogsDebug('执行结束了');
         $currAppRole = syOpenAppsAuth('syOpenAppRole');
 
         $log_role = $this->orgArr[$currAppRole];
-
-        // frameLogsDebug('执行结束了');
-        RoleOrgLogs::addEndLog($log_role);
+        event('syRoleOrgLogs', [
+            'type' => $log_role
+        ]);
     }
 }

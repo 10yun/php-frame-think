@@ -2,8 +2,6 @@
 
 namespace shiyun\middleware\role;
 
-use app\common\RoleOrgLogs;
-
 /**
  * 平台鉴权
  */
@@ -56,6 +54,8 @@ class SaasMiddle
     public function end(\think\Response $response)
     {
         // frameLogsDebug('执行结束了');
-        RoleOrgLogs::addEndLog('平台端');
+        event('syRoleOrgLogs', [
+            'type' => '平台端'
+        ]);
     }
 }

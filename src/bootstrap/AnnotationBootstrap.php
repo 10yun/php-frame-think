@@ -88,7 +88,7 @@ class AnnotationBootstrap extends \think\Service
              *  目前需要这么注册，才能生成缓存文件
              */
             $this->registerRoutes(function (Route $routeObj) use ($config) {
-                //     $route->get('captcha/[:config]', "\\think\\captcha\\CaptchaController@index");
+
                 RouteAttriLoad::register($routeObj);
 
                 if (!empty($config['route']['debug']) && $config['route']['debug'] == 'html') {
@@ -109,9 +109,6 @@ class AnnotationBootstrap extends \think\Service
             // throw $th;
             var_dump('--解析错误-', $th->getMessage());
         }
-
-        // $this->reader = $reader;
-
         // //注解路由
         // $this->registerAnnotationRoute();
 

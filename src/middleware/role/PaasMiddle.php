@@ -2,9 +2,6 @@
 
 namespace shiyun\middleware\role;
 
-use shiyun\support\Db;
-use app\common\RoleOrgLogs;
-
 /**
  * paas鉴权
  */
@@ -34,6 +31,8 @@ class PaasMiddle
     public function end(\think\Response $response)
     {
         // frameLogsDebug('执行结束了');
-        RoleOrgLogs::addEndLog('Paas端');
+        event('syRoleOrgLogs', [
+            'type' => 'Paas端'
+        ]);
     }
 }
