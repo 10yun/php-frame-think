@@ -57,8 +57,10 @@ class AnnotationBootstrap extends \think\Service
             $requSerArr = array_merge($requSerArr2);
             $requFirst = $requSerArr[0];
         }
-
-        return "addons/{$requFirst}/controller";
+        if (!empty($requFirst)) {
+            return "addons/{$requFirst}/controller";
+        }
+        return '';
     }
     function is_cli()
     {
@@ -72,39 +74,44 @@ class AnnotationBootstrap extends \think\Service
             RouteAttriLoad::loader();
             // 获取配置
             $config = $this->getConfig();
-            if (!$this->is_cli()) {
-                if (!empty($config['route']['load_type']) && $config['route']['load_type'] == 'current') {
-                    //
-                    $config['include_paths'] = [
-                        $this->getUriFirst()
-                    ];
+
+            if (!empty($config['route']['load_type']) && $config['route']['load_type'] == 'current') {
+                if (!$this->is_cli()) {
+                    $config['include_paths'] = '';
+                    if (!empty($this->getUriFirst())) {
+                        $config['include_paths'] = [
+                            $this->getUriFirst()
+                        ];
+                    }
                 }
             }
-            // 注解扫描
-            $generator = AnnotationParse::scanAnnotations($config['include_paths'], $config['exclude_paths']);
-            // 解析注解
-            AnnotationParse::parseAnnotations($generator);
-            /**
-             *  目前需要这么注册，才能生成缓存文件
-             */
-            $this->registerRoutes(function (Route $routeObj) use ($config) {
+            if (!empty($config['include_paths'])) {
+                // 注解扫描
+                $generator = AnnotationParse::scanAnnotations($config['include_paths'], $config['exclude_paths']);
+                // 解析注解
+                AnnotationParse::parseAnnotations($generator);
+                /**
+                 *  目前需要这么注册，才能生成缓存文件
+                 */
+                $this->registerRoutes(function (Route $routeObj) use ($config) {
 
-                RouteAttriLoad::register($routeObj);
+                    RouteAttriLoad::register($routeObj);
 
-                if (!empty($config['route']['debug']) && $config['route']['debug'] == 'html') {
-                    /**
-                     * 调试展示 - html
-                     */
-                    RouteAttriLoad::debug($routeObj);
-                    dd();
-                } else if (!empty($config['route']['debug']) && $config['route']['debug'] == 'dump') {
-                    /**
-                     * 调试展示 - dump
-                     */
-                    $allRule = $routeObj->getRuleList();
-                    dd('----555----', $allRule);
-                }
-            });
+                    if (!empty($config['route']['debug']) && $config['route']['debug'] == 'html') {
+                        /**
+                         * 调试展示 - html
+                         */
+                        RouteAttriLoad::debug($routeObj);
+                        dd();
+                    } else if (!empty($config['route']['debug']) && $config['route']['debug'] == 'dump') {
+                        /**
+                         * 调试展示 - dump
+                         */
+                        $allRule = $routeObj->getRuleList();
+                        dd('----555----', $allRule);
+                    }
+                });
+            }
         } catch (\Exception $exception) {
             // throw $exception;
             var_dump('--解析错误-', $exception->getMessage());

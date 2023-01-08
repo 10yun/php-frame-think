@@ -2,6 +2,8 @@
 
 namespace shiyun\middleware;
 
+use shiyun\support\Request;
+
 /**
  * token鉴权
  */
@@ -9,11 +11,13 @@ class SyAuthTokenMiddle
 {
     public function handle($request, \Closure $next)
     {
+        $isCheckApi = Request::isCheckApi();
+
         $syAppsAccess = [];
         $SyOpenAppsAuth = app('SyOpenAppsAuth')->getAuthData();
         $syOpenAppToken = $SyOpenAppsAuth['syOpenAppToken'] ?? '';
         if (empty($syOpenAppToken)) {
-            return sendRespCode401('100101');
+            return sendRespCode401($isCheckApi ? '100101' : '100000');
         }
         // 是否自动鉴权
         $syAppsAccess =  app('SyOpenAppsAccess')->getAccessData();
