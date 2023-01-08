@@ -15,7 +15,7 @@ function sy_vendor_path()
 }
 function sy_template_path()
 {
-    return root_path() . 'vendor/shiyun/template/';
+    return root_path() . 'vendor/shiyun/php-think/src/template/';
 }
 
 function syGetConfig($get_path = '', $get_def = [])

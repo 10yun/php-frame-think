@@ -69,9 +69,9 @@ abstract class AnnotationParse
                     return $item->getExtension() === 'php' && !($excludeRegular && preg_match($excludeRegular, $item->getPathname()));
                 });
             }
-        } catch (\Throwable $th) {
-            // var_dump('---', $th->getMessage());
-            //throw $th;
+        } catch (\Exception $exception) {
+            // var_dump('---', $exception->getMessage());
+            //throw $exception;
         }
     }
 

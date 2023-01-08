@@ -131,4 +131,24 @@ class Request extends Facade
     {
         return 'request';
     }
+
+    // 是否接口请求
+    public static function isCheckApi()
+    {
+        $CONTENT_TYPE = self::server('CONTENT_TYPE');
+        $HTTP_ACCEPT = self::server('HTTP_ACCEPT');
+        $HTTP_X_REQUESTED_WITH = self::server('HTTP_X_REQUESTED_WITH');
+
+
+        if (
+            str_contains($HTTP_ACCEPT, 'text/html') ||  str_contains($CONTENT_TYPE, 'text/html')
+        ) {
+            return false;
+        } else if (
+            str_contains($CONTENT_TYPE, 'application/json')
+            || (isset($HTTP_X_REQUESTED_WITH) && strtolower($HTTP_X_REQUESTED_WITH) == 'xmlhttprequest')
+        ) {
+            return true;
+        }
+    }
 }

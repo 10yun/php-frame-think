@@ -341,10 +341,10 @@ abstract class RouteAnnotationHandle implements IntfAnnotationHandle
                 // $parameters['name'] && $route->name($parameters['name']);
                 // // 路由中间件
                 // self::addMiddleware($route, $item['class'], $item['method']);
-            } catch (\Throwable $th) {
+            } catch (\Exception $exception) {
                 echo "error: RouteAnnotationHandle->addRoute \r\n";
-                echo "{$th->getMessage()}  \r\n";
-                throw $th;
+                echo "{$exception->getMessage()}  \r\n";
+                throw $exception;
                 return;
             }
         }

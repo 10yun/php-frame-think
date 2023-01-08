@@ -105,9 +105,9 @@ class AnnotationBootstrap extends \think\Service
                     dd('----555----', $allRule);
                 }
             });
-        } catch (\Throwable $th) {
-            // throw $th;
-            var_dump('--解析错误-', $th->getMessage());
+        } catch (\Exception $exception) {
+            // throw $exception;
+            var_dump('--解析错误-', $exception->getMessage());
         }
         // //注解路由
         // $this->registerAnnotationRoute();
