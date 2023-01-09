@@ -397,7 +397,7 @@ if (!function_exists('echo_value')) {
         <a title="官方网站-开放平台" target="_blank"  href="https://open.10yun.com/">十云-开放平台</a> 
         <span><?php echo syGetVersion(); ?></span> 
         <span>{ 科技改变未来，技术驱动世界 }</span>
-        <span>- <a title="官方手册" target="_blank" href="https://docs.10yun.com/php/">官方手册</a></span>
+        <span>- <a title="官方手册" target="_blank" href="https://www.10yun.com/php/">官方手册</a></span>
     </div>
     <?php if (\think\facade\App::isDebug()) { ?>
     <script>

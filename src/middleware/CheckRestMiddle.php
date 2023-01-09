@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace shiyun\middleware;
 
-use shiyun\support\Route;
-
 /**
  * 路由 method 处理
  */
@@ -14,14 +12,6 @@ class CheckRestMiddle
     public function handle($request, \Closure $next)
     {
         $method = $request->method();
-
-        // $dd = Route::getRuleList();
-        // $dd2 = Route::getRule('sett_parts');
-        // $dd3 = Route::getRuleName();
-        // // $dd = Route::setRule('sett_');
-        // $currItemRoute = current($dd2);
-        // echo $currItemRoute->getName();
-        // dd('---',  $dd3,);
 
         if ($method == 'GET') {
             // redirect('index/think');
@@ -56,7 +46,6 @@ class CheckRestMiddle
                 }
             }
         }
-        // dd($method);
 
         // 添加中间件执行代码
         return $next($request);

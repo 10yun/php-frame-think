@@ -202,13 +202,27 @@ function syOpenAppsAuth($key = '')
 }
 /**
  * 获取应用配置
- * @param $key 
+ * 支持多级获取 A.b.c
+ * @param $name 
  */
-function syOpenAppsConfig($key = '')
+function syOpenAppsConfig(string $name = null)
 {
     $data = app('SyOpenAppsConfig')->getSett();
-    if (!empty($key)) {
-        return $data[$key] ?? '';
+    if (is_null($name)) {
+        return $data;
+    }
+    // 是否包含.
+    if (str_contains($name, ".")) {
+        $nameArr = explode(".", $name);
+        $lastData = $data;
+        foreach ($nameArr as $val) {
+            if (isset($lastData[$val])) {
+                $lastData = $lastData[$val];
+            }
+        }
+        return $lastData;
+    } else {
+        return $data[$name] ?? '';
     }
     return $data;
 }
