@@ -35,7 +35,6 @@ class VendorPublish extends Command
             if (isset($packages['packages'])) {
                 $packages = $packages['packages'];
             }
-            dd($packages);
             foreach ($packages as $package) {
                 //配置
                 $configDir = $this->app->getConfigPath();
