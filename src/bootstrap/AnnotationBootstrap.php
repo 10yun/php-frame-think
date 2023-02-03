@@ -22,9 +22,6 @@ class AnnotationBootstrap extends \think\Service
     //     //     return new CachedReader(new AnnotationReader(), $cache->store($store), $app->isDebug());
     //     // });
     // }
-
-
-
     protected array $defaultConfig = [
         'include_paths' => [
             'app/controller',
@@ -58,6 +55,10 @@ class AnnotationBootstrap extends \think\Service
             $requFirst = $requSerArr[0];
         }
         if (!empty($requFirst)) {
+            if (str_contains($requFirst, ".")) {
+                $companyArr = str_replace(".", "/", $requFirst);
+                return "addons/{$companyArr}/controller";
+            }
             return "addons/{$requFirst}/controller";
         }
         return '';

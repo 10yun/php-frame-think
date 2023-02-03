@@ -17,6 +17,10 @@ class BaseCrossMiddle
     {
         // frameLogsFile('AllowCrossDomain   ----- ');
         $maxAge = 1800;
+        $headers = [
+            'Access-Control-Allow-Headers'  => 'x-token, Cache-Control, Content-Disposition, x-requested-with, Host, Sign, Auth-Token, Auth-Identity, Authorization, Content-Type, If-Match, If-Modified-Since, If-None-Match, If-Unmodified-Since, X-Requested-With',
+        ];
+
         $headerDefault = [
             'Authorization', 'authorization',
             'x-requested-with', 'X-Requested-With',
@@ -44,6 +48,9 @@ class BaseCrossMiddle
             'Access-Control-Max-Age' => "1800",
             'Access-Control-Request-Headers' => $Headers_default
         ];
+
+
+
         // $all_origin = array(
         // 	'http://console.' . env('ctocode.url_domain_base')
         // );

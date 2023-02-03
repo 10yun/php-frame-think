@@ -39,8 +39,8 @@ Support thinkphp6 (tp6) php8（Attribute）annotation
 
 ## php8
 
-- [路由注解](./docs/路由注解.md)  
-- [验证注解](./docs/验证注解.md)
+- [路由注解]( https://docs.10yun.com/php/frame/route.md)  
+- [验证注解]( https://docs.10yun.com/php/frame/validate.md)
 
 ## php7
 

@@ -4,6 +4,26 @@ namespace shiyun\model;
 
 trait ModelTraitParse
 {
+    // and fieldName = '%'
+    public function whereEqual($fieldName = '', $value = null, $isIsset = false)
+    {
+    }
+    public function whereStr($sql = '', $value = null, $isIsset = false)
+    {
+        if (empty($sql)) {
+            return '';
+        }
+        if ($isIsset) {
+            if (isset($value)) {
+                return sprintf(" $sql ", $value ?? '');
+            }
+        } else {
+            if (!empty($value)) {
+                return sprintf(" $sql ", $value ?? '');
+            }
+        }
+    }
+
     protected $whereArr = [];
     /**
      * @action SQL语句验证函数,防注入 防CC、至强抗DDoS 等

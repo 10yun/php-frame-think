@@ -14,4 +14,3 @@
 /*.zip                 export-ignore
 /example/              export-ignore
 composer2.json         export-ignore
-README.md              export-ignore

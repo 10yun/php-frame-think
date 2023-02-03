@@ -2,12 +2,12 @@
 
 namespace shiyun\model;
 
-use shiyun\extend\RedisCache;
+use think\Model;
 
 /**
  * model数据加缓存
  */
-class ModelCacheRedis extends RedisCache
+class ModelExtCache extends Model
 {
     protected static $instances = [];
     public static function getInstance()

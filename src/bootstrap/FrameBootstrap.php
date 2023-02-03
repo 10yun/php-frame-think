@@ -12,7 +12,14 @@ class FrameBootstrap extends \think\Service
         $this->copyConfigFile();
         //
         $this->commands([
-            'ConfigPush' => \shiyun\command\ConfigPush::class
+            'ConfigPush' => \shiyun\command\ConfigPush::class,
+            'VendorPublish' => \shiyun\command\vendorPublish::class,
+            // 'cmake:model' => \shiyun\command\Model::class,
+            // 'cmake:model_select' => \shiyun\command\ModelSelect::class,
+            // 'cmake:rpc' => \shiyun\command\Rpc::class,
+            // 'cmake:validate' => \shiyun\command\Validate::class,
+            // 'cmake:crud' => \shiyun\command\Crud::class,
+            // 'cmake:api' => \shiyun\command\Api::class,
         ]);
     }
 

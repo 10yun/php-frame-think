@@ -9,15 +9,18 @@ $frame_path = preg_replace('/(\/|\\\\){1,}/', '/', __DIR__) . '/';
 define('_PATH_PROJECT_', dirname($frame_path, 5) . '/');
 
 
-function sy_vendor_path()
+function syPathVendor()
 {
     return root_path() . 'vendor/';
 }
-function sy_template_path()
+function syPathTemplate()
 {
     return root_path() . 'vendor/shiyun/php-think/src/template/';
 }
-
+function syPathRuntime()
+{
+    return _PATH_PROJECT_ . 'runtime/';
+}
 function syGetConfig($get_path = '', $get_def = [])
 {
     $configPath = root_path() . 'config/';

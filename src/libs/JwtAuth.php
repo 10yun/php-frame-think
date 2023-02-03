@@ -91,6 +91,9 @@ class JwtAuth
     }
     public function init($secrect = '')
     {
+        if (empty($secrect)) {
+            throw new \Exception('secrect 不存在');
+        }
         $this->secrect = $secrect;
         // $key = InMemory::base64Encoded($this->secrect);
         $key = InMemory::plainText($this->secrect);
