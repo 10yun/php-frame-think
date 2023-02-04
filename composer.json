@@ -22,6 +22,15 @@
             "src/helpers.php"
         ]
     },
+    "extra": {
+        "shiyun": {
+            "config": {
+                "shiyun/annotation": "src/config/annotation.php",
+                "shiyun/connection": "src/config/connection.php",
+                "shiyun/throttle": "src/config/throttle.php"
+            }
+        }
+    },
     "autoload-dev": {
         "psr-4": {}
     }

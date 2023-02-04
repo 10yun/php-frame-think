@@ -5,6 +5,9 @@
  * ====== 计算
  * 
  */
+//全局设置所有bc数学函数的未设定情况下的小数点保留位数.
+// bcscale(3);
+
 /**加法 */
 function analysCalcJia($num1 = 0, $num2 = 0, $length = 2, $is_45 = true)
 {

@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace shiyun\bootstrap;
 
-class ConnectApp extends \think\Service
+use shiyun\support\Service as BaseService;
+
+class ConnectApp extends BaseService
 {
     public function register()
     {

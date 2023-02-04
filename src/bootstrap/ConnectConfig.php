@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace shiyun\bootstrap;
 
-class ConnectConfig extends \think\Service
+use shiyun\support\Service as BaseService;
+
+class ConnectConfig extends BaseService
 {
     public function register()
     {

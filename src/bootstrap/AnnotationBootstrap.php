@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace shiyun\bootstrap;
 
+use shiyun\support\Service as BaseService;
 use shiyun\annotation\AnnotationParse;
 use shiyun\route\RouteAttriLoad;
 use think\Route;
 
-class AnnotationBootstrap extends \think\Service
+class AnnotationBootstrap extends BaseService
 {
     // public function register()
     // {
