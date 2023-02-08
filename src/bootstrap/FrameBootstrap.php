@@ -12,6 +12,7 @@ class FrameBootstrap extends BaseService
     {
         $this->commands([
             'ConfigPush' => \shiyun\command\ConfigPush::class,
+            'ServiceDiscover' => \shiyun\command\ServiceDiscover::class,
             'VendorPublish' => \shiyun\command\vendorPublish::class,
             // 'cmake:model' => \shiyun\command\Model::class,
             // 'cmake:model_select' => \shiyun\command\ModelSelect::class,

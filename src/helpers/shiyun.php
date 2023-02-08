@@ -11,11 +11,11 @@ define('_PATH_PROJECT_', dirname($frame_path, 5) . '/');
 
 function syPathVendor()
 {
-    return root_path() . 'vendor/';
+    return _PATH_PROJECT_ . 'vendor/';
 }
 function syPathTemplate()
 {
-    return root_path() . 'vendor/shiyun/php-think/src/template/';
+    return _PATH_PROJECT_ . 'vendor/shiyun/php-think/src/template/';
 }
 function syPathRuntime()
 {
@@ -23,7 +23,7 @@ function syPathRuntime()
 }
 function syGetConfig($get_path = '', $get_def = [])
 {
-    $configPath = root_path() . 'config/';
+    $configPath = _PATH_PROJECT_ . 'config/';
     $configOpt = $get_def;
     // $pathArr =  explode(".", $get_path);
     // $pathAll = $configPath;
