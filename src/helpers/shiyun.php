@@ -17,27 +17,24 @@ function syPathTemplate()
 {
     return _PATH_PROJECT_ . 'vendor/shiyun/php-think/src/template/';
 }
+function syPathConfig()
+{
+    return _PATH_PROJECT_ . 'config/';
+}
+function syPathStorage()
+{
+    return _PATH_PROJECT_ . 'storage/';
+}
 function syPathRuntime()
 {
     return _PATH_PROJECT_ . 'runtime/';
 }
-function syGetConfig($get_path = '', $get_def = [])
+function syGetConfig(string $key = null, $default = [])
 {
     $configPath = _PATH_PROJECT_ . 'config/';
-    $configOpt = $get_def;
-    // $pathArr =  explode(".", $get_path);
-    // $pathAll = $configPath;
-    // foreach ($pathArr as $pathItem) {
-    //     if (is_dir($pathAll . $pathItem)) {
-    //         continue;
-    //     }
-    // }
-    $confPath = $configPath . str_replace(".", "/", $get_path);
-    $filePath = $confPath . '.php';
-    if (is_file($filePath)) {
-        $configOpt = include $filePath;
-    }
-    return $configOpt;
+    \shiyun\libs\Config::init($configPath);
+    $config = \shiyun\libs\Config::get($key, $default);
+    return $config;
 }
 function syGetVersion()
 {
