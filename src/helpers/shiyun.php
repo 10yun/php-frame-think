@@ -38,7 +38,7 @@ function syGetConfig(string $key = null, $default = [])
 }
 function syGetVersion()
 {
-    return 'ctocode-v6.22.1129';
+    return 'ctocode-v7.23.0115';
 }
 function syGetHeader()
 {

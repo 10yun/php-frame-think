@@ -63,6 +63,9 @@ class OpenAppAccess
             $token_access = $aes->decrypt(syOpenAppsAuth('syOpenAppToken'));
         }
         $tokenCache = SuperToken::sCacheGet(md5($token_access));
+        if (empty($tokenCache)) {
+            return sendRespCode401(100102);
+        }
         $this->accessData = analysJsonDecode($tokenCache) ?? [];
         if (!empty($this->accessData) && is_array($this->accessData)) {
             $this->accessData['account_id'] = $this->accessData['account_id'] ?? 0;
