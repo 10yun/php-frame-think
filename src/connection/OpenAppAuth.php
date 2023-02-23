@@ -2,8 +2,6 @@
 
 namespace shiyun\connection;
 
-use think\Request;
-
 class OpenAppAuth
 {
     /**
@@ -17,8 +15,6 @@ class OpenAppAuth
     }
     public function initAuthData()
     {
-        $this->authData['syOpenAppProject'] = $this->getAppProject();
-
         $fwParam = [];
         $fwParam['syOpenAppProject'] = $this->getAppProject();
         $fwParam['syOpenAppRole'] = $this->getAppRole();
@@ -46,6 +42,10 @@ class OpenAppAuth
          * 处理 syOpenAppProject
          * 如果没有header数据，获取 $reqParam['syOpenAppProject'] 数据
          */
+
+        if ($project = \shiyun\libs\Console::getInstance()->getOption('syOpenAppProject')) {
+            return $project;
+        }
         $reqVal = request()->param('syOpenAppProject');
         $headVal = request()->header('syOpenAppProject') ?: '';
         $lastVal = $headVal ?: ($reqVal ?? '');

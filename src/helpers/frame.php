@@ -13,9 +13,9 @@ function frameGetConfig($flag = null)
 {
     return Config::get($flag);
 }
-function frameGetEnv($flag)
+function frameGetEnv(string $name = null, $default = null)
 {
-    return Env::get($flag);
+    return Env::get($name, $default);
 }
 function frameEventTrigger($event, $param = null)
 {

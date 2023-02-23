@@ -157,8 +157,8 @@ class Http
     /**
      * 发送文件到客户端
      * @param string $file
-     * @param bool   $delaftersend
-     * @param bool   $exitaftersend
+     * @param bool   $delaftersend   发送后删除
+     * @param bool   $exitaftersend  发送后退出
      */
     public static function sendToBrowser($file, $delaftersend = true, $exitaftersend = true)
     {

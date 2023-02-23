@@ -29,6 +29,7 @@ function syPathRuntime()
 {
     return _PATH_PROJECT_ . 'runtime/';
 }
+// 获取配置
 function syGetConfig(string $key = null, $default = [])
 {
     $configPath = _PATH_PROJECT_ . 'config/';
@@ -180,7 +181,6 @@ function syGetAppsSett($diy_name = '')
             if (file_exists($sett_path)) {
                 // $xmlFile = file_get_contents($sett_path);
                 // $settArray = \shiyunUtils\libs\LibXml::xmlToArr($xmlFile);
-
                 $settArray = yaml_parse_file($sett_path);
                 if (empty($settArray)) {
                     $settArray = [];
