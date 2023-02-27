@@ -14,12 +14,12 @@ class FrameBootstrap extends BaseService
             'ConfigPush' => \shiyun\command\ConfigPush::class,
             'ServiceDiscover' => \shiyun\command\ServiceDiscover::class,
             'VendorPublish' => \shiyun\command\vendorPublish::class,
-            // 'cmake:model' => \shiyun\command\Model::class,
-            // 'cmake:model_select' => \shiyun\command\ModelSelect::class,
-            // 'cmake:rpc' => \shiyun\command\Rpc::class,
-            // 'cmake:validate' => \shiyun\command\Validate::class,
-            // 'cmake:crud' => \shiyun\command\Crud::class,
-            // 'cmake:api' => \shiyun\command\Api::class,
+            // 'addons:model' => \shiyun\command\addons\Model::class,
+            // 'addons:model_select' => \shiyun\command\addons\ModelSelect::class,
+            // 'addons:rpc' => \shiyun\command\addons\Rpc::class,
+            // 'addons:validate' => \shiyun\command\addons\Validate::class,
+            // 'addons:crud' => \shiyun\command\addons\Crud::class,
+            // 'addons:api' => \shiyun\command\addons\Api::class,
         ]);
     }
 }

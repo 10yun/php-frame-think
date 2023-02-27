@@ -53,7 +53,7 @@ class SaasMiddle
      */
     public function end(\think\Response $response)
     {
-        // frameLogsDebug('执行结束了');
+        // frameLogs('logs_channel_debug', '执行结束了');
         event('syRoleOrgLogs', [
             'type' => '平台端'
         ]);

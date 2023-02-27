@@ -15,7 +15,7 @@ class BaseCrossMiddle
      */
     public function handle($request, \Closure $next)
     {
-        // frameLogsFile('AllowCrossDomain   ----- ');
+        // frameLogs('LOGS_CHANNEL_FILE', 'AllowCrossDomain   ----- ');
         $maxAge = 1800;
         $headers = [
             'Access-Control-Allow-Headers'  => 'x-token, Cache-Control, Content-Disposition, x-requested-with, Host, Sign, Auth-Token, Auth-Identity, Authorization, Content-Type, If-Match, If-Modified-Since, If-None-Match, If-Unmodified-Since, X-Requested-With',

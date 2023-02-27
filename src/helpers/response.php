@@ -134,3 +134,15 @@ function sendRespGetAll($wsql = [], $result_data = [])
         'data' => !empty($result_data['data']) ? $result_data['data'] : array()
     ));
 }
+function sendRespDump()
+{
+    $args = func_get_args();
+    return sendRespInfo([
+        'status' => 200,
+        'success' => false,
+        'msg' => 'debug',
+        'data' => [
+            ...$args
+        ]
+    ]);
+}

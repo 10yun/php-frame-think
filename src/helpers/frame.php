@@ -29,33 +29,29 @@ function frameGetSession($flag)
 {
     return Session::get($flag);
 }
-function frameLogsDebug($info = '')
+function frameLogs($channel = '', $info = '')
 {
-    if (is_string($info)) {
-        Log::channel('logs_channel_debug')->write($info);
-    } else if (is_array($info)) {
-        Log::channel('logs_channel_debug')->info($info);
-    } else if (is_object($info)) {
-        Log::channel('logs_channel_debug')->info($info);
+    if (!empty($channel)) {
+        if (is_string($info)) {
+            Log::channel($channel)->write($info);
+        } else if (is_array($info)) {
+            Log::channel($channel)->info($info);
+        } else if (is_object($info)) {
+            Log::channel($channel)->info($info);
+        }
+    } else {
+        if (is_string($info)) {
+            Log::write($info);
+        } else if (is_array($info)) {
+            Log::info($info);
+        } else if (is_object($info)) {
+            Log::info($info);
+        }
     }
 }
-function frameLogsFile($info = '')
+function frameRedisGet($store = '', $key = '', $defVal = null)
 {
-    if (is_string($info)) {
-        Log::channel('logs_channel_file')->write($info);
-    } else if (is_array($info)) {
-        Log::channel('logs_channel_file')->info($info);
-    } else if (is_object($info)) {
-        Log::channel('logs_channel_file')->info($info);
-    }
 }
-function tp6LogsPayFile($info = '')
-{
-    Log::channel('logs_channel_paywx')->info($info);
-    // 	Log::save ();
-    // 	Log::close ();
-}
-
 function tp6RedisGet($key = '', $defVal = null)
 {
     $redisCacheHandle = \think\facade\Cache::store('CACHE_STORES_RD2')->handler();

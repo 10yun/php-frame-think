@@ -30,7 +30,7 @@ class PaasMiddle
      */
     public function end(\think\Response $response)
     {
-        // frameLogsDebug('执行结束了');
+        // frameLogs('logs_channel_debug', '执行结束了');
         event('syRoleOrgLogs', [
             'type' => 'Paas端'
         ]);

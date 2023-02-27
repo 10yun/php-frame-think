@@ -19,73 +19,96 @@ declare(strict_types=1);
 
 namespace shiyun\connection;
 
+use think\App;
+use shiyun\support\Cache;
+use shiyun\support\Env;
+
 /**
- * 依赖注入，应用事件类
+ * 注册的事件
+ * 应用事件类
  * 鉴权的时候 获取 【apps应用独立事件配置】
  * @author ctocode
  */
 class LoadAppEvent
 {
     protected $app;
-    public $eventData = [];
-    public function register()
+    public function __construct(App $app)
     {
-        $this->app = app();
-
-        // 可以参考 tp6的加载应用相关配置
-        // $appPath = $this->getAppPath();
-
-        // if (is_file($appPath . 'common.php')) {
-        //     include_once $appPath . 'common.php';
-        // }
-
-        // include_once $this->thinkPath . 'helper.php';
-
-        // $configPath = $this->getConfigPath();
-
-        // $files = [];
-
-        // if (is_dir($configPath)) {
-        //     $files = glob($configPath . '*' . $this->configExt);
-        // }
-
-        // foreach ($files as $file) {
-        //     $this->config->load($file, pathinfo($file, PATHINFO_FILENAME));
-        // }
-
-        // if (is_file($appPath . 'event.php')) {
-        //     app()->loadEvent();
-        //     $this->loadEvent(include $appPath . 'event.php');
-        // }
-
-        // if (is_file($appPath . 'service.php')) {
-        //     app()->register();
-        //     $services = include $appPath . 'service.php';
-        //     foreach ($services as $service) {
-        //         $this->register($service);
-        //     }
-        // }
-        // $this->app->event->listen('HttpRun', function () {
-        //     app()->register();
-        //     $this->app->middleware->add(MultiApp::class);
-        // });
-
-        // $this->commands([
-        //     'build' => command\Build::class,
-        //     'clear' => command\Clear::class,
-        // ]);
-
-        // $this->app->bind([
-        //     'think\route\Url' => Url::class,
-        // ]);
-
-        // bind('SyOpenAppsEve', function () {
-        //     $class = new \shiyun\connection\OpenAppEvent();
-        //     return $class;
-        // });
-        // bind('SyOpenAppsEve', 'shiyun\connection\SyOpenAppsEve');
+        $this->app = $app;
+        // 加载addons下的
+        $this->loadAddons();
+        // 加载project下的
+        // $this->loadProject();
     }
-    public function boot()
+    public function loadAddons()
+    {
+        // 这边可以判断缓存是否存在
+        $isDebug = $this->app->isDebug();
+        $isEnvironment = Env::get('ctocode.environment');
+
+        $loadCache = [];
+        $cacheKey = '__SY_load_app_event';
+        if (!$isDebug && $isEnvironment != 'development') {
+            $loadCache = Cache::get($cacheKey, []);
+        }
+        if (empty($loadCache)) {
+            $rootPath = root_path();
+            $batchPathArr = [];
+            $configLoadDirArr = syGetConfig('shiyun.connect_open.load_app_event', []);
+            if (!empty($configLoadDirArr) && is_array($configLoadDirArr)) {
+                foreach ($configLoadDirArr as $key => $val) {
+                    $itemPath = $val;
+                    if (!str_contains($itemPath, $rootPath)) {
+                        $itemPath = $rootPath . $itemPath;
+                    }
+                    if (is_dir($itemPath)) {
+                        $itemPath = "{$itemPath}/*.php";
+                    }
+                    if (!str_contains($itemPath, "*.php")) {
+                        $itemPath = "{$itemPath}/*.php";
+                    }
+                    $itemPath = str_replace("//", "/", $itemPath);
+                    $batchPathArr = array_merge($batchPathArr, glob($itemPath));
+                }
+            }
+            /**
+             * 批量注册 - 事件、监听、订阅
+             * @var array $batchPathArr
+             * @version 2019-12-11
+             */
+            if (!empty($batchPathArr)) {
+                $includeData = [
+                    'bind' => [],
+                    'listen' => [],
+                    'subscribe' => [],
+                ];
+                foreach ($batchPathArr as $itemPath) {
+                    $itemData = include_once $itemPath;
+                    if (empty($itemData) || !is_array($itemData)) {
+                        continue;
+                    }
+                    if (!empty($itemData['bind'])) {
+                        $includeData['bind'] = array_merge($includeData['bind'], $itemData['bind']);
+                    }
+                    if (!empty($itemData['listen'])) {
+                        $includeData['listen'] = array_merge($includeData['listen'], $itemData['listen']);
+                    }
+                    if (!empty($itemData['subscribe'])) {
+                        $includeData['subscribe'] = array_merge($includeData['subscribe'], $itemData['subscribe']);
+                    }
+                }
+                $loadCache = $includeData;
+            }
+            Cache::set($cacheKey, $loadCache);
+        }
+        if (!empty($loadCache)) {
+            $this->app->loadEvent($loadCache);
+        }
+    }
+    /**
+     * 注册项目配置下的事件
+     */
+    public function loadProject()
     {
         $diyProConf = [];
         $diyProFlag = request()->header('syOpenAppProject') ?: '';
@@ -95,40 +118,15 @@ class LoadAppEvent
         // $xxx = syOpenAppsAuth();
         var_dump('--222--', $diyProFlag, $diyProFlag_str);
 
-
         // 事件定义文件
         $event_def = [
             'bind' => [],
             'listen' => [],
             'subscribe' => []
         ];
-        /**
-         * 批量注册 - 事件、监听、订阅
-         * @var array $batchPathArr
-         * @version 2019-12-11
-         */
-        $batchPathArr = glob(root_path() . '/config/' . $diyProFlag_str . '/events/*.php');
-        if (!empty($batchPathArr)) {
-            foreach ($batchPathArr as $itemPath) {
-                $itemData = include_once $itemPath;
-                if (empty($itemData) || !is_array($itemData)) {
-                    continue;
-                }
-                $event_def['bind'] = array_merge($event_def['bind'], $itemData['bind']);
-                $event_def['listen'] = array_merge($event_def['listen'], $itemData['listen']);
-                $event_def['subscribe'] = array_merge($event_def['subscribe'], $itemData['subscribe']);
-            }
-        }
+
         var_dump($event_def);
         // 服务启动
         echo '启动xxxxx';
-    }
-    public function setEventData($data = [])
-    {
-        $this->eventData = $data;
-    }
-    public function getEventData()
-    {
-        return $this->eventData;
     }
 }

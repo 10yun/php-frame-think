@@ -7,25 +7,25 @@ class BaseRespMiddle
     protected $code = 0;
     public function handle($request, \Closure $next)
     {
-        // frameLogsFile('BaseRespMiddle->handle');
+        // frameLogs('LOGS_CHANNEL_FILE', 'BaseRespMiddle->handle');
         $response = $next($request);
         $this->code = $response->getCode();
         return $response;
     }
     public function end(\think\Response $response)
     {
-        // frameLogsFile('---BaseRespMiddle->end ====1 ');
-        // frameLogsFile($this);
-        // frameLogsFile('---BaseRespMiddle->end ====2 ');
+        // frameLogs('LOGS_CHANNEL_FILE', '---BaseRespMiddle->end ====1 ');
+        // frameLogs('LOGS_CHANNEL_FILE', $this);
+        // frameLogs('LOGS_CHANNEL_FILE', '---BaseRespMiddle->end ====2 ');
         if ($this->code == 200) {
             // 提交数据
-            // frameLogsFile('dbCommit');
-            // frameLogsFile(' ');
+            // frameLogs('LOGS_CHANNEL_FILE', 'dbCommit');
+            // frameLogs('LOGS_CHANNEL_FILE', ' ');
             event('dbCommit');
         } else {
             // 回滚数据
-            // frameLogsFile('dbRollback');
-            // frameLogsFile(' ');
+            // frameLogs('LOGS_CHANNEL_FILE', 'dbRollback');
+            // frameLogs('LOGS_CHANNEL_FILE', ' ');
             event('dbRollback');
         }
     }

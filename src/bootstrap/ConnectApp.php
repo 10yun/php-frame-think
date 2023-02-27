@@ -21,11 +21,8 @@ class ConnectApp extends BaseService
         $this->app->bind('SyOpenAppsConfig', \shiyun\connection\OpenAppConfig::class);
         // 应用信息
         $this->app->bind('SyOpenAppsAccess', \shiyun\connection\OpenAppAccess::class);
-        // 应用事件
-        // $this->app->bind('SyOpenAppsEvent', \shiyun\connection\OpenAppAccess::class);
-
         /**
-         * 加载路由
+         * 注册资源
          */
         $this->registerRoutes(function (\think\Route $route) {
             // $route->get('captcha/[:config]', "\\think\\captcha\\CaptchaController@index");
@@ -35,6 +32,19 @@ class ConnectApp extends BaseService
     }
     public function boot()
     {
-        // var_dump('ConnectApp   boot');
+        // 可以参考 tp6的加载应用相关配置
+        // $appPath = $this->getAppPath();
+        // \think\App-> load() 方法加载
+        /**
+         * 注册路由
+         */
+        new \shiyun\connection\LoadAppRoute($this->app);
+        /**
+         * 注册事件
+         */
+        new \shiyun\connection\LoadAppEvent($this->app);
+        /**
+         * 默认数据库切换
+         */
     }
 }

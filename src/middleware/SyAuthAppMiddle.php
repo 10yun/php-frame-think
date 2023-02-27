@@ -23,7 +23,6 @@ class SyAuthAppMiddle
     {
         $isCheckApi = Request::isCheckApi();
 
-        // frameLogsFile('SyAuthAppMiddleware  ----- ');
         $OpenAppAuthObj = new \shiyun\connection\OpenAppAuth();
         $OpenAppAuthObj->initAuthData();
         $authAppData = $OpenAppAuthObj->getAuthData();
@@ -37,10 +36,6 @@ class SyAuthAppMiddle
         if (empty($authAppData['syOpenAppProject'])) {
             return sendRespCode401($isCheckApi ? '100105' : '100000');
         }
-        // $maintainInfo = Cache::store('CACHE_STORES_RD2')->get($authAppData['syOpenAppProject'] . ":Maintain");
-        // if (!empty($maintainInfo) && $maintainInfo['weihu_open'] == 'on') {
-        //     return sendRespCode200('900000');
-        // }
         /**
          * 判断：appID
          */

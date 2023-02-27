@@ -37,7 +37,7 @@ class OrgMiddle
      */
     public function end(\think\Response $response)
     {
-        // frameLogsDebug('执行结束了');
+        // frameLogs('logs_channel_debug', '执行结束了');
         $currAppRole = syOpenAppsAuth('syOpenAppRole');
 
         $log_role = $this->orgArr[$currAppRole];

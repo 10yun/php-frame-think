@@ -14,7 +14,6 @@ use ZipArchive;
  */
 class Service
 {
-
     /**
      * 远程下载插件
      *
@@ -106,7 +105,8 @@ class Service
             $zip = new ZipArchive;
             $zip->open($file, ZipArchive::CREATE);
             $files = new RecursiveIteratorIterator(
-                new RecursiveDirectoryIterator($dir, RecursiveDirectoryIterator::SKIP_DOTS), RecursiveIteratorIterator::CHILD_FIRST
+                new RecursiveDirectoryIterator($dir, RecursiveDirectoryIterator::SKIP_DOTS),
+                RecursiveIteratorIterator::CHILD_FIRST
             );
             foreach ($files as $fileinfo) {
                 $filePath = $fileinfo->getPathName();
@@ -558,7 +558,8 @@ EOD;
             if (is_dir($addonDir . $dir)) {
                 //匹配出所有的文件
                 $files = new RecursiveIteratorIterator(
-                    new RecursiveDirectoryIterator($addonDir . $dir, RecursiveDirectoryIterator::SKIP_DOTS), RecursiveIteratorIterator::CHILD_FIRST
+                    new RecursiveDirectoryIterator($addonDir . $dir, RecursiveDirectoryIterator::SKIP_DOTS),
+                    RecursiveIteratorIterator::CHILD_FIRST
                 );
 
                 foreach ($files as $fileinfo) {
@@ -626,5 +627,4 @@ EOD;
             'public'
         ];
     }
-
 }

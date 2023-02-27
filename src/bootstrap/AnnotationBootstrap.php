@@ -14,10 +14,6 @@ class AnnotationBootstrap extends BaseService
     // public function register()
     // {
     //     // var_dump('---AnnotationBootstrap---register---');
-
-    //     // AnnotationReader::addGlobalIgnoredName('mixin');
-    //     // // TODO: this method is deprecated and will be removed in doctrine/annotations 2.0
-    //     // AnnotationRegistry::registerLoader('class_exists');
     //     // $this->app->bind(Reader::class, function (App $app, Config $config, Cache $cache) {
     //     //     $store = $config->get('annotation.store');
     //     //     return new CachedReader(new AnnotationReader(), $cache->store($store), $app->isDebug());
