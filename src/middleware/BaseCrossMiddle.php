@@ -35,6 +35,7 @@ class BaseCrossMiddle
         $Headers_default .= ",syOpenAppKey";
         $Headers_default .= ",syOpenAppToken";
         $Headers_default .= ",syOpenAppRole";
+        $Headers_default .= ",syOpenAppUuid";
         $Headers_default .= ",syOpenAppClientPlatform";
         // $Headers_default .= ",If-Match, If-Modified-Since, If-None-Match, If-Unmodified-Since";
         header("Access-Control-Allow-Origin: *");

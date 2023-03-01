@@ -47,9 +47,11 @@ class LoadAppEvent
         $isEnvironment = Env::get('ctocode.environment');
 
         $loadCache = [];
-        $cacheKey = '__SY_load_app_event';
+        $cacheOptimizePath = _PATH_RUNTIME_ . '/shiyun_optimize/events.php';
         if (!$isDebug && $isEnvironment != 'development') {
-            $loadCache = Cache::get($cacheKey, []);
+            if (file_exists($cacheOptimizePath)) {
+                $loadCache = include_once $cacheOptimizePath;
+            }
         }
         if (empty($loadCache)) {
             $rootPath = root_path();
@@ -99,7 +101,15 @@ class LoadAppEvent
                 }
                 $loadCache = $includeData;
             }
-            Cache::set($cacheKey, $loadCache);
+
+            if (!$isDebug && $isEnvironment != 'development') {
+                @mkdir(_PATH_RUNTIME_ . '/shiyun_optimize/');
+                if (is_file($cacheOptimizePath)) {
+                    unlink($cacheOptimizePath);
+                }
+                $cacheOptimizeContent = '<?php ' . PHP_EOL . 'return unserialize(\'' . serialize($loadCache) . '\');';
+                file_put_contents($cacheOptimizePath, $cacheOptimizeContent);
+            }
         }
         if (!empty($loadCache)) {
             $this->app->loadEvent($loadCache);

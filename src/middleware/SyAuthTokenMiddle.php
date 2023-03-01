@@ -21,7 +21,18 @@ class SyAuthTokenMiddle
         }
         // 是否自动鉴权
         $syAppsAccess =  app('SyOpenAppsAccess')->getAccessData();
-
+        /**
+         * token过期
+         */
+        if (!empty($syOpenAppToken) && empty($syAppsAccess)) {
+            return sendRespCode401(100102);
+        }
+        if (empty($syAppsAccess)) {
+            return sendRespCode401('100109');
+        }
+        if ($syAppsAccess && $syAppsAccess['ucenter_state'] == 9) {
+            return sendRespCode200('100400');
+        }
         // 获取全部的禁用用户名单
         // $ucenterBlcakRpcModelObj = loadAddonRpcClass('v210916_ucenter', 'Black');
         // $ucenterBlackDatas = $ucenterBlcakRpcModelObj->getListData(array(
@@ -34,12 +45,6 @@ class SyAuthTokenMiddle
         //     }
         //     $wsql['ucenter_black'] = implode(',', $tempArr);
         // }
-        if (empty($syAppsAccess)) {
-            return sendRespCode401('100109');
-        }
-        if ($syAppsAccess && $syAppsAccess['ucenter_state'] == 9) {
-            return sendRespCode200('100400');
-        }
 
         // $url_rule = $request->root() . '/' . $request->pathinfo();
         // dd($request->root(), $url_rule);

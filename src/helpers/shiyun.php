@@ -4,6 +4,7 @@
 
 use shiyun\support\Response;
 use shiyun\support\Request;
+use shiyun\support\Config;
 
 $frame_path = preg_replace('/(\/|\\\\){1,}/', '/', __DIR__) . '/';
 define('_PATH_PROJECT_', dirname($frame_path, 5) . '/');
@@ -89,9 +90,13 @@ function syGetProjectSett($diy_name = '')
  */
 function syGetProjectMysql()
 {
-    $OpenAppAuthObj = new \shiyun\connection\OpenAppAuth();
-    $OpenAppAuthObj->initAuthData();
-    $authAppData = $OpenAppAuthObj->getAuthData();
+    if (empty(app()->exists('SyOpenAppsAuth'))) {
+        $OpenAppAuthObj = new \shiyun\connection\OpenAppAuth();
+        $OpenAppAuthObj->initAuthData();
+        $authAppData = $OpenAppAuthObj->getAuthData();
+    } else {
+        $authAppData = app('SyOpenAppsAuth')->getAuthData();
+    }
 
     $settArray = [];
     $yamlData = [];
@@ -119,12 +124,31 @@ function syGetProjectMysql()
     ];
     return $settArray;
 }
+/**
+ * 动态设置
+ */
+function sySetProjectMysql()
+{
+    $databaseOld = Config::get('database');
+    $databaseSett =  syGetProjectMysql();
 
+    $authAppData = app('SyOpenAppsAuth')->getAuthData();
+
+    $databaseOld['connections'][$authAppData['syOpenAppProject']] =
+        frameGetDbInit($databaseSett, $databaseSett['database']);
+    $databaseOld['default'] = $authAppData['syOpenAppProject'];
+
+    Config::set($databaseOld, 'database');
+}
 function syGetProjectRedis()
 {
-    $OpenAppAuthObj = new \shiyun\connection\OpenAppAuth();
-    $OpenAppAuthObj->initAuthData();
-    $authAppData = $OpenAppAuthObj->getAuthData();
+    if (empty(app()->exists('SyOpenAppsAuth'))) {
+        $OpenAppAuthObj = new \shiyun\connection\OpenAppAuth();
+        $OpenAppAuthObj->initAuthData();
+        $authAppData = $OpenAppAuthObj->getAuthData();
+    } else {
+        $authAppData = app('SyOpenAppsAuth')->getAuthData();
+    }
 
     $settArray = [];
     $yamlData = [];

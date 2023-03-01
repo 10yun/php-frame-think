@@ -64,7 +64,7 @@ class OpenAppAccess
         }
         $tokenCache = SuperToken::sCacheGet(md5($token_access));
         if (empty($tokenCache)) {
-            return sendRespCode401(100102);
+            return [];
         }
         $this->accessData = analysJsonDecode($tokenCache) ?? [];
         if (!empty($this->accessData) && is_array($this->accessData)) {

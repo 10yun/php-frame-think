@@ -24,7 +24,7 @@ class OpenAppAuth
         // 设备 类型：ios、android
         $fwParam['syAppClientPlatform'] = $this->getAppClient();
         // 获取设备唯一标识
-        $fwParam['syAppClientUUID'] = '';
+        $fwParam['syAppClientUUID'] = $this->getAppClientUuid();
         $this->setAuthData($fwParam);
     }
     public function setAuthData($data = [])
@@ -51,6 +51,11 @@ class OpenAppAuth
         $lastVal = $headVal ?: ($reqVal ?? '');
         return $lastVal;
     }
+    public function setAppProject($str = '')
+    {
+        $this->authData['syOpenAppProject'] = $str;
+        return $this;
+    }
     public function getAppId()
     {
         /**
@@ -62,6 +67,11 @@ class OpenAppAuth
         $lastVal = $headVal ?: ($reqVal ?? '');
         return $lastVal;
     }
+    public function setAppId($str = '')
+    {
+        $this->authData['syOpenAppId'] = $str;
+        return $this;
+    }
     public function getAppKey()
     {
         /**
@@ -72,6 +82,11 @@ class OpenAppAuth
         $headVal = request()->header('syOpenAppKey') ?: '';
         $lastVal = $headVal ?: ($reqVal ?? '');
         return $lastVal;
+    }
+    public function setAppKey($str = '')
+    {
+        $this->authData['syOpenAppKey'] = $str;
+        return $this;
     }
     public function getAppRole()
     {
@@ -95,12 +110,17 @@ class OpenAppAuth
         $lastVal = $headVal ?: ($reqVal ?? '');
         return $lastVal;
     }
-
-
     public function getAppClient()
     {
         $reqVal = '';
         $headVal = request()->header('syOpenAppClientPlatform') ?: '';
+        $lastVal = $headVal ?: ($reqVal ?? '');
+        return $lastVal;
+    }
+    public function getAppClientUuid()
+    {
+        $reqVal = '';
+        $headVal = request()->header('syOpenAppUuid') ?: '';
         $lastVal = $headVal ?: ($reqVal ?? '');
         return $lastVal;
     }

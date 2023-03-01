@@ -49,28 +49,28 @@ function frameLogs($channel = '', $info = '')
         }
     }
 }
-function frameRedisGet($store = '', $key = '', $defVal = null)
+function frameCacheGet($store = 'default', $key = '', $defVal = null)
 {
-}
-function tp6RedisGet($key = '', $defVal = null)
-{
-    $redisCacheHandle = \think\facade\Cache::store('CACHE_STORES_RD2')->handler();
-    if (!empty($defVal)) {
-        $redisCacheHandle->get($key, $defVal);
+    if (empty($store)) {
+        $store = 'default';
     }
-    return $redisCacheHandle->get($key);
+    if (!empty($defVal)) {
+        Cache::store($store)->get($key, $defVal);
+    }
+    return  Cache::store($store)->get($key);
 }
-function tp6RedisSet($key = '', $val = '', $time = null)
+function frameCacheSet($store = 'default', $key = '', $val = '', $time = null)
 {
-    $redisCacheHandle = \think\facade\Cache::store('CACHE_STORES_RD2')->handler();
+    if (empty($store)) {
+        $store = 'default';
+    }
     if (!empty($time)) {
         // 缓存在3600秒之后过期
-        $redisCacheHandle->set($key, $val, $time);
+        Cache::store($store)->set($key, $val, $time);
     } else {
-        $redisCacheHandle->set($key, $val);
+        Cache::store($store)->set($key, $val);
     }
 }
-
 function frameGetDbInit($settData = [], $database = '')
 {
     $initData = [
