@@ -10,12 +10,14 @@ use shiyun\extend\RedisCache;
 class ModelCacheRedis extends RedisCache
 {
     protected static $instances = [];
-    public static function getInstance()
+    public static function getInstance($key = null)
     {
-        $class = get_called_class();
-        if (!isset(self::$instances[$class])) {
-            self::$instances[$class] = new static();
+        if (empty($key)) {
+            $key = get_called_class();
         }
-        return self::$instances[$class];
+        if (!isset(self::$instances[$key])) {
+            self::$instances[$key] = new static();
+        }
+        return self::$instances[$key];
     }
 }

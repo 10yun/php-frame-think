@@ -16,8 +16,6 @@ class ConnectConfig extends BaseService
     {
         // var_dump('ConnectConfig   boot');
         $this->setSlbHttps();
-        // $this->setDatabase();
-        // $this->setRedis();
     }
     protected function setSlbHttps()
     {
@@ -28,32 +26,5 @@ class ConnectConfig extends BaseService
         $HTTP_X_FORWARDED_PROTO = $this->app->request->server('HTTP_X_FORWARDED_PROTO');
         $isHttps = isset($HTTP_X_FORWARDED_PROTO) && 'https' == $HTTP_X_FORWARDED_PROTO;
         $this->app->request->server('HTTPS', $isHttps ? 'on' : 'off');
-    }
-    /**
-     * 配置 database
-     */
-    protected function setDatabase()
-    {
-        $settArray = syGetProjectMysql();
-        if (!empty($settArray) && !empty($settArray['database'])) {
-            $oldSett = $this->app->config->get('database');
-            $oldSett['connections']['ctocode_7'] = frameGetDbInit($settArray, $settArray['database']);
-            $this->app->config->set($oldSett, 'database');
-            $newSett = $this->app->config->get('database');
-        }
-    }
-    /**
-     * 配置 cache
-     */
-    protected function setRedis()
-    {
-        $settArray = syGetProjectRedis();
-        if (!empty($settArray) && !empty($settArray['cache'])) {
-            $oldSett = $this->app->config->get('cache');
-            var_dump($oldSett);
-            // $oldSett['connections']['ctocode_7'] = frameGetDbInit($settArray, $settArray['cache']);
-            // $this->app->config->set($oldSett, 'cache');
-            // $newSett = $this->app->config->get('cache');
-        }
     }
 }

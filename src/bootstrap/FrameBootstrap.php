@@ -5,9 +5,22 @@ declare(strict_types=1);
 namespace shiyun\bootstrap;
 
 use shiyun\support\Service as BaseService;
+use think\response\Json;
+use think\facade\Cache;
+use think\Request;
 
 class FrameBootstrap extends BaseService
 {
+
+    public function register()
+    {
+        /**
+         * 注册 csrf-token
+         */
+        $this->registerRoutes(function (\think\Route $route) {
+            $route->get('/csrf_token', "\\shiyun\\extend\CsrfToken@getCsrfToken");
+        });
+    }
     public function boot()
     {
         $this->commands([

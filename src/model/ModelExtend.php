@@ -39,13 +39,6 @@ class ModelExtend extends Model
     protected $tableType = '';
     protected $tableName = ''; // 当前模型.除开后缀的名字
     protected $tablePrimary = ''; // 当前模型.表单主键
-
-    // 是否自动解析
-    protected $_autoAnalys = false;
-
-    /* 数据库连接对象 */
-    protected $_dbObj;
-    /* */
     protected $dbprefix = ''; // 当前模型.表单前缀
     protected $time;
     // 当前模型的【表单字段】
@@ -57,7 +50,7 @@ class ModelExtend extends Model
     // 文件资源路径,指向ms下的file文件夹
     protected $page = 1;
     protected $pagesize = 10;
-
+    /* 数据库连接对象 */
     protected $exDb = null;
     // 扩展where
     protected $whereArr = array();
@@ -110,40 +103,6 @@ class ModelExtend extends Model
     public function _initialize()
     {
     }
-    // protected function exWhere($wsql = [])
-    // {
-    //     if (is_array($this->whereArr) && !empty($this->whereArr)) {
-    //         foreach ($this->whereArr as $key => $val) {
-    //             if (!empty($wsql[$key])) {
-    //                 $this->exDb->where($key, $val, $wsql[$key] ?? '');
-    //             }
-    //         }
-    //     }
-    //     return $this->exDb;
-    // }
-    protected function exLimit($wsql = [])
-    {
-        $page = !empty($wsql['page']) ? $wsql['page'] : 1;
-        $page = is_numeric($page) ? intval($page) : 1;
-        $pagesize = !empty($wsql['pagesize']) ? $wsql['pagesize'] : 10;
-        $pagesize = $pagesize == 'all' ? $pagesize : intval($pagesize);
-        $last = [
-            'page' => ($page - 1) * $pagesize,
-            'pagesize' => $pagesize
-        ];
-        $this->exDb->limit($last['page'], $last['pagesize']);
-        return $this->exDb;
-    }
-    // 解析列表
-    protected function exParseData($data = null, $type = '')
-    {
-        $parse_data = array();
-        foreach ($data as $key => $val) {
-            $parse_data[$key] = (array) $val->getData();
-            ksort($parse_data[$key]);
-        }
-        return $parse_data;
-    }
     // 分页
     protected function parseSqlLimit($wsql = [])
     {
@@ -152,5 +111,9 @@ class ModelExtend extends Model
         $pagesize = !empty($wsql['pagesize']) ? $wsql['pagesize'] : 10;
         $pagesize = $pagesize == 'all' ? $pagesize : intval($pagesize);
         return $pagesize == 'all' ? ' ' : ' LIMIT ' . ($page - 1) * $pagesize . ",{$pagesize} ";
+    }
+    public function getLastId()
+    {
+        return $this->id;
     }
 }

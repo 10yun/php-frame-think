@@ -1,6 +1,6 @@
 <?php
 
-namespace shiyun\model;
+namespace shiyun\model\exception;
 
 class ModelException extends \think\Exception
 {

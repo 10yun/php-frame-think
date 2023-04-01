@@ -23,7 +23,7 @@ class SyAuthJwtMiddle
 
         if (!empty($tokenType)) {
             if (!empty($tokenJwt)) {
-                $jwtauth = \app\common\lib\JwtAuth::getInstance();
+                $jwtauth = \shiyun\libs\JwtAuth::getInstance();
                 $jwtauth->setToken($tokenJwt);
                 if ($jwtauth->validate() && $jwtauth->verify()) {
                     return $next($request);

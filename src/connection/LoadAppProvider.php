@@ -28,12 +28,12 @@ class LoadAppProvider
 {
     public function boot()
     {
-        // $batchPathArr = glob ( root_path() . '/addons/*/repositories/provider.php' );
-        // if(! empty ( $batchPathArr )){
-        // foreach($batchPathArr as $itemPath){
-        // $itemData = include_once $itemPath;
-        // $tp6_def = array_merge ( $tp6_def, $itemData );
-        // }
+        // $batchPathArr = glob(root_path() . '/addons/*/repositories/provider.php');
+        // if (!empty($batchPathArr)) {
+        //     foreach ($batchPathArr as $itemPath) {
+        //         $itemData = include_once $itemPath;
+        //         $tp6_def = array_merge($tp6_def, $itemData);
+        //     }
         // }
     }
 }

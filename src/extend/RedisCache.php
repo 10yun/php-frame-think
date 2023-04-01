@@ -9,6 +9,9 @@ use shiyun\support\Cache;
 class RedisCache
 {
     protected $redis_store = 'CACHE_STORES_RD2';
+    protected $redis_handle = null;
+
+
     protected $cache_data;
     protected $cache_key;
     protected $cache_token = '';
@@ -21,6 +24,11 @@ class RedisCache
     // 最后一位key
     protected $key_flag = '';
     protected $key_time;
+
+    public function __construct()
+    {
+        $this->redis_handle = Cache::store($this->redis_store)->handler();
+    }
     /**
      * 设置驱动
      */
@@ -63,9 +71,11 @@ class RedisCache
      * 设置时效
      * @param $time [ $time 为空时，默认0 ]
      */
-    public function setTime($time = 0)
+    public function setTime($time = null)
     {
-        $this->key_time = $time;
+        if (!empty($time)) {
+            $this->key_time = $time;
+        }
         return $this;
     }
     /**
@@ -93,8 +103,7 @@ class RedisCache
         }
         $this->parseCacheKey();
 
-        $redisHandler = Cache::store($this->redis_store)->handler();
-        $redisHandler->set(
+        $this->redis_handle->set(
             $this->cache_key,
             $this->cache_data,
             $this->key_time
@@ -104,13 +113,12 @@ class RedisCache
     /**
      * 缓存-获取
      */
-    public function getCache()
+    public function getCache($isParseKey = true)
     {
-        if (empty($this->cache_key)) {
+        if ($isParseKey) {
             $this->parseCacheKey();
         }
-        $redisHandler = Cache::store($this->redis_store)->handler();
-        $cache = $redisHandler->get($this->cache_key);
+        $cache = $this->redis_handle->get($this->cache_key);
         if (HelperType::isJson($cache)) {
             $cache = json_decode($cache, true);
         }
@@ -122,9 +130,8 @@ class RedisCache
     public function clearCache()
     {
         $this->parseCacheKey();
-        $redisHandler = Cache::store($this->redis_store)->handler();
-        $tagArr = $redisHandler->keys("{$this->key_tags}:*");
-        $redisHandler->del($tagArr);
+        $tagArr = $this->redis_handle->keys("{$this->key_tags}:*");
+        $this->redis_handle->del($tagArr);
     }
     /**
      * 缓存-删除
@@ -132,8 +139,7 @@ class RedisCache
     public function delCache()
     {
         $this->parseCacheKey();
-        $redisHandler = Cache::store($this->redis_store)->handler();
-        $redisHandler->rm($this->cache_key);
+        $this->redis_handle->rm($this->cache_key);
     }
 
     protected function parseCacheKey()

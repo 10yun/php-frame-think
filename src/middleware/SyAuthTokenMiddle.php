@@ -34,8 +34,7 @@ class SyAuthTokenMiddle
             return sendRespCode200('100400');
         }
         // 获取全部的禁用用户名单
-        // $ucenterBlcakRpcModelObj = loadAddonRpcClass('v210916_ucenter', 'Black');
-        // $ucenterBlackDatas = $ucenterBlcakRpcModelObj->getListData(array(
+        // $ucenterBlackDatas = loadAddonsModel('v210916_ucenter', 'Black')->getListData(array(
         //     'field' => 'a.account_id'
         // ));
         // if (!empty($ucenterBlackDatas['data'])) {

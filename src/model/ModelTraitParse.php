@@ -23,7 +23,37 @@ trait ModelTraitParse
             }
         }
     }
-
+    public function whereItem($key, $val = '')
+    {
+    }
+    // 小于
+    public function appendWhereLT($key, $type = '')
+    {
+    }
+    // 小于等于
+    public function appendWhereLE($key, $type = '')
+    {
+    }
+    // 等于
+    public function appendWhereEQ($key, $val = '', $check = 'empty')
+    {
+    }
+    // 不等于
+    public function appendWhereNE($key, $type = '')
+    {
+    }
+    // 大于等于
+    public function appendWhereGE($key, $type = '')
+    {
+    }
+    // 大于
+    public function appendWhereGT($key, $type = '')
+    {
+    }
+    // OR
+    public function appendWhereOR($key, $type = '')
+    {
+    }
     protected $whereArr = [];
     /**
      * @action SQL语句验证函数,防注入 防CC、至强抗DDoS 等
@@ -42,22 +72,8 @@ trait ModelTraitParse
         $this->whereArr = $wArr;
         return $this;
     }
-    protected function orderBy($byStr)
+    private function orderBy($orderby, $ordersort)
     {
-        if (empty($this->tablePrimary)) {
-            return '';
-        }
-        $order_by = !empty($this->whereArr['orderby']) ? strtolower(trim($this->whereArr['orderby'])) : $this->tablePrimary;
-        // $order_by = $this->tablePrimary;
-        if ($order_by == 'rand') {
-            return " ORDER BY RAND() ";
-        }
-        $order_sort = !empty($this->whereArr['ordersort']) ? strtoupper(trim($this->whereArr['ordersort'])) : 'DESC';
-        $order_sort = in_array($order_sort, array(
-            'DESC',
-            'ASC'
-        )) ? $order_sort : 'DESC';
-        return " ORDER BY {$byStr} {$order_sort} ";
     }
     // 分页
     protected function parseSqlLimit($wsql = [])

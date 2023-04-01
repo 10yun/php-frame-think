@@ -19,8 +19,6 @@ declare(strict_types=1);
 
 namespace shiyun\connection;
 
-use app\supers\SuperToken;
-
 /**
  * 依赖注入，应用配置类
  * 鉴权的时候 获取 【apps应用相关配置】
@@ -28,23 +26,44 @@ use app\supers\SuperToken;
  */
 class OpenAppAccess
 {
+    protected $setCacheStore = 'CACHE_STORES_REDIS';
+    protected $setCacheKey = '_token_';
+    protected $setCacheTime =  (60 * 60 * 24) * 3; // 缓存3天
+
+    public function sCacheGet($diyKey = '', $needField = [])
+    {
+        $setCacheKey = $this->setCacheKey;
+        $key_project = syOpenAppsAuth('syOpenAppProject');
+        $key_apps = syOpenAppsAuth('syOpenAppId');
+        $cacheKey = $key_project . ':' . $key_apps . ':' . $setCacheKey . $diyKey;
+        $cacheData = frameCacheGet('CACHE_STORES_RD2', $cacheKey);
+        return $cacheData;
+    }
+    public function sCacheSet($diyKey = '', $data = null)
+    {
+        $setCacheKey = $this->setCacheKey;
+        $key_project = syOpenAppsAuth('syOpenAppProject');
+        $key_apps = syOpenAppsAuth('syOpenAppId');
+        $cacheKey = $key_project . ':' . $key_apps . ':' . $setCacheKey . $diyKey;
+        frameCacheSet('CACHE_STORES_RD2', $cacheKey, $data, (60 * 60 * 24 * 3));
+    }
+
     public $accessData = [];
     public function setAccessData($data = [])
     {
         $token_access = syOpenAppsAuth('syOpenAppToken');
-
-        SuperToken::sCacheSet(md5($token_access), json_encode($data));
+        $this->sCacheSet(md5($token_access), json_encode($data));
         $this->accessData = $data;
     }
     public function setAccessName($key = '', $val = null)
     {
         $token_access = syOpenAppsAuth('syOpenAppToken');
 
-        $tokenCache = SuperToken::sCacheGet(md5($token_access));
+        $tokenCache = $this->sCacheGet(md5($token_access));
         $accessData = analysJsonDecode($tokenCache) ?? [];
 
         $accessData[$key] = $val;
-        SuperToken::sCacheSet(md5($token_access), json_encode($accessData));
+        $this->sCacheSet(md5($token_access), json_encode($accessData));
         $this->accessData = $accessData;
     }
 
@@ -62,7 +81,7 @@ class OpenAppAccess
             $aes = new \ctocode\library\CtoAes();
             $token_access = $aes->decrypt(syOpenAppsAuth('syOpenAppToken'));
         }
-        $tokenCache = SuperToken::sCacheGet(md5($token_access));
+        $tokenCache = $this->sCacheGet(md5($token_access));
         if (empty($tokenCache)) {
             return [];
         }
