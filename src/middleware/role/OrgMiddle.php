@@ -11,7 +11,6 @@ class OrgMiddle
     protected $orgArr = [
         'org-business' => '商家端',
         'org-saas' => '平台端',
-        'org-paas' => 'paas端',
         'org-agent' => 'agent端',
         'org-group' => '集团端',
         'org-admin' => '超管端',
