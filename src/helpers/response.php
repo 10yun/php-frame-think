@@ -38,7 +38,7 @@ function sendRespInfo($send_data = [])
 /**
  * 成功
  */
-function sendRespSucc($msg = '操作成功~', $status = 200, $data = [])
+function sendRespSucc(string $msg = '操作成功~', int $status = 200, array|string $data = [])
 {
     return sendRespInfo([
         'status' => $status,
@@ -51,9 +51,9 @@ function sendRespSucc($msg = '操作成功~', $status = 200, $data = [])
 /**
  * 错误
  */
-function sendRespError($msg = null, $code = 404, $data = null): Response
+function sendRespError(string $msg = '', int $code = 404, array|string $data = []): Response
 {
-    if ($msg == null) {
+    if (empty($msg)) {
         $msg = '操作失败';
     }
     if (is_array($msg)) {

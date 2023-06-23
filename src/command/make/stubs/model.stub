@@ -1,0 +1,37 @@
+<?php
+
+namespace {%namespaceClass%};
+
+use shiyun\model\ModelCheckExt;
+
+class {%className%}Models extends ModelCheckExt
+{
+    protected $table = 'table_name';
+    protected $pk = 'table_id';
+
+    protected $checkRule = [
+        'field_name' => ['repeat'],
+    ];
+    protected $checkMessage = [
+        'field_name' => [
+            'repeat' => '配件名称已存在',
+        ],
+    ];
+    protected $checkWhere = [
+        'business_postData' => [
+            'business_id' => '=',
+        ],
+        'business_putById' => [
+            'parts_id' => '<>',
+            'business_id' => '='
+        ],
+    ];
+    protected $checkScene = [
+        'business_postData' => [
+            'field_name' => '='
+        ],
+        'business_putById' => [
+            'field_name' => '='
+        ],
+    ];
+}

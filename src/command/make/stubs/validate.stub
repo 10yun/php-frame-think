@@ -1,0 +1,50 @@
+<?php
+
+namespace {%namespace%};
+
+use shiyun\validate\ValidateExtend;
+
+class {%className%}Validate extends ValidateExtend
+{
+    protected $rule = [
+        'id' => [
+            'require', 'number', 'regex' => '/^[1-9]{1}\d{0,9}$/',
+        ],
+        'activity_name' => [
+            'require'
+        ],
+        'activity_starttime' => [
+            'require',
+            'date',
+        ],
+        'activity_endtime' => [
+            'require',
+            'date',
+            'gt:activity_starttime'
+        ],
+    ];
+    protected $message = [
+        'id' => [
+            'require' => 'id不能为空',
+            'number' => 'id格式错误',
+            'regex' => 'id参数错误',
+        ],
+        'activity_name' => [
+            'require' => '活动名称不能为空',
+        ],
+        'activity_starttime' => [
+            'require' => '活动开始时间不能为空',
+            'date' => '开始时间格式错误',
+        ],
+        'activity_endtime' => [
+            'require' => '活动结束时间不能为空',
+            'date' => '结束时间格式错误',
+            'gt' => '结束时间要大于开始时间'
+        ],
+    ];
+    protected $scene = [
+        'business_postData' => ['activity_name', 'activity_starttime', 'activity_endtime'],
+        'putById' => ['id',],
+        'deleteById' => ['id',],
+    ];
+}

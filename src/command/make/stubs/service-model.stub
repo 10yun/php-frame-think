@@ -1,0 +1,61 @@
+<?php
+
+use shiyun\model\ModelExtend;
+
+class {%className%}Model extends ModelExtend
+{
+    protected $tableName = 'table_name';
+    protected $tablePrimary = 'table_id';
+    protected $pagesize = 10;
+    protected $bids = '';
+
+    public function getListData($wsql = [], $type = '')
+    {
+        $sql_select = "SELECT a.*
+		";
+        $sql_from = " FROM table_name AS a 
+		";
+        $sql_where = " WHERE 1=1 ";
+        // 其他搜索条件
+        $sql_where .= !empty($wsql['business_id']) ? "  AND a.business_id='{$wsql['business_id']}' " : null;
+        $sql_where .= !empty($wsql['table_id']) ? "  AND a.table_id='{$wsql['table_id']}'" : null;
+        $sql_where .= !empty($wsql['business_id']) ? "  AND a.business_id='{$wsql['business_id']}'" : null;
+        if (!empty($wsql['keyword'])) {
+            // 关键字处理
+            $keyword = $wsql['keyword'];
+            $sql_where .= " AND (
+			( a.room_title LIKE '%{$keyword}%' )
+			OR( a.table_id LIKE '%{$keyword}%' ) )";
+        }
+        // 排序
+        $sql_order = " ORDER BY a.table_id DESC ";
+
+        if ($type == 'row') {
+            $sql_limit = " LIMIT 0,1; ";
+            // 获取数据
+            $sql_all = $sql_select . $sql_from . $sql_where . $sql_order . $sql_limit;
+            $sql_all_result = $this->sqlRead($sql_all);
+            $data['data'] = $this->parseListData($sql_all_result);
+        } else {
+            $sql_limit = $this->parseSqlLimit($wsql);
+            $sql_limit = "";
+            // 获取数据
+            $sql_all = $sql_select . $sql_from . $sql_where . $sql_order . $sql_limit;
+            $sql_all_result = $this->sqlRead($sql_all);
+            $data['data'] = $this->parseListData($sql_all_result);
+            // 获取总数
+            $sql_count = "SELECT COUNT(*) AS d " . $sql_from . $sql_where . $sql_order;
+            $sql_count_result = $this->sqlRead($sql_count);
+            $data['total'] = $sql_count_result[0]['d'];
+        }
+        return $data;
+    }
+    private function parseListData($data = null)
+    {
+        $parse_data = array();
+        foreach ($data as $key => $val) {
+            $parse_data[$key] = $val;
+        }
+        return $parse_data;
+    }
+}

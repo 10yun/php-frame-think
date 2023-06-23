@@ -57,7 +57,7 @@ function frameCacheGet($store = 'default', $key = '', $defVal = null)
     if (!empty($defVal)) {
         Cache::store($store)->get($key, $defVal);
     }
-    return  Cache::store($store)->get($key);
+    return Cache::store($store)->get($key);
 }
 function frameCacheSet($store = 'default', $key = '', $val = '', $time = null)
 {

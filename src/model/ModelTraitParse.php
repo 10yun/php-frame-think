@@ -72,8 +72,10 @@ trait ModelTraitParse
         $this->whereArr = $wArr;
         return $this;
     }
-    private function orderBy($orderby, $ordersort)
+    protected function parseSqlOrderBy($wsql = [])
     {
+        if (!empty($wsql['orderby'])) {
+        }
     }
     // 分页
     protected function parseSqlLimit($wsql = [])

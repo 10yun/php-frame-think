@@ -56,3 +56,76 @@ function get_class_from_file($path_to_file)
     //Build the fully-qualified class name and return it
     return $namespace ? $namespace . '\\' . $class : $class;
 }
+
+function get_namespace_class_form_file($classFilePath)
+{
+    // 替换为实际的类文件路径
+
+    // 读取类文件内容
+    $classContent = file_get_contents($classFilePath);
+
+    // 使用正则表达式从文件内容中提取类名和命名空间
+    $classNamePattern = '/class\s+(\w+)/';
+    $namespacePattern = '/namespace\s+(.*?);/';
+
+    $className = null;
+    $namespace = null;
+
+    if (preg_match($classNamePattern, $classContent, $matches)) {
+        $className = $matches[1];
+    }
+
+    if (preg_match($namespacePattern, $classContent, $matches)) {
+        $namespace = $matches[1];
+    }
+    return $namespace ? $namespace . '\\' . $className : $className;
+}
+
+
+function getMethodAnnotations($method)
+{
+    $reflection = new \ReflectionMethod($method);
+    // 获取注释
+    $annotations = [];
+    foreach ($reflection->getDocComment() as $comment) {
+        if (preg_match('/@[a-zA-Z]+/', $comment)) {
+            $annotations[] = preg_replace('/^@([a-zA-Z]+)(.*)$/', '$1', $comment);
+        }
+    }
+
+    // 将注释转换为数组格式
+    $annotations = array_map(function ($annotation) {
+        return json_decode($annotation, true);
+    }, $annotations);
+
+    // 返回方法名、参数和注释信息
+    return [$reflection->name, $reflection->getParameters(), $annotations];
+}
+/**
+ * 获取一个函数的依赖
+ * @param  string|callable $func
+ * @param  array  $param 调用方法时所需参数 形参名就是key值
+ * @return array  返回方法调用所需依赖
+ */
+function getFucntionParameter($func, $param = [])
+{
+    if (!is_array($param)) {
+        $param = [$param];
+    }
+    $ReflectionFunc = new \ReflectionFunction($func);
+    $depend = array();
+    foreach ($ReflectionFunc->getParameters() as $value) {
+        if (isset($param[$value->name])) {
+            $depend[] = $param[$value->name];
+        } elseif ($value->isDefaultValueAvailable()) {
+            $depend[] = $value->getDefaultValue();
+        } else {
+            $tmp = $value->getClass();
+            if (is_null($tmp)) {
+                throw new \Exception("Function parameters can not be getClass {$class}");
+            }
+            $depend[] = $this->get($tmp->getName());
+        }
+    }
+    return $depend;
+}

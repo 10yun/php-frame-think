@@ -1,0 +1,103 @@
+<?php
+
+namespace {%namespaceClass%};
+
+use shiyun\route\annotation\RouteFlag;
+use shiyun\route\annotation\RouteMiddleware;
+use shiyun\route\annotation\RouteRestful;
+use shiyun\support\Db;
+
+/**
+ * 	数量单位
+ * @author ctocode-zhw
+ * @version 2023
+ */
+#[RouteFlag('CHANNEL_MOD_BUS_XXX_XXX')]
+#[RouteRestful('/channle.module/business/xxx_xxx')]
+#[RouteMiddleware([
+    \shiyun\middleware\SyAuthAppMiddle::class,
+    \shiyun\middleware\SyAuthTokenMiddle::class,
+    \shiyun\middleware\role\BizsMiddle::class,
+])]
+class {%className%}
+{
+    public function getById(int $id = 0)
+    {
+        $wsql = array();
+        $wsql['business_id'] = syOpenAccess('business_id');
+        $wsql['xxxx_id'] = $id;
+        $wsql['page'] = ctoRequest('page', 'int', 1);
+        $result_data = loadAddonsModel('xxxxxxxxxx', '{%className%}')->getRowData($wsql);
+        return sendRespGetItem($result_data);
+    }
+    public function getData()
+    {
+        $wsql = \app\common\lib\RequestExtend::getDataParam();
+        $wsql['business_id'] = syOpenAccess('business_id');
+        $wsql['xxxx_id'] = ctoRequest('xxxx_id', 'int');
+        $result_data = loadAddonsModel('xxxxxxxxxx', '{%className%}')->getListData($wsql);
+        return sendRespGetAll($wsql, $result_data);
+    }
+    public function postData()
+    {
+        $post_param = request()->filter(['trim'])->only([
+            'unit_name', 'unit_sort'
+        ]);
+        $post_param['business_id'] = syOpenAccess('business_id');
+
+        // 动态规则场景
+        $validateForm = new \{%namespaceValidate%}\{%className%}Validate();
+        if (!$validateForm->scene('business_postData')->check($post_param)) {
+            return sendRespError($validateForm->getError());
+        }
+
+        // 动态验证模型
+        $validateModel = new \{%namespaceModel%}\{%className%}Models();
+        if (!$validateModel->scene('business_postData')->check($post_param)) {
+            return sendRespError($validateModel->getError());
+        }
+        
+        $resData = loadAddonsModel('xxxxxxxxxx', '{%className%}')->create($post_param);
+        if ($resData) {
+            return sendRespSucc('添加成功');
+        }
+        return sendRespError('添加失败');
+    }
+    public function putById(int $id = 0)
+    {
+        $put_param = request()->filter(['trim'])->only([
+            'unit_name', 'unit_sort'
+        ]);
+        $put_param['business_id'] = syOpenAccess('business_id');
+        $put_param['xxxx_id'] = $id;
+
+        // 动态规则场景
+        $validateForm = new \{%namespaceValidate%}\{%className%}Validate();
+        if (!$validateForm->scene('business_putById')->check($put_param)) {
+            return sendRespError($validateForm->getError());
+        }
+
+        // 动态验证模型
+        $validateModel = new \{%namespaceModel%}\{%className%}Models();
+        if (!$validateModel->scene('business_putById')->check($put_param)) {
+            return sendRespError($validateModel->getError());
+        }
+
+        $resData = loadAddonsModel('xxxxxxxxxx', '{%className%}')->update($put_param);
+        if ($resData) {
+            return sendRespSucc('更新成功');
+        }
+        return sendRespError('更新失败');
+    }
+    public function deleteById(int $id = 0)
+    {
+        $delRes = loadAddonsModel('xxxxxxxxxx', '{%className%}')->whereDelete([
+            'business_id' => syOpenAccess('business_id'),
+            'xxxx_id' => $id
+        ]);
+        if ($delRes) {
+            return sendRespSucc('删除成功');
+        }
+        return sendRespError('删除失败');
+    }
+}

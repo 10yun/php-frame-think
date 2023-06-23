@@ -6,10 +6,6 @@ use shiyun\support\Response;
 use shiyun\support\Request;
 use shiyun\support\Config;
 
-$frame_path = preg_replace('/(\/|\\\\){1,}/', '/', __DIR__) . '/';
-define('_PATH_PROJECT_', dirname($frame_path, 5) . '/');
-define('_PATH_RUNTIME_', _PATH_PROJECT_ . 'runtime/');
-define('_PATH_STORAGE_', _PATH_PROJECT_ . 'storage/');
 
 function syPathVendor()
 {

@@ -103,15 +103,6 @@ class ModelExtend extends Model
     public function _initialize()
     {
     }
-    // 分页
-    protected function parseSqlLimit($wsql = [])
-    {
-        $page = !empty($wsql['page']) ? $wsql['page'] : 1;
-        $page = is_numeric($page) ? intval($page) : 1;
-        $pagesize = !empty($wsql['pagesize']) ? $wsql['pagesize'] : 10;
-        $pagesize = $pagesize == 'all' ? $pagesize : intval($pagesize);
-        return $pagesize == 'all' ? ' ' : ' LIMIT ' . ($page - 1) * $pagesize . ",{$pagesize} ";
-    }
     public function getLastId()
     {
         return $this->id;

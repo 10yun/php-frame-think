@@ -27,12 +27,13 @@ class FrameBootstrap extends BaseService
             'ConfigPush' => \shiyun\command\ConfigPush::class,
             'ServiceDiscover' => \shiyun\command\ServiceDiscover::class,
             'VendorPublish' => \shiyun\command\vendorPublish::class,
-            // 'addons:model' => \shiyun\command\addons\Model::class,
-            // 'addons:model_select' => \shiyun\command\addons\ModelSelect::class,
-            // 'addons:rpc' => \shiyun\command\addons\Rpc::class,
-            // 'addons:validate' => \shiyun\command\addons\Validate::class,
-            // 'addons:crud' => \shiyun\command\addons\Crud::class,
-            // 'addons:api' => \shiyun\command\addons\Api::class,
+            'CreateApiFlag' => \shiyun\command\CreateApiFlag::class,
+            // 生成 addons 应用相关
+            'MakeController' => \shiyun\command\make\MakeController::class,
+            'MakeModel' => \shiyun\command\make\MakeModel::class,
+            'MakeServer' => \shiyun\command\make\MakeServer::class,
+            'MakeValidate' => \shiyun\command\make\MakeValidate::class,
+            'MakeQueue' => \shiyun\command\make\MakeQueue::class,
         ]);
     }
 }
