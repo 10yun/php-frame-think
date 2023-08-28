@@ -1,22 +1,25 @@
 # php-frame-think
 
 
-## 介绍
+### 介绍
 
-基于thinkphp6扩展  
-支持 thinkphp6（tp6）php8原生（Attribute）注解   
-Support thinkphp6 (tp6) php8（Attribute）annotation 
+基于 thinkphp8 扩展  
+支持 thinkphp8（tp8）php8原生（Attribute）注解   
+Support thinkphp8 (tp8) php8（Attribute）annotation 
 
-## 依赖
+php,消息队列,mqtt,rabbitmq,redis
+
+### 依赖
 
 - php8
-- thinkphp6
+- thinkphp8
 
-## 文档
+### 文档
 
-- [路由注册]( https://docs.10yun.com/php )
-- [路由注解]( https://docs.10yun.com/php/)  
-- [验证注解]( https://docs.10yun.com/php/)
+- [路由注册]( https://docs.10yun.com/php )  
+- [路由注解]( https://docs.10yun.com/php/)    
+- [验证注解]( https://docs.10yun.com/php/)  
+- [消息队列]( https://docs.10yun.com/php/queue)  
 
 
 

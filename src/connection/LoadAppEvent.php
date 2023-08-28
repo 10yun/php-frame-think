@@ -44,11 +44,11 @@ class LoadAppEvent
     {
         // 这边可以判断缓存是否存在
         $isDebug = $this->app->isDebug();
-        $isEnvironment = Env::get('ctocode.environment');
+        $envProjectEnvironment = Env::get('ctocode.project_environment');
 
         $loadCache = [];
         $cacheOptimizePath = _PATH_RUNTIME_ . '/shiyun_optimize/events.php';
-        if (!$isDebug && $isEnvironment != 'development') {
+        if (!$isDebug && $envProjectEnvironment != 'development') {
             if (file_exists($cacheOptimizePath)) {
                 $loadCache = include_once $cacheOptimizePath;
             }
@@ -102,7 +102,7 @@ class LoadAppEvent
                 $loadCache = $includeData;
             }
 
-            if (!$isDebug && $isEnvironment != 'development') {
+            if (!$isDebug && $envProjectEnvironment != 'development') {
                 @mkdir(_PATH_RUNTIME_ . '/shiyun_optimize/');
                 if (is_file($cacheOptimizePath)) {
                     unlink($cacheOptimizePath);

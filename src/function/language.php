@@ -257,7 +257,7 @@ function _cc_lang_first_letter($str = '', $isZh = true)
     // return strtoupper ( substr ( $s0, 0, 1 ) );
     // }
     // if($fchar >= ord ( "a" ) and $fchar <= ord ( "Z" ))
-    // return strtoupper ( $s0{0} );
+    // return strtoupper ( $s0[0] );
     // if(is_numeric ( substr ( $s0, 0, 1 ) )){
     // $s0 = _cc_lang_money_to_capital_cn ( substr ( $s0, 0, 1 ) );
     // }

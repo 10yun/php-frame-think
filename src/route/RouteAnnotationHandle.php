@@ -253,11 +253,27 @@ abstract class RouteAnnotationHandle implements IntfAnnotationHandle
                         'method' => $funcName,
                         'methods' => 'PUT',
                     ]));
+                } else if ($funcName == 'putData') {
+                    self::addRoute($parameters['path'], array_merge($item, [
+                        'parameters' => array_merge($parameters, [
+                            'methods' => 'PUT',
+                        ]),
+                        'method' => $funcName,
+                        'methods' => 'PUT',
+                    ]));
                 } else if ($funcName == 'patchById') {
                     self::addRoute($parameters['path'] . "/<id>", array_merge($item, [
                         'parameters' => array_merge($parameters, [
                             'methods' => 'PATCH',
                             'pattern' => ['id' => '\d+'],
+                        ]),
+                        'method' => $funcName,
+                        'methods' => 'PATCH',
+                    ]));
+                } else if ($funcName == 'patchData') {
+                    self::addRoute($parameters['path'], array_merge($item, [
+                        'parameters' => array_merge($parameters, [
+                            'methods' => 'PATCH',
                         ]),
                         'method' => $funcName,
                         'methods' => 'PATCH',

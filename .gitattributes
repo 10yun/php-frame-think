@@ -14,3 +14,4 @@
 /*.zip                 export-ignore
 /example/              export-ignore
 composer2.json         export-ignore
+composer-queue.json    export-ignore

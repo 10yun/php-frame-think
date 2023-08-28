@@ -5,6 +5,7 @@
 use shiyun\support\Response;
 use shiyun\support\Request;
 use shiyun\support\Config;
+use shiyun\support\Env;
 
 
 function syPathVendor()
@@ -37,7 +38,7 @@ function syGetConfig(string $key = null, $default = [])
 }
 function syGetVersion()
 {
-    return 'ctocode-v7.23.0115';
+    return __CTOCODE__['_version_'];
 }
 function syGetHeader()
 {
@@ -51,15 +52,39 @@ function syGetHeader()
 }
 function syGetEnvironment()
 {
-    $environment = frameGetEnv('ctocode.environment');
-    if (empty($environment)) {
+    $envProjectEnvironment = frameGetEnv('ctocode.project_environment');
+    if (empty($envProjectEnvironment)) {
         return false;
     }
-    if ($environment !== 'development') {
+    if ($envProjectEnvironment !== 'development') {
         return false;
     }
     return true;
 }
+/**
+ * 获取项目路径
+ */
+function syGetProjectPath($proStr = '')
+{
+    $envProjectPath = Env::get('ctocode.project_path', 'off');
+    if ($envProjectPath == 'open') {
+        return root_path() . '/project/' . $proStr . '/';
+    } else {
+        return root_path() . '/project/';
+    }
+}
+/**
+ * 
+ */
+function syGetProjectConfig($projectName = '', $configFile)
+{
+    $sett_path2 = syGetProjectPath($projectName) . "/{$configFile}.yml";
+    if (file_exists($sett_path2)) {
+        $settArray = yaml_parse_file($sett_path2);
+    }
+    return $settArray;
+}
+
 /**
  * 获取项目配置
  */
@@ -68,16 +93,9 @@ function syGetProjectSett($diy_name = '')
     if (empty($diy_name)) {
         return [];
     }
-    $settArray = [];
-    $sett_path1 = root_path() . '/project/' . $diy_name . '/project.php';
-    if (file_exists($sett_path1)) {
-        $settArray1 = include $sett_path1;
-        $settArray = array_merge($settArray, $settArray1);
-    }
-    $sett_path2 = root_path() . '/project/' . $diy_name . '/project.yml';
+    $sett_path2 = syGetProjectPath($diy_name) . '/project.yml';
     if (file_exists($sett_path2)) {
-        $settArray2 = yaml_parse_file($sett_path2);
-        $settArray = array_merge($settArray, $settArray2);
+        $settArray = yaml_parse_file($sett_path2);
     }
     return $settArray;
 }
@@ -86,7 +104,7 @@ function syGetProjectSett($diy_name = '')
  */
 function syGetAppsArr()
 {
-    $pathStr = root_path() . '/project/*/apps/*';
+    $pathStr = syGetProjectPath('*') . '/apps/*';
     $pathArr = glob($pathStr);
     $appsArr = [];
     foreach ($pathArr as $val) {
@@ -105,7 +123,7 @@ function syGetAppsSett($diy_name = '')
     }
     $settArray = [];
     if (!empty($diy_name)) {
-        $configPath = root_path() . '/project/*/apps/' . $diy_name . '.yml';
+        $configPath = syGetProjectPath('*') . '/apps/' . $diy_name . '.yml';
         $configArr = glob($configPath);
         if (!empty($configArr[0])) {
             $sett_path = $configArr[0];

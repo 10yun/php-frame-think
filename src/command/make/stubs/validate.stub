@@ -10,17 +10,17 @@ class {%className%}Validate extends ValidateExtend
         'id' => [
             'require', 'number', 'regex' => '/^[1-9]{1}\d{0,9}$/',
         ],
-        'activity_name' => [
+        'field_name' => [
             'require'
         ],
-        'activity_starttime' => [
+        'field_date1' => [
             'require',
             'date',
         ],
-        'activity_endtime' => [
+        'field_date2' => [
             'require',
             'date',
-            'gt:activity_starttime'
+            'gt:field_date1'
         ],
     ];
     protected $message = [
@@ -29,21 +29,21 @@ class {%className%}Validate extends ValidateExtend
             'number' => 'id格式错误',
             'regex' => 'id参数错误',
         ],
-        'activity_name' => [
+        'field_name' => [
             'require' => '活动名称不能为空',
         ],
-        'activity_starttime' => [
+        'field_date1' => [
             'require' => '活动开始时间不能为空',
             'date' => '开始时间格式错误',
         ],
-        'activity_endtime' => [
+        'field_date2' => [
             'require' => '活动结束时间不能为空',
             'date' => '结束时间格式错误',
             'gt' => '结束时间要大于开始时间'
         ],
     ];
     protected $scene = [
-        'business_postData' => ['activity_name', 'activity_starttime', 'activity_endtime'],
+        'business_postData' => ['field_name', 'field_date1', 'field_date2'],
         'putById' => ['id',],
         'deleteById' => ['id',],
     ];

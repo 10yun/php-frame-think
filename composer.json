@@ -1,37 +1,66 @@
 {
     "name": "shiyun/php-think",
-    "type": "library",
-    "license": "MIT",
-    "description": "thinkphp extend shiyun/php-think",
     "version": "1.0.1",
+    "type": "library",
+    "description": "shiyun ctocode frame extend thinkphp  shiyun/php-think",
+    "description2": "php worker for shiyun，workerman的一些二次封装",
+    "keywords": [
+        "mqtt",
+        "mqtt_client",
+        "mqtt3",
+        "mqtt5.0",
+        "rabbitmq",
+        "queue",
+        "redis",
+        "amqp"
+    ],
+    "homepage": "https://docs.10yun.com/php/",
+    "license2": "Apache-2.0",
+    "license": "MIT",
     "authors": [
         {
             "name": "ctocode",
             "email": "343196936@qq.com"
+        },
+        {
+            "name": "十云",
+            "email": "syky@10yun.com"
         }
     ],
     "require": {
-        "php": "^8"
+        "php": "^8",
+        "shiyun/php-worker": "@dev",
+        "ext-json": "*",
+        "nesbot/carbon": "^2.16"
     },
-    "require-dev": {},
+    "require-dev": {
+        "ext-json": "*",
+        "ext-curl": "*",
+        "ext-bcmath": "*"
+    },
     "autoload": {
         "psr-4": {
+            "shiyunQueue\\": "src",
             "shiyun\\": "src"
         },
         "files": [
             "src/helpers.php"
         ]
     },
+    "autoload-dev": {
+        "psr-4": {
+            "shiyun\\test\\queue\\": "tests"
+        }
+    },
     "extra": {
         "shiyun": {
             "config": {
                 "shiyun/annotation": "src/config/annotation.php",
                 "shiyun/connection": "src/config/connection.php",
-                "shiyun/throttle": "src/config/throttle.php"
+                "shiyun/throttle": "src/config/throttle.php",
+                "shiyun/queue": "src/config/queue.php"
             }
         }
     },
-    "autoload-dev": {
-        "psr-4": {}
-    }
+    "minimum-stability": "dev"
 }

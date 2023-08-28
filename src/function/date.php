@@ -20,8 +20,6 @@ function _cc_date_to_interval($str = '', $type = 'time')
 {
     $curr_time = time();
 
-    $beginTime = 0;
-    $endTime = 0;
     switch ($str) {
         case '今天':
         case '今日':
@@ -101,6 +99,19 @@ function _cc_date_to_interval($str = '', $type = 'time')
             // $time_end = mktime(23, 59, 59, date('m', strtotime(date('Y-m'))) + 1, 00);
             $time_begin = mktime(0, 0, 0, date('m'), 1, date('Y'));
             $time_end = mktime(23, 59, 59, date('m'), date('t'), date('Y'));
+
+
+            // $startdate = date('Y-m-01 00:00:00');
+            // $startdate = date('Y-m-01 00:00:00', time());
+            // $startdate = date('Y-m-01 00:00:00', strtotime(date("Y-m-d")));
+
+            // $end_date = date('Y-m-d', strtotime("$startdate +1 month -1 day"));
+            // $end_month = date('Y-m-d 23:59:59', strtotime("$startdate +1 month -1 day"));
+
+            // $end_time = strtotime($startdate) + 86400 - 1;
+            // $end_time = strtotime($startdate . ' 23:59:59');
+
+
             break;
             /**
              * 上月
@@ -160,16 +171,47 @@ function _cc_date_to_interval($str = '', $type = 'time')
             $time_begin = mktime(0, 0, 0, 1, 1, date('Y', time()) - 1);
             $time_end = mktime(23, 59, 59, 12, 31, date('Y', time()) - 1);
             break;
+            // 历史 
+        case '自定义':
+        case 'history':
+        case 'history':
+            $startdate = ctoRequest('startdate');
+            $enddate = ctoRequest('enddate');
+            if (!empty($startdate)) {
+                $date['startdate'] = strtotime($startdate . ' 00:00:00');
+                $startdate = !empty($startdate) ? $startdate . ' 00:00:00' : $startdate;
+                $startdate = strtotime('2015-01-01 00:00:00');
+                $startdate = strtotime($startdate);
+            }
+            if (!empty($enddate)) {
+                $date['enddate'] = strtotime($enddate . ' 23:59:59');
+                $enddate = !empty($enddate) ? $enddate . ' 23:59:59' : $enddate;
+                $y = date('Y', time());
+                $enddate = strtotime($y . '-12-31 23:59:59');
+                $enddate = strtotime($enddate) + 86400 - 1;
+            }
+
+            break;
     }
     if ($type == 'time' && !empty($time_begin) && !empty($time_end)) {
         // if (_cc_check_timestamp($time_begin) && _cc_check_timestamp($time_end)) {
         //     return array($time_begin, $time_end);
         // }
-        return array($time_begin, $time_end);
+        // return array($time_begin, $time_end);
+        return array(
+            'time_begin' => $time_begin,
+            'time_end' => $time_end,
+        );
     } else if ($type == 'date' && !empty($time_begin) && !empty($time_end)) {
         $beginDate = date('Y-m-d 00:00:00', $time_begin);
         $endDate = Date("Y-m-d 23:59:59", $time_end);
-        return array($beginDate, $endDate);
+        return array(
+            'date_begin' => $beginDate,
+            'date_end' => $endDate,
+        );
     }
-    return array($beginTime, $endTime);
+    return array(
+        'time_begin' => 0,
+        'time_end' => 0,
+    );
 }

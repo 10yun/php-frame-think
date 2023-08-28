@@ -55,7 +55,6 @@ function ctoStrNumberDecode($s)
     preg_match_all('/1?\d{3}/', $s, $t);
     $r = '';
     foreach ($t[0] as $v)
-        // 旧的 $val{0}
         $r .= chr(($v[0] == 1 ? 1255 : 999) - $v);
     return $r;
 }

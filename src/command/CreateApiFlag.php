@@ -37,17 +37,19 @@ class CreateApiFlag extends Command
         $saasArr = [];
         $ucenterArr = [];
         $touristArr = [];
+
+        $need_write = false;
         foreach ($addonsDir as $dirItem) {
             if (!is_dir($dirItem)) {
                 continue;
             }
-            $this->writeAttrApiFlag($commonArr, $dirItem, 'common', $version);
-            $this->writeAttrApiFlag($orgArr, $dirItem, 'org', $version);
-            $this->writeAttrApiFlag($businessArr, $dirItem, 'business', $version);
-            $this->writeAttrApiFlag($agentArr, $dirItem, 'agent', $version);
-            $this->writeAttrApiFlag($saasArr, $dirItem, 'saas', $version);
-            $this->writeAttrApiFlag($ucenterArr, $dirItem, 'ucenter', $version);
-            $this->writeAttrApiFlag($touristArr, $dirItem, 'tourist', $version);
+            $this->writeAttrApiFlag($commonArr, $dirItem, 'common', $version, $need_write);
+            $this->writeAttrApiFlag($orgArr, $dirItem, 'org', $version, $need_write);
+            $this->writeAttrApiFlag($businessArr, $dirItem, 'business', $version, $need_write);
+            $this->writeAttrApiFlag($agentArr, $dirItem, 'agent', $version, $need_write);
+            $this->writeAttrApiFlag($saasArr, $dirItem, 'saas', $version, $need_write);
+            $this->writeAttrApiFlag($ucenterArr, $dirItem, 'ucenter', $version, $need_write);
+            $this->writeAttrApiFlag($touristArr, $dirItem, 'tourist', $version, $need_write);
         }
 
         $this->writeMergeApiFlag('common', $commonArr, $version);
@@ -65,12 +67,12 @@ class CreateApiFlag extends Command
     {
         @mkdir(_PATH_CONFIG_ . "api", 0777);
         $commonYmlStr = implode("\n", $ymlArr);
-        file_put_contents(_PATH_CONFIG_ . "api/{$type}.yml", $commonYmlStr . "\n");
+        file_put_contents(_PATH_CONFIG_ . "api/v{$version}/{$type}.yml", $commonYmlStr . "\n");
 
         echo " CreateApiFlag - {$type} -v{$version} \n";
     }
     // 写入
-    protected function writeAttrApiFlag(&$typeAllArr, $dirItem, $type, $version = 1)
+    protected function writeAttrApiFlag(&$typeAllArr, $dirItem, $type, $version = 1, $isWrite = true)
     {
         $dirParent = dirname($dirItem);
         $typeHttp = glob($dirItem . "{$type}/*.php");
@@ -83,10 +85,12 @@ class CreateApiFlag extends Command
             /**
              * 写入文件
              */
-            $typeYmlStr = implode("\n", $typeYmlArr);
-            @mkdir("{$dirParent}/api", 0777);
-            $typeYmlFile = "{$dirParent}/api/v{$version}-{$type}.yml";
-            file_put_contents($typeYmlFile, $typeYmlStr . "\n");
+            if ($isWrite) {
+                $typeYmlStr = implode("\n", $typeYmlArr);
+                @mkdir("{$dirParent}/api", 0777);
+                $typeYmlFile = "{$dirParent}/api/v{$version}-{$type}.yml";
+                file_put_contents($typeYmlFile, $typeYmlStr . "\n");
+            }
             if (!empty($typeYmlArr)) {
                 $typeAllArr = array_merge($typeAllArr, $typeYmlArr);
             }

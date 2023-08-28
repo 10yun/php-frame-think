@@ -41,11 +41,11 @@ class LoadAppRoute
     {
         // 这边可以判断缓存是否存在
         $isDebug = $this->app->isDebug();
-        $isEnvironment = Env::get('ctocode.environment');
+        $envProjectEnvironment = Env::get('ctocode.project_environment');
 
         $loadCache = [];
         $cacheOptimizePath = _PATH_RUNTIME_ . '/shiyun_optimize/route.php';
-        if (!$isDebug && $isEnvironment != 'development') {
+        if (!$isDebug && $envProjectEnvironment != 'development') {
             if (file_exists($cacheOptimizePath)) {
                 $loadCache = include_once $cacheOptimizePath;
             }
@@ -94,17 +94,19 @@ class LoadAppRoute
                 }
             }
         }
-        // dd($this->app->route->getRule('/'));
+        // var_dump($this->app->route->getRule('index'));
+        // dd($this->app->route->getRule(''));
+        // dd($this->app->route->getRuleName());
+        // dd($this->app->route->getName('/index'));
+        // dd($this->app->route->getName('\\think\\captcha\\CaptchaController@index'));
         $this->app->event->listen(RouteLoaded::class, function (Route $route) {
-            if (empty($route->getRule(''))) {
-                $route->get('/', function () {
-                    if (request()->isAjax()) {
-                        return sendRespSucc('暂无数据');
-                    } else {
-                        return 'hello - ' . syGetVersion();
-                    }
-                });
-            }
+            $route->get('/', function () {
+                if (request()->isAjax()) {
+                    return sendRespSucc('暂无数据');
+                } else {
+                    return 'hello - ' . syGetVersion();
+                }
+            });
             // dd(
             //     '----LoadAppRoute',
             //     $route->getName(),
@@ -118,7 +120,7 @@ class LoadAppRoute
          */
         // dd($batchPathArr, $loadCache);
         // if (empty($loadCache)) {
-        //     if (!$isDebug && $isEnvironment != 'development') {
+        //     if (!$isDebug && $envProjectEnvironment != 'development') {
         //         $path = $rootPath . 'runtime/shiyun/';
         //         $path = $rootPath . 'runtime/';
         //         @mkdir($path);
