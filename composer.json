@@ -56,6 +56,7 @@
         "shiyun": {
             "config": {
                 "shiyun/annotation": "src/config/annotation.php",
+                "shiyun/app": "src/config/app.php",
                 "shiyun/connection": "src/config/connection.php",
                 "shiyun/throttle": "src/config/throttle.php",
                 "shiyun/queue": "src/config/queue.php"

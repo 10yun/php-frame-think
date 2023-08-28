@@ -20,6 +20,18 @@ class FrameBootstrap extends BaseService
         $this->registerRoutes(function (\think\Route $route) {
             $route->get('/csrf_token', "\\shiyun\\extend\CsrfToken@getCsrfToken");
         });
+        /**
+         * 注册 事件
+         */
+        $isDbAutoTA = syGetConfig('shiyun.app.db_auto_transaction');
+
+        if (!empty($isDbAutoTA)  && ($isDbAutoTA == true || $isDbAutoTA == 'on')) {
+            $this->app->loadEvent([
+                'subscribe' => [
+                    \shiyun\extend\DbAutoTransaction::class,
+                ]
+            ]);
+        }
     }
     public function boot()
     {

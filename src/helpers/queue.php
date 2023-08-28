@@ -30,7 +30,7 @@ if (!function_exists('queue_producer')) {
 /**
  * 响应错误
  */
-function queue_resp_error($msg = '')
+function queue_resp_error(string $msg = '')
 {
     echo "{$msg} \n";
     return false;
@@ -38,7 +38,7 @@ function queue_resp_error($msg = '')
 /**
  * 响应队列成功
  */
-function queue_resp_succ($msg = '')
+function queue_resp_succ(string $msg = '')
 {
     echo "{$msg} \n";
     return true;
