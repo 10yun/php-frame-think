@@ -7,7 +7,6 @@ namespace shiyun\libs;
  */
 class Http
 {
-
     /**
      * 发送一个POST请求
      * @param string $url     请求URL

@@ -78,7 +78,7 @@ class OpenAppAccess
          * @var boolean
          */
         if (!true) {
-            $aes = new \ctocode\library\CtoAes();
+            $aes = new \shiyunUtils\libs\LibsAes();
             $token_access = $aes->decrypt(syOpenAppsAuth('syOpenAppToken'));
         }
         $tokenCache = $this->sCacheGet(md5($token_access));
