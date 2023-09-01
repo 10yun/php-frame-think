@@ -1,10 +1,10 @@
 <?php
 
-namespace shiyunQueue\drive;
+namespace shiyunQueue;
 
 use stdClass;
 
-interface QueueConsume
+interface IntfQueueConsumer
 {
     /**
      * 队列消费

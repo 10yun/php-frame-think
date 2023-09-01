@@ -16,10 +16,7 @@
         "shiyun": {
             "services": [
                 "shiyunQueue\\Bootstrap"
-            ],
-            "config": {
-                "shiyun/queue": "src/config/queue.php"
-            }
+            ]
         }
     }
 }

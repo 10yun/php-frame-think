@@ -14,7 +14,7 @@ if (!function_exists('queue_producer')) {
      * @param string|array  $msg           队列数据
      * @param int           $delay         延迟时间
      */
-    function queue_producer($connectName, $exchangeName = '', $queueName = null, $msg = null, $delay = 0)
+    function queue_producer(string $connectName, string $exchangeName = '', string|array $queueName = null, string|array $msg = null, int $delay = 0)
     {
         \shiyunQueue\QueueFactory::getInstance()
             ->connection($connectName)
