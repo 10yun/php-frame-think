@@ -6,9 +6,8 @@ trait TraitBase
 {
     /**
      * 错误次数
-     * @var int
      */
-    protected $allowError = 3;
+    protected int $allowError = 3;
     /**
      * 初始化
      */

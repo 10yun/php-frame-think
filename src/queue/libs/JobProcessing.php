@@ -1,17 +1,16 @@
 <?php
 
-namespace shiyunQueue\event;
+namespace shiyunQueue\libs;
 
 // use shiyunQueue\drive\Job;
 
 class JobProcessing
 {
-    // /** @var string */
-    public $connection = null;
+    public mixed $connection = null;
     // /** @var Job */
     public $job = null;
 
-    public function __construct($connection = null, $job = null)
+    public function __construct(mixed $connection = null, $job = null)
     {
         $this->connection = $connection;
         $this->job        = $job;

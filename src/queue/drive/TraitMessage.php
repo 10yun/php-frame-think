@@ -12,31 +12,26 @@ trait TraitMessage
     /**
      * 数据延迟,延迟执行秒数,延迟时间
      * 在n秒后执行
-     * @var int
      */
-    protected $msgDelay = 0;
+    protected int $msgDelay = 0;
+    // 消息实际时间
+    protected int $msgActualTime = 0;
     /**
      * 执行时间
-     * @var int
      */
-    protected $msgExecuteTime = 0;
+    protected int $msgExecuteTime = 0;
     /**
      * 当前时间
-     * @var int
      */
-    protected $msgCurrTime = 0;
+    protected int $msgCurrTime = 0;
     /**
      * 是否加密
-     * @var boolean
      */
-    protected $msgEncrypt = false;
-    /**
-     * 数据
-     * @var array|string
-     */
-    protected $msgData;
+    protected bool $msgEncrypt = false;
+    // 数据
+    protected array|string $msgData;
     // 原有数据
-    protected $msgOriginalData;
+    protected array|string $msgOriginalData;
 
     public function initMsgSett()
     {

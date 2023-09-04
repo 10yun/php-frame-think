@@ -1,6 +1,6 @@
 <?php
 
-namespace shiyun\queue\annotation;
+namespace shiyunQueue\annotation;
 
 class AnnotationParse
 {

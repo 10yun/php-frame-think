@@ -14,22 +14,16 @@ trait TraitJob
     use InteractsWithTime;
     /**
      * 任务类名
-     * 类
-     * @var string
      */
-    protected $jobServer;
+    protected string $jobServer = '';
     /**
      * 任务执行方法
-     * 方法
-     * @var string
      */
-    protected $jobFunc = 'onQueueMessage';
-
+    protected string $jobFunc = 'onQueueMessage';
     /**
      * 默认任务执行方法名
-     * @var string
      */
-    protected $_defaultDo;
+    protected string $_defaultDo = '';
 
     // 初始化设置
     public function initJobSett()
@@ -70,20 +64,32 @@ trait TraitJob
      */
     public function retryJobAll()
     {
-        $ids = \think\helper\Arr::pluck($this->app['queue_failer']->all(), 'id');
+        $config = $this->app->config->get('queue.failed', []);
+        $type = \think\helper\Arr::pull($config, 'type', 'none');
+        $queueFailerObj = $this->app->invokeClass("\\shiyunQueue\\drive\\{$type}Failed::class", [$config]);
+
+        $ids = \think\helper\Arr::pluck($queueFailerObj->all(), 'id');
         $this->retryJobIds($ids);
     }
     protected function retryJobIds($ids)
     {
         foreach ($ids as $id) {
-            $job = $this->app['queue_failer']->find($id);
+            $config = $this->app->config->get('queue.failed', []);
+            $type = \think\helper\Arr::pull($config, 'type', 'none');
+            $queueFailerObj = $this->app->invokeClass("\\shiyunQueue\\drive\\{$type}Failed::class", [$config]);
+
+            $job = $queueFailerObj->find($id);
             if (is_null($job)) {
                 return  '无法用ID找到失败的作业';
             } else {
                 $this->retryJobItem($job);
                 // 失败的作业[{$id}]已被推回队列     
-                return  '失败的作业[{$id}]已被推回队列';
-                $this->app['queue_failer']->forget($id);
+                return '失败的作业[{$id}]已被推回队列';
+                $config = $this->app->config->get('queue.failed', []);
+                $type = \think\helper\Arr::pull($config, 'type', 'none');
+                $queueFailerObj = $this->app->invokeClass("\\shiyunQueue\\drive\\{$type}Failed::class", [$config]);
+
+                $queueFailerObj->forget($id);
             }
         }
     }

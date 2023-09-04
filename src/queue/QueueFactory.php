@@ -6,10 +6,12 @@ namespace shiyunQueue;
 
 use shiyun\support\Config;
 use shiyunQueue\drive\Connector;
+use shiyunQueue\exception\DriverException;
 use shiyunQueue\drive\database\DatabaseConnector;
 use shiyunQueue\drive\redis\RedisConnector;
-use think\helper\Str;
+use shiyunQueue\drive\rabbitmq\RabbitmqConnector;
 use think\App;
+use InvalidArgumentException;
 
 /**
  * Class Queue
@@ -20,71 +22,85 @@ use think\App;
  * @method $this sendPublish(array|string $msg) 发送消息
  * @mixin DatabaseConnector
  * @mixin RedisConnector
- * @mixin Manager
+ * @mixin RabbitmqConnector
  */
-class QueueFactory extends Manager
+class QueueFactory
 {
-    // use ErrorTrait;
-    protected $namespace = 'shiyunQueue\\drive\\';
+    /** @var App */
+    protected $app;
     /**
-     * 获取驱动类
-     * @param string $type
-     * @return string
+     * 驱动
      */
-    protected function resolveClass(string $type): string
+    protected array $driversHandle = [];
+    public function __construct(App $app)
     {
-        if ($this->namespace || false !== strpos($type, '\\')) {
-            // $class = false !== strpos($type, '\\') ? $type : $this->namespace . Str::studly($type);
-            $class = false !== strpos($type, '\\') ? $type : $this->namespace  . $type . "\\" . Str::studly($type) . "Connector";
-            if (class_exists($class)) {
-                return $class;
-            }
-        }
-        throw new \InvalidArgumentException("Driver [$type] not supported.");
-    }
-    protected function resolveConfig(string $name)
-    {
-        return syGetConfig("shiyun.queue.connections.{$name}");
-    }
-    protected function resolveType(string $name)
-    {
-        return syGetConfig("shiyun.queue.connections.{$name}.connect_type", 'sync');
+        $this->app = $app;
     }
     /**
      * 默认驱动
+     * @return string|null
      * @return string
      */
     public function getDefaultDriver()
     {
         return syGetConfig('shiyun.queue.default');
     }
-    protected function createDriver(string $name)
-    {
-        /** @var Connector $driver */
-        $driver = parent::createDriver($name);
-        // 初始化设置
-        $driver->baseInit();
-        return $driver->setApp($this->app)
-            ->setConnectName($name);
-    }
     /**
-     * @param null|string $name
-     * @return Connector
+     * 获取驱动实例
+     * @param null|string $name 驱动名称
+     * @return Connector|mixed
      */
     public function connection($name = null)
     {
-        return $this->driver($name);
+        $name = $name ?: $this->getDefaultDriver();
+
+        if (is_null($name)) {
+            throw new InvalidArgumentException(sprintf(
+                '【ctocode-queue】无法解析的NULL驱动程序 [%s].',
+                static::class
+            ));
+        }
+        if (!empty($this->driversHandle[$name])) {
+            /**
+             * 获取驱动实例
+             */
+            return $this->driversHandle[$name];
+        } else {
+            /**
+             * 创建驱动实例
+             */
+            // 获取驱动参数配置
+            $driverConfig = syGetConfig("shiyun.queue.connections.{$name}");
+            // 获取驱动类型
+            $driverType = $driverConfig['connect_type'] ?? 'sync';
+            switch ($driverType) {
+                case 'redis':
+                    $redisDrive = new RedisConnector($driverConfig);
+                    break;
+                case 'database':
+                    $redisDrive = new DatabaseConnector($driverConfig);
+                    break;
+                case 'rabbitmq':
+                    $redisDrive = new RabbitmqConnector($driverConfig);
+                    break;
+                default:
+                    throw new InvalidArgumentException("【ctocode-queue】Driver [$driverType] 不支持");
+                    throw new DriverException('【ctocode-queue】驱动类型错误');
+                    break;
+            }
+            $redisDrive->setApp($this->app);
+            $this->driversHandle[$name] = $redisDrive;
+            return $this->driversHandle[$name];
+        }
     }
     /**
-     * 容器对象实例
-     * @var static
+     * 单例实例
      */
     protected static $instance;
     /**
-     * 容器中的对象实例
-     * @var array
+     * 存储单例
      */
-    protected $instances = [];
+    protected array $instances = [];
     /**
      * 获取当前容器的实例（单例）
      * @access public
@@ -112,5 +128,32 @@ class QueueFactory extends Manager
         //     // $prefix = syGetConfig('shiyun.queue.xxx.prefix', 'ctocode_');
         //     // $this->jobServer .= '@' . $prefix . $this->jobFunc;
         // } 
+    }
+
+    /**
+     * 动态调用
+     * @param string $method
+     * @param array  $parameters
+     * @return mixed
+     */
+    public function __call($method, $parameters)
+    {
+        return $this->connection()->$method(...$parameters);
+    }
+    /**
+     * 移除一个驱动实例
+     *
+     * @param array|string|null $name
+     * @return $this
+     */
+    public function forgetDriver($name = null)
+    {
+        $name = $name ?? $this->getDefaultDriver();
+        foreach ((array) $name as $cacheName) {
+            if (isset($this->driversHandle[$cacheName])) {
+                unset($this->driversHandle[$cacheName]);
+            }
+        }
+        return $this;
     }
 }

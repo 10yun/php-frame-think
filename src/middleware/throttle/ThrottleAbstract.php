@@ -6,10 +6,10 @@ use Psr\SimpleCache\CacheInterface;
 
 abstract class ThrottleAbstract
 {
-    /** @var int */
-    protected $cur_requests = 0;    // 当前已有的请求数
-    /** @var int */
-    protected $wait_seconds = 0;    // 距离下次合法请求还有多少秒
+    // 当前已有的请求数
+    protected int $cur_requests = 0;
+    // 距离下次合法请求还有多少秒
+    protected int $wait_seconds = 0;
 
     /**
      * 是否允许访问

@@ -13,12 +13,11 @@ class AddonsLoadException extends \Exception
 {
     /**
      * 保存异常页面显示的额外Debug数据
-     * @var array
      */
-    protected $data = [];
-    protected $error;
+    protected array $data = [];
+    protected string $error;
 
-    public function __construct($message = '', $code = 404, $data = '')
+    public function __construct(string $message = '', int $code = 404, mixed $data = '')
     {
         $this->message  = $message;
         $this->message = is_array($message) ? implode(PHP_EOL, $message) : $message;

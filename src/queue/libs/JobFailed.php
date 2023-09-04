@@ -1,13 +1,12 @@
 <?php
 
-namespace shiyunQueue\event;
+namespace shiyunQueue\libs;
 
 use shiyunQueue\drive\Job;
 
 class JobFailed
 {
-    /** @var string */
-    public $connection;
+    public string $connection;
     /** @var Job */
     public $job;
     /** @var \Exception */
@@ -20,7 +19,7 @@ class JobFailed
     }
     // 事件监听处理
     // 格式化队列工作者的状态输出。
-    public function handle($eve_data)
+    public function handle($eve_data = [])
     {
         // $logArr = [
         //     'type' => 'error',
@@ -37,8 +36,11 @@ class JobFailed
      */
     protected function logFailedJob()
     {
-        // $this->app['queue_failer']->addLog(
-        app('queue_failer')->addLog(
+        $config = $this->app->config->get('queue.failed', []);
+        $type = \think\helper\Arr::pull($config, 'type', 'none');
+        $queueFailerObj = $this->app->invokeClass("\\shiyunQueue\\drive\\{$type}Failed::class", [$config]);
+
+        $queueFailerObj->addLog(
             $this->connection,
             $this->job->getQueue(),
             $this->job->getJobRawBody(),

@@ -1,54 +1,55 @@
 <?php
-// +----------------------------------------------------------------------
-// | ThinkPHP [ WE CAN DO IT JUST THINK IT ]
-// +----------------------------------------------------------------------
-// | Copyright (c) 2006-2015 http://thinkphp.cn All rights reserved.
-// +----------------------------------------------------------------------
-// | Licensed ( http://www.apache.org/licenses/LICENSE-2.0 )
-// +----------------------------------------------------------------------
-// | Author: yunwuxin <448901948@qq.com>
-// +----------------------------------------------------------------------
 
 namespace shiyunQueue\drive\sync;
 
 use Exception;
 use shiyunQueue\drive\Connector;
 use shiyunQueue\drive\IntfDrive;
-use shiyunQueue\event\JobFailed;
-use shiyunQueue\event\JobProcessed;
-use shiyunQueue\event\JobProcessing;
+use shiyunQueue\libs\JobFailed;
+use shiyunQueue\libs\JobProcessed;
+use shiyunQueue\libs\JobProcessing;
 use Throwable;
-use shiyunQueue\drive\TraitConnect;
-use shiyunQueue\drive\TraitChannel;
-use shiyunQueue\drive\TraitMessage;
 
 //  implements IntfDrive
 class SyncConnector extends Connector
 {
-    use TraitConnect,
-        TraitChannel,
-        TraitMessage;
+    protected $connectHandle;
+
+
+    public function createConnect()
+    {
+        $this->connectHandle = '';
+    }
 
     public function size($queue = null)
     {
         return 0;
     }
-    protected function resolveJob($payload, $queue)
+    /**
+     * 重新发布
+     */
+    public function retryPublish($payload, $queue = null, array $options = [])
     {
-        return new SyncJob($this->app, $payload, $this->connectionName, $queue);
+        // if ($this->connectHandle->rPush($this->getQueue($queue), $payload)) {
+        //     return json_decode($payload, true)['id'] ?? null;
+        // }
     }
     public function sendPublish()
     {
         if (!empty($this->msgDelay) && $this->msgDelay > 0) {
-        } else { 
-        $payload = $this->createPayload($job, $data);
-        $queueJob = $this->resolveJob($payload, $queue);
+        } else {
+            $payload = $this->createPayload($job, $data);
+            $queueJob = new SyncJob($this->app, $payload, $this->connectionName, $queue);
+        }
         try {
-            $this->app->event->trigger(new JobProcessing($this->connectionName, $job));
+            $jobObj = new JobProcessing($this->connectionName, $job);
+            $jobObj->handle();
             $queueJob->onQueueMessage();
-            $this->app->event->trigger(new JobProcessed($this->connectionName, $job));
+            $jobObj = new JobProcessed($this->connectionName, $job);
+            $jobObj->handle();
         } catch (Exception | Throwable $e) {
-            $this->app->event->trigger(new JobFailed($this->connectionName, $job, $e));
+            $jobObj = new JobFailed($this->connectionName, $job, $e);
+            $jobObj->handle();
             throw $e;
         }
         return 0;

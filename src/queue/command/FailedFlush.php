@@ -18,7 +18,11 @@ class FailedFlush extends Command
     // 删除所有失败的队列作业
     public function deleteData()
     {
-        $this->app->get('queue_failer')->flush();
+        $config = $this->app->config->get('queue.failed', []);
+        $type = \think\helper\Arr::pull($config, 'type', 'none');
+        $queueFailerObj = $this->app->invokeClass("\shiyunQueue\drive\{$type}Failed::class", [$config]);
+        $queueFailerObj->flush();
+
         return sendRespSucc('所有失败的作业已成功删除');
     }
     /**
@@ -30,7 +34,11 @@ class FailedFlush extends Command
         if (empty($id)) {
             return sendRespError('没有与给定ID匹配的失败作业。');
         }
-        if ($this->app['queue_failer']->forget($this->input->getArgument('id'))) {
+        $config = $this->app->config->get('queue.failed', []);
+        $type = \think\helper\Arr::pull($config, 'type', 'none');
+        $queueFailerObj = $this->app->invokeClass("\shiyunQueue\drive\{$type}Failed::class", [$config]);
+
+        if ($queueFailerObj->forget($this->input->getArgument('id'))) {
             $this->output->info('Failed job deleted successfully!');
         }
     }

@@ -20,13 +20,11 @@ abstract class AnnotationParse
 {
     /**
      * 注解处理类
-     * @var array
      */
     protected static array $handle = [];
 
     /**
      * 注解类结果集
-     * @var array
      */
     protected static array $annotations = [];
 

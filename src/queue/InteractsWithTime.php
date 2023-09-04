@@ -2,44 +2,52 @@
 
 namespace shiyunQueue;
 
-use Carbon\Carbon;
 use DateInterval;
 use DateTimeInterface;
+use DateTime;
 
 trait InteractsWithTime
 {
     /**
-     * Get the number of seconds until the given DateTime.
+     * 获取到给定DateTime的秒数
      *
      * @param DateTimeInterface|DateInterval|int $delay
      * @return int
      */
-    protected function secondsUntil($delay)
+    protected function secondsUntil($delay): int
     {
         $delay = $this->parseDateInterval($delay);
-
-        return $delay instanceof DateTimeInterface
-            ? max(0, $delay->getTimestamp() - $this->currentTime())
-            : (int) $delay;
+        // 添加实际秒数
+        if ($delay instanceof DateTimeInterface) {
+            $timestamp = max(0, $delay->getTimestamp() - $this->currentTime());
+        } else {
+            $timestamp = (int) $delay;
+        }
+        return $timestamp;
     }
 
     /**
-     * Get the "available at" UNIX timestamp.
+     * 获取“available at”UNIX时间戳
      *
      * @param DateTimeInterface|DateInterval|int $delay
      * @return int
      */
-    protected function availableAt($delay = 0)
+    protected function availableAt($delay = 0): int
     {
         $delay = $this->parseDateInterval($delay);
 
-        return $delay instanceof DateTimeInterface
-            ? $delay->getTimestamp()
-            : Carbon::now()->addRealSeconds($delay)->getTimestamp();
+        if ($delay instanceof DateTimeInterface) {
+            $timestamp = $delay->getTimestamp();
+        } else {
+            $interval = new DateInterval("PT{$delay}S"); // 创建间隔对象，单位为秒
+            $future = (new DateTime())->add($interval); // 计算间隔后的日期和时间
+            $timestamp = $future->getTimestamp(); // 获取时间戳
+        }
+        return $timestamp;
     }
 
     /**
-     * If the given value is an interval, convert it to a DateTime instance.
+     * 如果给定的值是一个间隔，请将其转换为DateTime实例
      *
      * @param DateTimeInterface|DateInterval|int $delay
      * @return DateTimeInterface|int
@@ -47,19 +55,18 @@ trait InteractsWithTime
     protected function parseDateInterval($delay)
     {
         if ($delay instanceof DateInterval) {
-            $delay = Carbon::now()->add($delay);
+            $delay = (new DateTime())->add($delay);
         }
-
         return $delay;
     }
 
     /**
-     * Get the current system time as a UNIX timestamp.
-     *
+     * 获取当前系统时间作为UNIX时间戳
+     * 当前日期和时间
      * @return int
      */
-    protected function currentTime()
+    protected function currentTime(): int
     {
-        return Carbon::now()->getTimestamp();
+        return (new DateTime())->getTimestamp();
     }
 }

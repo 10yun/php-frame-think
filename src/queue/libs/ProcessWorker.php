@@ -2,18 +2,11 @@
 
 namespace shiyunQueue\libs;
 
-use Carbon\Carbon;
 use Throwable;
 use Exception;
 use RuntimeException;
 use shiyun\support\Cache;
-use shiyun\support\Event;
 use think\exception\Handle as ExceptHandle;
-use shiyunQueue\event\JobExceptionOccurred;
-use shiyunQueue\event\JobFailed;
-use shiyunQueue\event\JobProcessed;
-use shiyunQueue\event\JobProcessing;
-use shiyunQueue\event\WorkerStopping;
 use shiyunQueue\drive\Job;
 use shiyunQueue\exception\MaxAttemptsExceededException;
 use shiyunQueue\exception\TimeoutException;
@@ -21,46 +14,35 @@ use shiyunQueue\exception\MethodNotException;
 use shiyunQueue\exception\JobObjNoMoreException;
 use shiyunQueue\exception\JobMsgNoMoreException;
 use shiyunQueue\exception\JobFailedException;
+use shiyunQueue\libs\JobExceptionOccurred;
+use shiyunQueue\libs\JobFailed;
+use shiyunQueue\libs\JobProcessed;
+use shiyunQueue\libs\JobProcessing;
+use shiyunQueue\libs\WorkerStopping;
 
 trait ProcessWorker
 {
-    /** @var Event */
-    protected $event;
     /** @var ExceptHandle */
     protected $exceptHandle;
     /** @var Cache */
     protected $cache;
     /**
-     * Indicates if the worker should exit.
      * 指示工作是否应退出
-     * @var bool
      */
-    public $procShouldQuit = false;
+    public bool $procShouldQuit = false;
     /**
-     * Indicates if the worker is paused.
      * 指示工作进程是否已暂停。
-     * @var bool
      */
-    public $procPaused = false;
+    public bool $procPaused = false;
     /**
      * 开启debug调试信息
      */
-    public $procDebugInfo = false;
-    /**
-     * 注册事件
-     */
-    protected function listenForEvents()
-    {
-        $this->event->listen(JobProcessing::class, \shiyunQueue\event\JobProcessing::class);
-        $this->event->listen(JobProcessed::class, \shiyunQueue\event\JobProcessed::class);
-        $this->event->listen(JobFailed::class, \shiyunQueue\event\JobFailed::class);
-    }
+    public bool $procDebugInfo = false;
+
     public function dealInit($consumeClassOpt = [])
     {
-        $this->event = app('event');
         // $this->exceptHandle = new ExceptHandle();
         // $this->cache = app('cache');
-        $this->listenForEvents();
     }
     protected function dealItemCheck($file)
     {
@@ -117,13 +99,17 @@ trait ProcessWorker
                     return false;
                 }
                 $consumeClassOpt['exchange_name'] = !empty($consumeClassOpt['exchange_name']) ? $consumeClassOpt['exchange_name'] : 'queues';
+                // $consumeClassOpt['exchange_name'] = !empty($consumeClassOpt['exchange_name']) ? $consumeClassOpt['exchange_name'] : '';
 
                 $consumeQeObj = \shiyunQueue\QueueFactory::getInstance()
-                    ->connection($consumeClassOpt['connect_name'])
+                    ->connection($consumeClassOpt['connect_name']);
+
+                $consumeQeObj
                     ->setExchangeName($consumeClassOpt['exchange_name'])
                     ->setQueueName($consumeClassOpt['queue_name']);
 
                 $that = $this;
+
                 // 是否存在定时器
                 if (!empty($consumeClassOpt['execute_timing'])) {
                     \Workerman\Timer::add(
@@ -143,10 +129,9 @@ trait ProcessWorker
                 // }
             }
         } catch (\Throwable $th) {
-            //throw $th;
-            echo str_pad('asdasdad', 50, " ")
-                . str_pad('class', 20, " ")
-                . " 不存在\n";
+            echo str_pad('--- ProcessWorker @ dealItemCheck ---', 50, " ") . "\n";
+            echo $th->getMessage();
+            echo  " \n";
             return false;
         } finally {
             return false;
@@ -160,6 +145,8 @@ trait ProcessWorker
     protected function dealItemData($consumeClassObj, $consumeClassOpt, $consumeQeObj)
     {
         try {
+
+            $this->dealEchoDebug('① 开始', '', '');
 
             /**
              * 获取下个任务
@@ -179,7 +166,6 @@ trait ProcessWorker
             }
 
             $lastOption = $this->getLastPeizhi($consumeJobObj, $consumeClassOpt);
-            $this->dealEchoDebug('① 开始', '', '');
             /**
              * 判断环境
              */
@@ -192,12 +178,17 @@ trait ProcessWorker
              * 执行事件-进行中
              */
             $this->dealEchoDebug('② 执行事件', 'JobProcessing', '开始...');
-            $this->event->trigger(new JobProcessing($consumeQeObj, $consumeJobObj));
-            $this->dealEchoDebug('③ 参数判断', '', '');
+            // $jobObj = new JobProcessing($consumeQeObj, $consumeJobObj);
+            // $jobObj->handle();
+
             /**
+             * ③ 参数判断
              * 有些任务在到达消费者时，可能已经不再需要执行了
              * 任务名
              */
+            $this->dealEchoDebug('③ 参数判断', '', '');
+
+
             if (false) {
                 $consumeJobObj->delete();
                 return;
@@ -205,10 +196,13 @@ trait ProcessWorker
             if ($consumeJobObj->hasFailedState()) {
                 throw new JobFailedException($consumeJobObj->getName() . ' 已错误');
             }
+
+            // 当前时间戳
+            $currTime = (new \DateTime())->getTimestamp();
             /**
              * 是否超时
              */
-            if ($lastOption['last_timeout_at'] && Carbon::now()->getTimestamp() <= $lastOption['last_timeout_at']) {
+            if ($lastOption['last_timeout_at'] && $currTime <= $lastOption['last_timeout_at']) {
                 throw new TimeoutException($consumeJobObj->getName() . ' 作业可能已超时');
             }
             /**
@@ -222,7 +216,7 @@ trait ProcessWorker
             // /**
             //  * 如果【即将】超过最大尝试次数，则将作业标记为失败
             //  */
-            // if ($peizhiTimeoutAt && $peizhiTimeoutAt <= Carbon::now()->getTimestamp()) {
+            // if ($peizhiTimeoutAt && $peizhiTimeoutAt <= $currTime) {
             //     $this->failJob($consumeQeObj, $consumeJobObj, $e);
             // }
             // if ($peizhiTriesMax > 0 && $peizhiTriesAttempts >= $peizhiTriesMax) {
@@ -234,23 +228,25 @@ trait ProcessWorker
              * 执行
              */
             $this->dealEchoDebug('④ 执行回调', 'onQueueMessage', '');
-            $queueJobRes = \call_user_func([$consumeClassObj, 'onQueueMessage'], [
+            $queueJobRes = \call_user_func(
+                [$consumeClassObj, 'onQueueMessage'],
                 $consumeJobMsg,
                 $consumeJobObj
-            ]);
+            );
+
+            // var_dump($consumeJobObj->getResolvedJob());
+
             /**
              * 执行事件-已完成
              */
             $this->dealEchoDebug('⑤ 执行事件', 'JobProcessed', '开始...');
-            $this->event->trigger(new JobProcessed($consumeQeObj, $consumeJobObj));
+            (new JobProcessed($consumeQeObj, $consumeJobObj))->handle();
 
             $this->dealEchoDebug('⑥ 是否重启', '', '');
             $this->stopIfNecessary($consumeJobObj);
 
             $this->dealEchoDebug('⑦ 队列结果', $consumeClassOpt['queue_name'], $queueJobRes);
-
-            // echo str_pad('队列结果', 50, " ") . str_pad($consumeClassOpt['queue_name'], 20, " ") . " {$queueJobRes}\n";
-            echo str_pad('队列结果', 50, " ") . str_pad($consumeClassOpt['queue_name'], 20, " ") . " {$queueJobRes}\n";
+            var_dump($queueJobRes);
 
             if ($queueJobRes) {
                 $this->dealEchoDebug('⑧ 成功-删除', '', '');
@@ -276,17 +272,16 @@ trait ProcessWorker
                     $consumeJobObj->release();
                 }
             }
-        } catch (
-            MaxAttemptsExceededException | TimeoutException $e
-        ) {
+        } catch (MaxAttemptsExceededException | TimeoutException $e) {
             //  $this->failJob($consumeQeObj, $consumeJobObj, $e);
         } catch (JobFailedException $e) {
-            // $this->event->trigger(new JobExceptionOccurred($consumeQeObj, $consumeJobObj, $e));
+            // (new JobExceptionOccurred($consumeQeObj, $consumeJobObj, $e))->handle();
             // // throw $e;
             // $this->exceptHandle->report($e);
             // $this->sleep(1);
         } catch (Exception | Throwable $e) {
-            // echo $e->getMessage(); 
+            // echo " Exception  \n";
+            // echo $e->getMessage() . "  \n";
         } finally {
             return false;
             // if (!$consumeJobObj->isDeleted() && !$consumeJobObj->isReleased() && !$consumeJobObj->hasFailedState()) {
@@ -312,22 +307,23 @@ trait ProcessWorker
             $job->delete();
             $job->failed($e);
         } finally {
-            $this->event->trigger(new JobFailed(
+            $jobObj = new JobFailed(
                 $consumeQeObj,
                 $job,
                 $e ?: new RuntimeException('ManuallyFailed')
-            ));
+            );
+            $jobObj->handle();
         }
     }
     /**
      * debug调试
      */
-    protected function dealEchoDebug($msg1 = '', $msg2 = '', $msg3 = '')
+    protected function dealEchoDebug($msg1 = '', $msg2 = '', mixed $msg3 = '')
     {
         if ($this->procDebugInfo) {
             echo str_pad($msg1, 50, " ")
                 . str_pad($msg2, 20, " ")
-                . " {$msg3}\n";
+                . " {$msg3} \n";
         }
     }
     /**
@@ -336,9 +332,7 @@ trait ProcessWorker
     protected function dealItemLog($consumeClassObj, $consumeJobMsg = null)
     {
         if (method_exists($consumeClassObj, 'onQueueLog')) {
-            \call_user_func([$consumeClassObj, 'onQueueLog'], [
-                $consumeJobMsg,
-            ]);
+            \call_user_func([$consumeClassObj, 'onQueueLog'], $consumeJobMsg);
         }
     }
 
@@ -347,29 +341,26 @@ trait ProcessWorker
      */
     protected function getLastPeizhi($consumeJobObj, $consumeClassOpt = [])
     {
-        //最大错误次数
+        // 最大错误次数 20
         $errorMaxAllow = $consumeJobObj->payload('allowError') ?? 0;
-        // 允许最大的重试
+        // 允许最大的重试 20
         $jobTriesMax = $consumeJobObj->payload('maxTries');
         $peizhiTriesMax = !is_null($jobTriesMax) ? $jobTriesMax : (int) ($consumeClassOpt['tries_max'] ?? 0);
         // 已经重试
         $peizhiTriesAttempts = $consumeJobObj->getJobAttemptsNum();
         // 允许超时
         $peizhiTimeoutAt = $consumeJobObj->getTimeoutAt();
-        // 最大的超时
+        // 最大的超时 20
         $peizhiTimeoutMax = $consumeClassOpt['timeout_max'] ?? 0;
         // 设置的内存
         $memory = 128;
         return [
             'last_sett_memory'      => $memory,
             'last_error_max'        => $errorMaxAllow,
-            // 'last_error_max'        => 20,
             'last_tries_attempts'   => $peizhiTriesAttempts,
             'last_tries_max'        => $peizhiTriesMax,
-            // 'last_tries_max'        => 20,
             'last_timeout_at'       => $peizhiTimeoutAt,
             'last_timeout_max'      => $peizhiTimeoutMax,
-            // 'last_timeout_max'      => 20
         ];
     }
     /**
@@ -390,7 +381,7 @@ trait ProcessWorker
         $cacheRestartTimer = null;
         $isRestart = false;
         if (!empty($this->cache)) {
-            $cacheRestartTimer = $this->cache->get('think:queue:restart');
+            // $cacheRestartTimer = $this->cache->get('shiyun:queue:restart');
         }
         $isRestart = $cacheRestartTimer != $lastRestartTimer;
         if ($this->procShouldQuit || $isRestart) {
@@ -435,7 +426,7 @@ trait ProcessWorker
      */
     public function stopProcess($status = 0)
     {
-        $this->event->trigger(new WorkerStopping($status));
+        // (new WorkerStopping($status))->handle();
         exit($status);
         die;
     }
@@ -451,7 +442,7 @@ trait ProcessWorker
         /**
          * 终止进程。
          */
-        $this->event->trigger(new WorkerStopping($status));
+        // new WorkerStopping($status)->hanlde();
         if (extension_loaded('posix')) {
             posix_kill(getmypid(), SIGKILL);
         }

@@ -17,11 +17,9 @@ use shiyunQueue\drive\Job;
 class SyncJob extends Job
 {
     /**
-     * The queue message data.
-     *
-     * @var string
+     * 队列消息数据
      */
-    protected $job;
+    protected string $job;
 
     public function __construct(App $app, $job, $connection, $queue)
     {
@@ -32,29 +30,25 @@ class SyncJob extends Job
     }
 
     /**
-     * Get the number of times the job has been attempted.
-     * @return int
+     * 获取尝试作业的次数
      */
-    public function getJobAttemptsNum()
+    public function getJobAttemptsNum(): int
     {
         return 1;
     }
 
     /**
-     * Get the raw body string for the job.
-     * @return string
+     * 获取作业的原始正文字符串
      */
-    public function getJobRawBody()
+    public function getJobRawBody(): string
     {
         return $this->job;
     }
 
     /**
-     * Get the job identifier.
-     *
-     * @return string
+     * 获取作业标识符.
      */
-    public function getJobId()
+    public function getJobId(): string
     {
         return '';
     }

@@ -14,6 +14,10 @@ trait TraitConnect
     protected string $connectHost;
     // 连接 port
     protected string|int $connectPort;
+    // 连接 用户
+    protected string|int $connectUser;
+    // 连接 密码
+    protected string|int $connectPassword;
     // 连接对象
     protected $connection;
     // 通道对象

@@ -1,6 +1,6 @@
 <?php
 
-namespace shiyunQueue\event;
+namespace shiyunQueue\libs;
 
 use Exception;
 use shiyunQueue\drive\Job;
@@ -9,10 +9,8 @@ class JobExceptionOccurred
 {
     /**
      * The connection name.
-     *
-     * @var string
      */
-    public $connectionName;
+    public string $connectionName;
 
     /**
      * The job instance.
@@ -41,5 +39,9 @@ class JobExceptionOccurred
         $this->job            = $job;
         $this->exception      = $exception;
         $this->connectionName = $connectionName;
+    }
+
+    public function handle()
+    {
     }
 }

@@ -44,10 +44,10 @@ class CheckFormMiddle
 
         //拼接验证类名，注意路径不要出错
 
-        if (\think\helper\Str::contains($conName, '.')) {
+        if (str_contains($conName, '.')) {
             $conName = str_replace(".", "\\", $conName);
         }
-        if (strpos($method, 'app\\') !== false || strpos($method, 'addons\\') !== false) {
+        if (str_contains($method, 'app\\')  || str_contains($method, 'addons\\')) {
             // 如果是全命名空间
             $conName = str_replace("controller", "validate", $conName);
             $checkClassName = "{$conName}Validate";

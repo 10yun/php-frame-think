@@ -5,19 +5,17 @@ namespace shiyun\libs;
 class Console
 {
     /**
-     * @var static
+     * 单例
      */
     protected static $instance;
-    /**
-     * @return static
-     */
-    public static function getInstance()
+    public static function getInstance(): static
     {
         if (is_null(self::$instance)) {
             self::$instance = new static();
         }
         return self::$instance;
     }
+
     protected $tokens;
     public function __construct($argv = null)
     {

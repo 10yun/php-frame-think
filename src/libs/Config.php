@@ -5,28 +5,24 @@ namespace shiyun\libs;
 class Config
 {
     /**
-     * @var array
      */
-    protected static $_config = [];
+    protected static array $_config = [];
+    /**
+     */
+    protected static string $_configPath = '';
 
     /**
-     * @var string
      */
-    protected static $_configPath = '';
+    protected static bool $_loaded = false;
 
-    /**
-     * @var bool
-     */
-    protected static $_loaded = false;
-
-    public static function init($path)
+    public static function init(string $path)
     {
         self::$_configPath = $path;
     }
     /**
      * @param string|null $key
      * @param mixed $default
-     * @return array|mixed|void|null
+     * @return array|mixed|null
      */
     public static function get(string $key = null, $default = null)
     {

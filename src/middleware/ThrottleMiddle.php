@@ -25,9 +25,8 @@ class ThrottleMiddle
 {
     /**
      * 默认配置参数
-     * @var array
      */
-    public static $default_config = [
+    public static array $default_config = [
         'prefix' => 'throttle_',                    // 缓存键前缀，防止键与其他应用冲突
         'key'    => true,                           // 节流规则 true为自动规则
         'visit_method' => ['GET', 'HEAD'],          // 要被限制的请求类型
@@ -54,9 +53,8 @@ class ThrottleMiddle
 
     /**
      * 配置参数
-     * @var array
      */
-    protected $config = [];
+    protected array $config = [];
 
     protected $key = null;          // 解析后的标识
     protected $wait_seconds = 0;    // 下次合法请求还有多少秒

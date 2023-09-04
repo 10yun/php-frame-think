@@ -75,7 +75,6 @@ class OpenAppAccess
 
         /**
          * 是否解密token
-         * @var boolean
          */
         if (!true) {
             $aes = new \shiyunUtils\libs\LibsAes();

@@ -30,9 +30,8 @@ class AnnotationBootstrap extends BaseService
     ];
     /**
      * 注解配置
-     * @var array
      */
-    public function getConfig()
+    public function getConfig(): array
     {
         // // 获取配置
         $configOpt = syGetConfig('shiyun.annotation');

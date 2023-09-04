@@ -6,9 +6,8 @@ trait TraitLog
 {
     /**
      * 记录日志
-     * @var string|callable|array
      */
-    protected $logData;
+    protected mixed $logData;
     public function addLog($log)
     {
         $this->logData = $log;

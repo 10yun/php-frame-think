@@ -14,25 +14,22 @@ class ModelCheckExt extends Model
     protected $pk = '';
     /**
      * 当前验证场景
-     * @var string
      */
-    protected $currentScene;
+    protected string $currentScene;
 
-    protected $only = [];
-    protected $append = [];
-    protected $remove = [];
+    protected array $only = [];
+    protected array $append = [];
+    protected array $remove = [];
 
     /**
      * 验证失败错误信息
-     * @var string|array
      */
-    protected $error = [];
+    protected string|array $error = [];
 
     /**
      * 获取错误信息
-     * @return array|string
      */
-    public function getError()
+    public function getError(): array|string
     {
         return $this->error;
     }

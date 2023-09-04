@@ -11,7 +11,6 @@
 
 namespace shiyunQueue\drive\database;
 
-use Carbon\Carbon;
 use stdClass;
 use think\Db;
 use think\db\ConnectionInterface;
@@ -26,38 +25,37 @@ class DatabaseConnector extends Connector
 
     /**
      * The database table that holds the jobs.
-     *
-     * @var string
      */
-    protected $table;
+    protected string $table;
 
     /**
      * The name of the default queue.
-     *
-     * @var string
      */
-    protected $default;
+    protected string $default;
 
     /**
      * The expiration time of a job.
-     *
-     * @var int|null
      */
-    protected $retryAfter = 60;
+    protected int|null $retryAfter = 60;
 
-    public function __construct(ConnectionInterface $db, $table, $default = 'default', $retryAfter = 60)
+    public function __construct(array $config = [])
     {
-        $this->db         = $db;
-        $this->table      = $table;
-        $this->default    = $default;
-        $this->retryAfter = $retryAfter;
+        $this->table      =  $config['table'];
+        $this->default    =  $config['queue'] ?? 'default';
+        $this->retryAfter =  $config['retry_after'] ?? 60;
+        $this->createDriver($config);
     }
-
-    public static function __make(Db $db, $config)
+    public function createDriver($config = [])
     {
-        $connection = $db->connect($config['connection'] ?? null);
+        if (empty($config['connection'])) {
+            throw new \Exception('配置错误');
+        }
 
-        return new self($connection, $config['table'], $config['queue'], $config['retry_after'] ?? 60);
+        $dbObj = new \think\DbManager();
+        $dbObj->setConfig([]);
+        $dbObj->connect();
+        // $connection = Db::connect($config['connection'] ?? null);
+        $this->db = $dbObj;
     }
 
     public function size($queue = null)
@@ -171,8 +169,12 @@ class DatabaseConnector extends Connector
                         ->where('available_time', '<=', $this->currentTime());
                 });
 
-                //超时任务重试
-                $expiration = Carbon::now()->subSeconds($this->retryAfter)->getTimestamp();
+
+
+                $interval = new \DateInterval("PT{$this->retryAfter}S"); // 创建间隔对象，单位为秒
+                $future = (new \DateTime())->add($interval); // 计算间隔后的日期和时间
+                $expiration = $future->getTimestamp(); // 有效期
+
 
                 $query->whereOr(function (Query $query) use ($expiration) {
                     $query->where('reserve_time', '<=', $expiration);

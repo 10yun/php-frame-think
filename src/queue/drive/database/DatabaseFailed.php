@@ -2,21 +2,20 @@
 
 namespace shiyunQueue\drive\database;
 
-use Carbon\Carbon;
 use think\Db;
 use shiyunQueue\drive\FailedJob;
 
 class DatabaseFailed extends FailedJob
 {
-    /** @var Db */
+    /** 
+     * @var Db 
+     */
     protected $db;
 
     /**
      * The database table.
-     *
-     * @var string
      */
-    protected $table;
+    protected string $table;
 
     public function __construct(Db $db, $table)
     {
@@ -40,7 +39,8 @@ class DatabaseFailed extends FailedJob
      */
     public function log($connection, $queue, $payload, $exception)
     {
-        $fail_time = Carbon::now()->toDateTimeString();
+        $fail_time = (new \DateTime())->format('Y-m-d H:i:s');
+
         $exception = (string) $exception;
         return $this->getTable()->insertGetId(compact(
             'connection',

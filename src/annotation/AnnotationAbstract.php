@@ -8,19 +8,16 @@ abstract class AnnotationAbstract implements IntfAnnotationItem
 {
     /**
      * 注解传入的参数
-     * @var array
      */
     protected array $_arguments = [];
 
     /**
      * 参数名
-     * @var array
      */
     protected array $_parameters = [];
 
     /**
      * 参数默认值
-     * @var array
      */
     protected array $_defaultValues = [];
 

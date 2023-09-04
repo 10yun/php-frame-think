@@ -26,40 +26,33 @@ class RedisConnector extends Connector
     protected $redis;
 
     /**
-     * The name of the default queue.
-     *
-     * @var string
+     * 默认队列的名称
      */
-    protected $default;
-
+    protected string $default = 'default';
     /**
-     * The expiration time of a job.
-     *
-     * @var int|null
+     * 作业的过期时间
      */
-    protected $retryAfter = 60;
-
+    protected int|null $retryAfter = 60;
     /**
-     * The maximum number of seconds to block for a job.
-     *
-     * @var int|null
+     * 作业要阻止的最大秒数
      */
-    protected $blockFor = null;
+    protected int|null $blockFor = null;
 
-    public function __construct($redis, $default = 'default', $retryAfter = 60, $blockFor = null)
-    {
-        $this->redis      = $redis;
-        $this->default    = $default;
-        $this->retryAfter = $retryAfter;
-        $this->blockFor   = $blockFor;
+    public function __construct(
+        array $config = [],
+    ) {
+
+        $this->default    = $config['queue_name'] ?? '';
+        $this->retryAfter =  $config['retry_after'] ?? 60;
+        $this->blockFor   =  $config['block_for'] ?? null;
+
+        $this->createDriver($config);
     }
-
-    public static function __make($config)
+    public function createDriver($config = [])
     {
         if (!extension_loaded('redis')) {
             throw new Exception('redis扩展未安装');
         }
-
         $redis = new class($config)
         {
             protected $config;
@@ -100,8 +93,7 @@ class RedisConnector extends Connector
                 }
             }
         };
-
-        return new self($redis, $config['queue_name'], $config['retry_after'] ?? 60, $config['block_for'] ?? null);
+        $this->redis = $redis;
     }
     public function size($queue = null)
     {

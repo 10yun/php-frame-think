@@ -10,23 +10,20 @@ trait TraitChannel
 {
     /**
      * 交换机名称
-     * @var null
      */
-    protected $exchangeName = null;
+    protected string|null $exchangeName = null;
     /**
      * 交换机类型
-     * @var null
      */
-    protected $exchangeType = 'direct';
+    protected string|null $exchangeType = 'direct';
     /**
      * string 队列名称
-     * @var null
      */
-    protected $queueName = null;
+    protected string|null $queueName = null;
     /**
      * 路由key
      */
-    protected $routeKey = null;
+    protected string|null $routeKey = null;
 
 
 

@@ -2,7 +2,6 @@
 
 namespace shiyun\middleware;
 
-use think\helper\Str;
 use shiyun\support\Db;
 use shiyun\support\Cache;
 use shiyun\support\Request;

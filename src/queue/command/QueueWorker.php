@@ -45,13 +45,7 @@ class QueueWorker extends Command
             /**
              * TODO 要么这里注册，要么在每个里面单独注册
              */
-            // $this->app->event->listen(\shiyunQueue\event\JobProcessing::class, \shiyunQueue\event\JobProcessing::class);
-            // $this->app->event->listen(\shiyunQueue\event\JobProcessed::class, \shiyunQueue\event\JobProcessed::class);
-            // $this->app->event->listen(\shiyunQueue\event\JobFailed::class, \shiyunQueue\event\JobFailed::class);
-            // $this->app->event->trigger(new \shiyunQueue\event\JobProcessing(null, null), [
-            //     'a' => '111',
-            //     'b' => '222',
-            // ]);
+
             $count = $input->getOption('processes');
 
             ini_set('display_errors', 'on');

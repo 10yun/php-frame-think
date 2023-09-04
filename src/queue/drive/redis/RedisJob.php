@@ -30,12 +30,10 @@ class RedisJob extends Job
 
     /**
      * The Redis job payload inside the reserved queue.
-     *
-     * @var string
      */
-    protected $reserved;
+    protected mixed $reserved;
 
-    public function __construct(App $app, RedisConnector $redis, $job, $reserved, $connection, $queue)
+    public function __construct(App $app, RedisConnector $redis, $job, $reserved, $connection = '', $queue = '')
     {
         $this->app        = $app;
         $this->redis      = $redis;
@@ -78,7 +76,6 @@ class RedisJob extends Job
     }
 
     /**
-     * Get the job identifier.
      * 获取job标识符
      * @return string
      */
@@ -87,7 +84,6 @@ class RedisJob extends Job
         return $this->payload('id');
     }
     /**
-     * Get the underlying reserved Redis job.
      * 获取底层预留的Redis作业
      * @return string
      */
@@ -96,7 +92,6 @@ class RedisJob extends Job
         return $this->reserved;
     }
     /**
-     * Get the raw body string for the job.
      * 获取job的数据
      * @return string
      */

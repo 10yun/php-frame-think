@@ -50,12 +50,12 @@ function ctoIpGet()
         $ip = getenv("REMOTE_ADDR");
     elseif (isset($_SERVER['REMOTE_ADDR']) && $_SERVER['REMOTE_ADDR'] && strcasecmp($_SERVER['REMOTE_ADDR'], "unknown"))
         $ip = $_SERVER['REMOTE_ADDR'];
-    else if ($HTTP_SERVER_VARS["HTTP_X_FORWARDED_FOR"]) {
-        $ip = $HTTP_SERVER_VARS["HTTP_X_FORWARDED_FOR"];
-    } elseif ($HTTP_SERVER_VARS["HTTP_CLIENT_IP"]) {
-        $ip = $HTTP_SERVER_VARS["HTTP_CLIENT_IP"];
-    } elseif ($HTTP_SERVER_VARS["REMOTE_ADDR"]) {
-        $ip = $HTTP_SERVER_VARS["REMOTE_ADDR"];
+    else if ($_SERVER["HTTP_X_FORWARDED_FOR"]) {
+        $ip = $_SERVER["HTTP_X_FORWARDED_FOR"];
+    } elseif ($_SERVER["HTTP_CLIENT_IP"]) {
+        $ip = $_SERVER["HTTP_CLIENT_IP"];
+    } elseif ($_SERVER["REMOTE_ADDR"]) {
+        $ip = $_SERVER["REMOTE_ADDR"];
     } elseif (isset($_SERVER)) {
         if (isset($_SERVER["HTTP_X_FORWARDED_FOR"])) {
             $ip = $_SERVER["HTTP_X_FORWARDED_FOR"];

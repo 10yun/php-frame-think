@@ -23,22 +23,17 @@ abstract class RouteAbstract implements IntfAnnotationItem
     protected string|array $methods = [];
     /**
      * 注解传入的参数
-     * @var array
      */
     protected array $_arguments = [];
 
     /**
      * 参数名
-     * @var array
      */
     protected array $_parameters = [];
-
     /**
      * 参数默认值
-     * @var array
      */
     protected array $_defaultValues = [];
-
     /**
      * 解析参数
      * @access public

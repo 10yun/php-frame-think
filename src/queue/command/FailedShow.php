@@ -10,10 +10,8 @@ class FailedShow extends Command
 {
     /**
      * The table headers for the command.
-     *
-     * @var array
      */
-    protected $headers = ['ID', 'Connection', 'Queue', 'Class', 'Fail Time'];
+    protected array $headers = ['ID', 'Connection', 'Queue', 'Class', 'Fail Time'];
 
     protected function configure()
     {
@@ -42,7 +40,11 @@ class FailedShow extends Command
      */
     protected function getFailedJobs()
     {
-        $failed = $this->app['queue_failer']->all();
+        $config = $this->app->config->get('queue.failed', []);
+        $type = \think\helper\Arr::pull($config, 'type', 'none');
+        $queueFailerObj = $this->app->invokeClass("\shiyunQueue\drive\{$type}Failed::class", [$config]);
+
+        $failed = $queueFailerObj->all();
         return collect($failed)->map(function ($failed) {
             return $this->parseFailedJob((array) $failed);
         })->filter()->all();

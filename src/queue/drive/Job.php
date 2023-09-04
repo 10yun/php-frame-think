@@ -20,16 +20,14 @@ abstract class Job
 {
 
     /**
-     * The job handler instance.
-     * @var object
+     * 作业处理程序实例
      */
-    private $instance;
+    private mixed $instance;
 
     /**
      *  The JSON decoded version of "$job".
-     * @var array
      */
-    private $payload;
+    private array $payload;
 
     /**
      * @var App
@@ -37,37 +35,32 @@ abstract class Job
     protected $app;
 
     /**
-     * The name of the queue the job belongs to.
-     * @var string
+     * 作业所属队列的名称
      */
-    protected $queue;
+    protected string $queue;
 
     /**
-     * The name of the connection the job belongs to.
+     * 作业所属连接的名称
      */
-    protected $connection;
+    protected  $connection;
 
     /**
-     * Indicates if the job has been deleted.
-     * @var bool
+     * 指示作业是否已删除
      */
-    protected $deleted = false;
+    protected bool $deleted = false;
 
     /**
-     * Indicates if the job has been released.
-     * @var bool
+     * 指示作业是否已发布
      */
-    protected $released = false;
+    protected bool $released = false;
 
     /**
-     * Indicates if the job has failed.
-     *
-     * @var bool
+     * 指示作业是否失败
      */
-    protected $failed = false;
+    protected bool $failed = false;
 
     /**
-     * Fire the job.
+     * 解雇这份作业
      * @return void
      */
     public function onQueueMessage()
@@ -77,8 +70,7 @@ abstract class Job
         $instance->{$method}($this, $this->payload('data'));
     }
     /**
-     * Process an exception that caused the job to fail.
-     *
+     * 处理导致作业失败的异常
      * @param Exception $e
      * @return void
      */
@@ -164,32 +156,34 @@ abstract class Job
 
         return count($segments) > 1 ? $segments : [$segments[0], 'fire'];
     }
-
     /**
-     * Resolve the given job handler.
-     * @param string $name
-     * @return mixed
+     * Resolve the given job handler
      */
-    protected function resolve($name, $param)
-    {
-        // $namespace = $this->app->getNamespace() . '\\job\\';
-        $namespace = '\\shiyunQueue\\drive\\';
-
-        $class = false !== strpos($name, '\\') ? $name : $namespace . $name . "\\" . Str::studly($name) . "Job";
-        return $this->app->make($class, [$param], true);
-    }
-
     public function getResolvedJob()
     {
         if (empty($this->instance)) {
+
             [$class] = $this->getParsedJob();
-            $this->instance = $this->resolve($class, $this->payload('data'));
+
+            // var_dump($class);
+            $param  = $this->payload('data');
+
+            switch ($class) {
+                case 'redis':
+                    $this->instance = $this->app->make(\shiyunQueue\drive\redis\RedisJob::class, [$param], true);
+                    break;
+                case 'database':
+                    $this->instance = $this->app->make(\shiyunQueue\drive\database\DatabaseJob::class, [$param], true);
+                    break;
+                case 'rabbitmq':
+                    // $this->instance = $this->app->make(\shiyunQueue\drive\database\Rabb::class, [$param], true);
+                    break;
+            }
         }
         return $this->instance;
     }
 
     /**
-     * Determine if the job has been marked as a failure.
      * 确定作业是否已标记为失败
      * @return bool
      */
@@ -198,7 +192,6 @@ abstract class Job
         return $this->failed;
     }
     /**
-     * Mark the job as "failed".
      * 将作业标记为“失败”
      * @return void
      */
@@ -208,7 +201,6 @@ abstract class Job
     }
 
     /**
-     * Get the number of times to attempt a job.
      * 获取尝试某个任务的次数。
      * @return int|null
      */
@@ -218,8 +210,7 @@ abstract class Job
     }
 
     /**
-     * Get the number of seconds the job can run.
-     *
+     * 获取作业可以运行的秒数
      * @return int|null
      */
     public function timeout()
@@ -228,7 +219,6 @@ abstract class Job
     }
 
     /**
-     * Get the timestamp indicating when the job should timeout.
      * 获取超市参数的时间戳。
      * @return int|null
      */
@@ -237,8 +227,7 @@ abstract class Job
         return $this->payload('timeoutAt');
     }
     /**
-     * Get the name of the queued job class.
-     *
+     * 获取排队作业类的名称
      * @return string
      */
     public function getName()
@@ -246,7 +235,7 @@ abstract class Job
         return $this->payload('job');
     }
     /**
-     * Get the name of the queue the job belongs to.
+     * 获取作业所属队列的名称
      * @return string
      */
     public function getQueue()
@@ -254,8 +243,7 @@ abstract class Job
         return $this->queue;
     }
     /**
-     * Get the decoded body of the job.
-     *
+     * 获取作业的解码正文
      * @return mixed
      */
     public function payload($name = null, $default = null)

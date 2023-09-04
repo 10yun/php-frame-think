@@ -36,7 +36,6 @@ abstract class RouteAnnotationHandle implements IntfAnnotationHandle
     protected static array $flags = [];
     /**
      * 控制器注解
-     * @var array
      */
     protected static array $controllers = [];
     /**
@@ -45,13 +44,11 @@ abstract class RouteAnnotationHandle implements IntfAnnotationHandle
     protected static array $restArr = [];
     /**
      * 控制器中间件
-     * @var array
      */
     protected static array $middlewares = [];
 
     /**
      * 保存的路由
-     * @var array
      */
     protected static array $routes = [];
     protected static array $routesLast = [];
