@@ -89,6 +89,8 @@ class QueueFactory
                     break;
             }
             $redisDrive->setApp($this->app);
+            $redisDrive->baseInit();
+            $redisDrive->setConnectName($name);
             $this->driversHandle[$name] = $redisDrive;
             return $this->driversHandle[$name];
         }
