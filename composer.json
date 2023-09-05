@@ -30,8 +30,7 @@
     "require": {
         "php": "^8",
         "shiyun/php-worker": "@dev",
-        "ext-json": "*",
-        "nesbot/carbon": "^2.16"
+        "ext-json": "*"
     },
     "require-dev": {
         "ext-json": "*",

@@ -21,14 +21,6 @@ function frameEventTrigger($event, $param = null)
 {
     return Event::trigger($event, $param);
 }
-function frameEventUntil($event, $param = null)
-{
-    return Event::until($event, $param);
-}
-function frameGetSession($flag)
-{
-    return Session::get($flag);
-}
 function frameLogs($channel = '', $info = '')
 {
     if (!empty($channel)) {

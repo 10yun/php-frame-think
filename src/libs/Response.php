@@ -14,6 +14,21 @@ class Response
 {
     protected $httpVersion = "HTTP/1.1";
 
+    /**
+     * 
+     */
+    public static function sendSucc()
+    {
+    }
+    public static function sendError()
+    {
+    }
+
+    public static function sendListData()
+    {
+    }
+
+
 
     // 返回结果
     public function sendResponse($result_data = null, $send_type = 'json')
@@ -41,8 +56,6 @@ class Response
             exit();
         }
     }
-
-
     // json格式
     protected function encodeJson($responseData = array())
     {
