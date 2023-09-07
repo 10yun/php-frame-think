@@ -1,6 +1,14 @@
 <?php
 
 /**
+ * 生成随机浮点数
+ */
+function _cc_random_float($min, $max)
+{
+    return round($min + mt_rand() / mt_getrandmax() * ($max - $min), 2);
+}
+
+/**
  * @todo 循环分多次
  * @author ctocode-zwj
  * @version 2018/08/31

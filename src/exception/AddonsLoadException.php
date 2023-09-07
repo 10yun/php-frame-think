@@ -14,7 +14,7 @@ class AddonsLoadException extends \Exception
     /**
      * 保存异常页面显示的额外Debug数据
      */
-    protected array $data = [];
+    protected mixed $data = [];
     protected string $error;
 
     public function __construct(string $message = '', int $code = 404, mixed $data = '')

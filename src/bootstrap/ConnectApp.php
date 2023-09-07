@@ -42,7 +42,7 @@ class ConnectApp extends BaseService
         /**
          * 注册事件
          */
-        new \shiyun\connection\LoadAppEvent($this->app);
+        // new \shiyun\connection\LoadAppEvent($this->app);
         /**
          * 默认数据库切换
          */

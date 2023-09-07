@@ -25,6 +25,11 @@ trait TraitMessage
      */
     protected int $msgCurrTime = 0;
     /**
+     * 当前 IP
+     */
+    protected string $msgIp = '';
+
+    /**
      * 是否加密
      */
     protected bool $msgEncrypt = false;
@@ -37,6 +42,7 @@ trait TraitMessage
     {
         $now = time();
         $this->msgCurrTime = $now;
+        $this->msgIp = ctoIpGet();
     }
     public function clearMsgSett()
     {
@@ -82,6 +88,7 @@ trait TraitMessage
         $msgLast = [];
         $msgLast['msgEncrypt'] = $this->msgEncrypt ?? false;
         $msgLast['msgID'] = rand();
+        $msgLast['msgIp'] = $this->msgIp;
         $msgLast['msgCurrTime'] = $this->msgCurrTime;
         $msgLast['msgCurrDate'] = date('Y-m-d H:i:s', $this->msgCurrTime);
         $msgLast['msgDelay'] = $this->msgDelay;

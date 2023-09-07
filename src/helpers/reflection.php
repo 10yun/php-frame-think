@@ -120,11 +120,11 @@ function getFucntionParameter($func, $param = [])
         } elseif ($value->isDefaultValueAvailable()) {
             $depend[] = $value->getDefaultValue();
         } else {
-            $tmp = $value->getClass();
+            $tmp = $value->getType();
             if (is_null($tmp)) {
-                throw new \Exception("Function parameters can not be getClass {$class}");
+                throw new \Exception("Function parameters can not be getClass {$tmp}");
             }
-            $depend[] = $this->get($tmp->getName());
+            $depend[] = $tmp->getName();
         }
     }
     return $depend;

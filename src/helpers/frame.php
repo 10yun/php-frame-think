@@ -2,7 +2,6 @@
 
 use think\facade\Config;
 use think\facade\Env;
-use think\facade\Event;
 use think\facade\Session;
 use think\facade\Log;
 use think\facade\Cache;
@@ -16,10 +15,6 @@ function frameGetConfig($flag = null)
 function frameGetEnv(string $name = null, $default = null)
 {
     return Env::get($name, $default);
-}
-function frameEventTrigger($event, $param = null)
-{
-    return Event::trigger($event, $param);
 }
 function frameLogs($channel = '', $info = '')
 {

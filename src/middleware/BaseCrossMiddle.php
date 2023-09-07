@@ -2,6 +2,9 @@
 
 namespace shiyun\middleware;
 
+use Closure;
+use think\Config;
+use think\Request;
 use think\Response;
 
 class BaseCrossMiddle
@@ -13,44 +16,43 @@ class BaseCrossMiddle
      * @param \Closure $next
      *            return void
      */
-    public function handle($request, \Closure $next)
+
+    public function handle(Request $request, Closure $next): Response
     {
-        // frameLogs('LOGS_CHANNEL_FILE', 'AllowCrossDomain   ----- ');
         $maxAge = 1800;
-        $headers = [
-            'Access-Control-Allow-Headers'  => 'x-token, Cache-Control, Content-Disposition, x-requested-with, Host, Sign, Auth-Token, Auth-Identity, Authorization, Content-Type, If-Match, If-Modified-Since, If-None-Match, If-Unmodified-Since, X-Requested-With',
+
+        // $headerArr .= 'x-token, Cache-Control, Content-Disposition, Host, Sign, Auth-Token, Auth-Identity';
+        $headerArr = [
+            'Authorization',
+            'Content-Type',
+            'If-Match', 'If-Modified-Since', 'If-None-Match', 'If-Unmodified-Since',
+            'X-CSRF-TOKEN', 'X-Requested-With',
+            'Host', 'Origin', 'Accept',
+            'Sec-Fetch-Site', 'Sec-Fetch-Mode', 'Sec-Fetch-Dest'
         ];
 
-        $headerDefault = [
-            'Authorization', 'authorization',
-            'x-requested-with', 'X-Requested-With',
-            'content-type', 'Content-Type',
-            'Origin', 'Accept'
-        ];
-        $Headers_default = implode(",", $headerDefault);
         // 自定义请求方式，解决 无PUT、POST、DELETE 问题
-        $Headers_default .= ",x-http-method-override";
-        $Headers_default .= ",syOpenAppProject";
-        $Headers_default .= ",syOpenAppId";
-        $Headers_default .= ",syOpenAppKey";
-        $Headers_default .= ",syOpenAppToken";
-        $Headers_default .= ",syOpenAppRole";
-        $Headers_default .= ",syOpenAppUuid";
-        $Headers_default .= ",syOpenAppClientPlatform";
-        // $Headers_default .= ",If-Match, If-Modified-Since, If-None-Match, If-Unmodified-Since";
-        header("Access-Control-Allow-Origin: *");
-        header("Access-Control-Allow-Headers: {$Headers_default} ");
+        $headerArr[] = 'x-http-method-override';
+        $headerArr[] = 'syOpenAppProject';
+        $headerArr[] = 'syOpenAppId';
+        $headerArr[] = 'syOpenAppKey';
+        $headerArr[] = 'syOpenAppToken';
+        $headerArr[] = 'syOpenAppRole';
+        $headerArr[] = 'syOpenAppUuid';
+        $headerArr[] = 'syOpenAppClientPlatform';
+        $headerStr = implode(",", $headerArr);
+        // var_dump('---', $headerStr);
+        header("Access-Control-Allow-Origin: * ");
+        header("Access-Control-Allow-Headers: {$headerStr} ");
         header("Access-Control-Max-Age: {$maxAge}");
         $header = [
             'Access-Control-Allow-Origin' => '*',
             'Access-Control-Allow-Methods' => 'OPTIONS,GET,POST,PUT,PATCH,DELETE',
             'Access-Control-Allow-Credentials' => 'true',
-            'Access-Control-Allow-Headers' => $Headers_default,
+            'Access-Control-Allow-Headers' => $headerStr,
             'Access-Control-Max-Age' => "1800",
-            'Access-Control-Request-Headers' => $Headers_default
+            'Access-Control-Request-Headers' => $headerStr
         ];
-
-
 
         // $all_origin = array(
         // 	'http://console.' . env('ctocode.url_domain_base')
@@ -66,6 +68,6 @@ class BaseCrossMiddle
                 ->code(204)
                 ->header($header);
         }
-        return $next($request);
+        return $next($request)->header($header);
     }
 }

@@ -30,9 +30,13 @@ class AgentMiddle
      */
     public function end(\think\Response $response)
     {
-        // frameLogs('logs_channel_debug', '执行结束了');
-        event('syRoleOrgLogs', [
-            'type' => 'agent端'
+        queue_producer('queue_connect_redis', '', 'RoleOrgLogAdd', [
+            'business_id' =>  syOpenAccess('business_id'),
+            'log_role' => 'agent端',
+            'log_method' => request()->method(),
+            'log_remarks' => request()->pathinfo(),
+            'log_optid' => syOpenAccess('account_id'),
+            'log_name' => syOpenAccess('staff_name'),
         ]);
     }
 }

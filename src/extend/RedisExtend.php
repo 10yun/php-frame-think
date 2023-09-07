@@ -55,7 +55,7 @@ class RedisExtend
             // tp5配置
             $db_redis = Config::get('cache');
         } else {
-            // saas配置
+            // platform 配置
             $redisConfig = include_once root_path() . '/config/database/redis_base.php';
             $db_redis = $redisConfig;
             unset($redisConfig);

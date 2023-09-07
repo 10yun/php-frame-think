@@ -5,7 +5,7 @@ namespace shiyun\middleware\role;
 /**
  * 平台鉴权
  */
-class SaasMiddle
+class PlatMiddle
 {
     /**
      * 前置
@@ -13,7 +13,7 @@ class SaasMiddle
     public function handle($request, \Closure $next)
     {
         $currAppRole = syOpenAppsAuth('syOpenAppRole');
-        if ($currAppRole != 'org-saas') {
+        if ($currAppRole != 'org-platform') {
             return sendRespError('角色类型错误~');
         }
         $currTokenRole = syOpenAccess('token_role');
@@ -23,11 +23,11 @@ class SaasMiddle
         if ($currAppRole != $currTokenRole) {
             return sendRespError('角色类型错误~');
         }
-        $request->role_type_xxxx = 'org-saas';
+        $request->role_type_xxxx = 'org-platform';
         // dd('-12321--');
         // $isSaas = gDoGetRoleTypeArr([
         //     'account_id' => syOpenAccess('account_id'),
-        //     'business_mode' => 'org-saas',
+        //     'business_mode' => 'org-platform',
         // ]);
         // // $isSaas = gDoGetRoleTypeArr([
         // //     'account_id' => syOpenAccess('account_id'),
@@ -36,7 +36,7 @@ class SaasMiddle
         // // 如果是平台
         // $isSaas = gDoGetRoleTypeArr([
         //     'account_id' => syOpenAccess('account_id'),
-        //     'business_mode' => 'org-saas',
+        //     'business_mode' => 'org-platform',
         //     'role_type_in' => 'sy-org-admin',
         //     'role_type_in' => 'sy-org-admin,sy-org-staff',
         // ]);
@@ -53,9 +53,13 @@ class SaasMiddle
      */
     public function end(\think\Response $response)
     {
-        // frameLogs('logs_channel_debug', '执行结束了');
-        event('syRoleOrgLogs', [
-            'type' => '平台端'
+        queue_producer('queue_connect_redis', '', 'RoleOrgLogAdd', [
+            'business_id' => syOpenAccess('business_id'),
+            'log_role' => '平台端',
+            'log_method' => request()->method(),
+            'log_remarks' => request()->pathinfo(),
+            'log_optid' => syOpenAccess('account_id'),
+            'log_name' => syOpenAccess('staff_name'),
         ]);
     }
 }

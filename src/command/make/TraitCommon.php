@@ -30,7 +30,7 @@ trait TraitCommon
         }
         $roleMate = [
             'business' => 'BUS',
-            'saas' => 'SAAS',
+            'platform' => 'PLAT',
             'admin' => 'ADMIN',
             'agent' => 'AGENT',
             'tourist' => 'TOU',

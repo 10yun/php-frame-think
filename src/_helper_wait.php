@@ -7,25 +7,6 @@ function ctoStrRandId($length)
     $random_str = $random_str . rand(1000, 999999);
     return $random_str;
 }
-// MD5加密截取 默认24位
-function ctoStrNmd5($str, $len = 24, $start = 5)
-{
-    // 此值不要更改 否则会员会登录失败
-    $hash = 'ctocode!@$=#=%+#com';
-    return substr(md5($str . $hash), $start, $len);
-}
-function ctoStrGetHashv($key)
-{
-    $vstr_a = $vstr = '';
-    $n = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    for ($i = 0; $i < 25; $i++) {
-        $j = mt_rand(0, (strlen($n) - 1));
-        $vstr_a .= $n[$j];
-    }
-    $vstr_b = md5($key . $vstr_a);
-    $vstr = $vstr_b . '-' . $vstr_a;
-    return $vstr;
-}
 // 验证Hash字符串是否合法
 function ctoStrCheckhashv($v, $key)
 {

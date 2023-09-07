@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace shiyun\middleware;
 
+use shiyun\support\Event;
+
 /**
  * 路由 method 处理
  */
@@ -20,16 +22,16 @@ class CheckRestMiddle
 			 */
         } else if ($method == 'PUT') {
             // 开启事务
-            frameEventTrigger('dbStartTask');
+            Event::trigger('dbStartTask');
         } else if ($method == 'PATCH') {
             // 开启事务
-            frameEventTrigger('dbStartTask');
+            Event::trigger('dbStartTask');
         } else if ($method == 'DELETE') {
             // 开启事务
-            frameEventTrigger('dbStartTask');
+            Event::trigger('dbStartTask');
         } else if ($method == 'POST') {
             // 开启事务
-            frameEventTrigger('dbStartTask');
+            Event::trigger('dbStartTask');
             /**
              *  '路由methods 转换';
              */
