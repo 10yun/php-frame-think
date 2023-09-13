@@ -47,7 +47,6 @@ function sendRespSucc(string $msg = '操作成功~', int $status = 200, mixed $d
         'data' => $data
     ]);
 }
-
 /**
  * 错误
  */

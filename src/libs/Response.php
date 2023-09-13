@@ -35,7 +35,7 @@ class Response
         return $this;
     }
     // 返回结果
-    public function sendResponse($data = null)
+    public function sendResponse(mixed $data)
     {
         // 输出结果
         // header ( $this->httpVersion . " " . $statusCode . " " . $statusMessage );
@@ -77,15 +77,22 @@ class Response
         }
     }
     // json格式
-    protected function encodeJson($data = array())
+    protected function encodeJson(array $data = [])
     {
         return json_encode($data, true);
     }
     // xml格式
-    protected function encodeXml($data = array())
-    { // 创建 SimpleXMLElement 对象
+    protected function encodeXml(array $data = [])
+    {
+        $keyNodes = array_keys($data);
+        $rootNode = 'ctocode';
+        if (count($keyNodes) == 1) {
+            $rootNode = $keyNodes[0];
+        }
+        $rootNoteXml = "<{$rootNode}></{$rootNode}>";
+        // 创建 SimpleXMLElement 对象
         /* '<?xml version="1.0"?><site></site>' */
-        $xml = new \SimpleXMLElement('<?xml version="1.0"?><rest></rest>');
+        $xml = new \SimpleXMLElement('<?xml version="1.0"?>' . $rootNoteXml);
         foreach ($data as $key => $value) {
             if (is_array($value)) {
                 foreach ($value as $k => $v) {
