@@ -48,14 +48,3 @@ function queue_resp_succ(string $msg = '')
     echo "{$msg} \n";
     return true;
 }
-
-function frameLogsQueue($info = '')
-{
-    if (is_string($info)) {
-        Log::channel('logs_channel_queue')->write($info);
-    } else if (is_array($info)) {
-        Log::channel('logs_channel_queue')->info($info);
-    } else if (is_object($info)) {
-        Log::channel('logs_channel_queue')->info($info);
-    }
-}

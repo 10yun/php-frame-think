@@ -4,17 +4,7 @@ namespace shiyun\libs;
 
 class Console
 {
-    /**
-     * 单例
-     */
-    protected static $instance;
-    public static function getInstance(): static
-    {
-        if (is_null(self::$instance)) {
-            self::$instance = new static();
-        }
-        return self::$instance;
-    }
+    use \shiyun\libs\TraitModeInstance;
 
     protected $tokens;
     public function __construct($argv = null)

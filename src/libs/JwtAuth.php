@@ -39,10 +39,9 @@ use Lcobucci\JWT\Validation\RequiredConstraintsViolated;
  */
 class JwtAuth
 {
+    use \shiyun\libs\TraitModeInstance;
 
     protected $jwtContainer;
-    private static $instance;
-
     // 加密后的token
     private $token;
     // 解析JWT得到的token
@@ -67,27 +66,12 @@ class JwtAuth
     private function __construct()
     {
     }
-    // public function __construct()
-    // {
-    // }
     /**
      * 单例模式 禁止外部克隆
      */
     private function __clone()
     {
         // TODO: Implement __clone() method.
-    }
-
-    /**
-     * 该类的实例
-     * @return JwtAuth
-     */
-    public static function getInstance()
-    {
-        if (is_null(self::$instance)) {
-            self::$instance = new self();
-        }
-        return self::$instance;
     }
     public function init($secrect = '')
     {

@@ -4,6 +4,7 @@
     "type": "library",
     "description": "shiyun ctocode frame extend thinkphp  shiyun/php-think",
     "description2": "php worker for shiyun，workerman的一些二次封装",
+    "description3": "php worker for shiyun，workerman的一些二次封装",
     "keywords": [
         "mqtt",
         "mqtt_client",
@@ -12,7 +13,10 @@
         "rabbitmq",
         "queue",
         "redis",
-        "amqp"
+        "amqp",
+        "event-loop",
+        "php",
+        "workerman"
     ],
     "homepage": "https://docs.10yun.com/php/",
     "license2": "Apache-2.0",
@@ -27,19 +31,42 @@
             "email": "syky@10yun.com"
         }
     ],
+    "support": {
+        "email": "343196936@qq.com",
+        "issues": "https://github.com/10yun/php-think/issues",
+        "forum": "http://docs.10yun.com/php/",
+        "wiki": "http://docs.10yun.com/php/",
+        "source": "https://github.com/10yun/php-think"
+    },
     "require": {
         "php": "^8",
-        "shiyun/php-worker": "@dev",
+        "workerman/workerman": "^4",
+        "workerman/gateway-worker": "^3",
+        "workerman/gatewayclient": "^3",
+        "ext-fileinfo": "*",
         "ext-json": "*"
     },
     "require-dev": {
         "ext-json": "*",
         "ext-curl": "*",
-        "ext-bcmath": "*"
+        "ext-bcmath": "*",
+        "php": "^8",
+        "aliyuncs/oss-sdk-php": "~2.0",
+        "phpmailer/phpmailer": "^6.1",
+        "phpoffice/phpspreadsheet": "1.7",
+        "php-amqplib/php-amqplib": "^2.11",
+        "robthree/twofactorauth": "^1.7",
+        "rodneyrehm/plist": "^2.0",
+        "firebase/php-jwt": "^5.4",
+        "phpunit/phpunit": "^6.2",
+        "mockery/mockery": "^1.2",
+        "topthink/think-migration": "^3.0.0"
     },
     "autoload": {
         "psr-4": {
             "shiyunQueue\\": "src\\queue",
+            "shiyunRpc\\": "src\\rpc",
+            "shiyunWorker\\": "src\\worker",
             "shiyun\\": "src"
         },
         "files": [
@@ -53,12 +80,21 @@
     },
     "extra": {
         "shiyun": {
+            "services": [
+                "shiyunWorker\\Bootstrap"
+            ],
             "config": {
                 "shiyun/annotation": "src/config/annotation.php",
                 "shiyun/app": "src/config/app.php",
                 "shiyun/connection": "src/config/connection.php",
                 "shiyun/throttle": "src/config/throttle.php",
-                "shiyun/queue": "src/config/queue.php"
+                "shiyun/queue": "src/config/queue.php",
+                "shiyun/worker_worker": "src/config/worker_worker.php",
+                "shiyun/worker_server": "src/config/worker_server.php",
+                "shiyun/worker_gateway": "src/config/worker_gateway.php",
+                "shiyun/rpc_client": "src/config/rpc_client.php",
+                "shiyun/rpc_server_statistics": "src/config/rpc_server_statistics.php",
+                "shiyun/rpc_server": "src/config/rpc_server.php"
             }
         }
     },

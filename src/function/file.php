@@ -28,82 +28,11 @@ function ctoFileDel($dir, $type = TRUE)
     }
 }
 
-// 写入文件内容,写入数据str
-function ctoFilePutContents($file_path, $content)
-{
-    if (empty($file_path))
-        return '';
-    // 无视文件，是否存在，直接创建，
-    ctoFileDirCreate($file_path, 0777, _PATH_RUNTIME_);
-    chmod($file_path, 0777);
-    // ob_start ();
-    try {
-        file_put_contents($file_path, $content);
-    } catch (\Exception $e) {
-        echo '<div style="color:red;">' . '写入缓存失败!请检查目录权限!' . '</div>';
-    }
-}
-/**
- * @action 写入php内容
- * @param string $file_name
- * @param string $content
- * @param string $is_root
- * @param string $min  去除空格 
- * @param string $slize 是否序列化
- */
-/*
- * @可被删除或放弃的文件缓存 关于文件缓存格式 是 var_export | serialize *
- * @效率对比 这个有待商榷 ,有的地方说 serialize序列化的效率更高
- * @很多文档支持serialize
- * @在本系统中实测并未发现太大差别
- */
-function ctoFileArrayStr($array = array(), $sql = 1)
-{
-    $rs = '';
-    if (is_array($array)) {
-        $rs = @serialize($array);
-        if ($sql) {
-            $rs = addslashes($rs);
-        }
-    }
-    return $rs;
-}
-function ctoFilePutPhp($file_path = '', $content = '', $is_root = TRUE, $min = FALSE, $slize = FALSE)
-{
-    if ($slize == TRUE) { // 是否序列化
-        $cache = array();
-        $cache['data'] = $val;
-        $cata = ctoFileArrayStr($cache, 0);
-    }
-    $put_content = var_export($content, true);
-    if ($min == TRUE) {
-        $put_content = preg_replace("'([\r\n])[\s]+'", "", $put_content);
-    }
-
-    // if($min){
-    // $put_content = preg_replace("'([\r\n])[\s]+'", "",$cache);
-    // }
-    // $cata = "<?php \r\nif(!defined('DBGMS_ROOT')){\n\theader('HTTP/1.1 404 Not Found' );\n\texit('权限路径.No
-    // direct script access allowed');\n}\nreturn ";
-    $cata = "<?php \r\n";
-    if ($is_root == TRUE) {
-        // $cata .= "if(!defined('_CTOCODE_ROOT_')){\r\n";
-        // $cata .= "\t" . "header('HTTP/1.1 404 Not Found');\r\n";
-        // $cata .= "\t" . "exit('权限路径.No direct script access allowed');\r\n";
-        // $cata .= "}\r\n";
-        $cata .= "\r\n";
-    }
-    $cata .= 'return ';
-    $cata .= $put_content;
-    $cata .= ";\r\n?>";
-    ctoFilePutContents($file_path, $cata);
-}
-
 /*
  * @action: 写入文件
  * 【文件】 $path,文件存放路径; $type,模式; $content,文件内容;
  */
-function ctoFileFopen($file_path = NULL, $content = NULL, $open_type = "w+", $is_root)
+function ctoFileFopen($content = NULL, $open_type = "w+", $is_root)
 {
     $put_content = '';
     $put_content .= "<?php \n";

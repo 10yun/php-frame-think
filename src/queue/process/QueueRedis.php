@@ -58,12 +58,18 @@ class QueueRedis extends WorkermanServer
                 }
             }
         } catch (\Throwable $e) {
-            frameLogsQueue('执行消息队列发生错误,错误原因: Throwable ' . $e->getMessage());
+            $this->queueLogEerror('执行消息队列发生错误,错误原因: Throwable ' . $e->getMessage());
         } catch (\PDOException $e) {
-            frameLogsQueue('执行消息队列发生错误,错误原因: PDOException ' . $e->getMessage());
+            $this->queueLogEerror('执行消息队列发生错误,错误原因: PDOException ' . $e->getMessage());
         } catch (\Exception $e) {
-            frameLogsQueue('执行消息队列发生错误,错误原因: Exception ' . $e->getMessage());
+            $this->queueLogEerror('执行消息队列发生错误,错误原因: Exception ' . $e->getMessage());
         }
+    }
+    protected function queueLogEerror($info = '')
+    {
+        \shiyunUtils\libs\LibsLogger::getInstance()
+            ->setGroup('queue_redis')
+            ->writeError($info);
     }
     /**
      * 处理-=普通模式

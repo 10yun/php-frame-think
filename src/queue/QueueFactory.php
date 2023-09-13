@@ -26,15 +26,18 @@ use InvalidArgumentException;
  */
 class QueueFactory
 {
-    /** @var App */
+    use \shiyun\libs\TraitModeInstance;
+    /**
+     * @var App
+     */
     protected $app;
     /**
      * 驱动
      */
     protected array $driversHandle = [];
-    public function __construct(App $app)
+    public function __construct()
     {
-        $this->app = $app;
+        $this->app = app();
     }
     /**
      * 默认驱动
@@ -96,30 +99,6 @@ class QueueFactory
         }
     }
     /**
-     * 单例实例
-     */
-    protected static $instance;
-    /**
-     * 存储单例
-     */
-    protected array $instances = [];
-    /**
-     * 获取当前容器的实例（单例）
-     * @access public
-     * @return static
-     */
-    public static function getInstance()
-    {
-        if (is_null(self::$instance)) {
-            self::$instance = new static(App());
-        }
-        return self::$instance;
-        // if (is_null(static::$instance)) {
-        //     static::$instance = new static();
-        // }
-        // return static::$instance;
-    }
-    /**
      * 获取参数
      * @param $data
      * @return array
@@ -131,7 +110,6 @@ class QueueFactory
         //     // $this->jobServer .= '@' . $prefix . $this->jobFunc;
         // } 
     }
-
     /**
      * 动态调用
      * @param string $method

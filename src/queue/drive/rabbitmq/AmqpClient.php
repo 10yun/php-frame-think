@@ -32,7 +32,6 @@ class AmqpClient
             $param['connect_vhost']
         );
         $channel = $connection->channel();
-
         $this->createChannel();
         return $this;
     }

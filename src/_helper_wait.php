@@ -160,3 +160,39 @@ function ctoStrIconv($str, $in_charset, $out_charset = '')
         return $str;
     }
 }
+
+/**
+ * 数字(>0)加密变长
+ * @author ctocode-zhw
+ * @version 2015-07-12
+ * @param number $int
+ * @param string $type
+ * @return number|string
+ */
+function ctoValueNumEncode($int = 0, $type = 'ENCODE')
+{
+    if ($type == 'ENCODE') {
+        $int = (int) $int;
+        if ($int == 0) {
+            return 0;
+        }
+        $len = strlen($int);
+        $temp = (300000000 + $int - 19750806) * 2;
+        return $temp . $len;
+    } else {
+        $num = (int) substr($int, 0, strlen($int) - 1);
+        $len = (int) substr($int, -1, 1);
+        if ($num == 0 || $len == 0) {
+            return 0;
+        }
+        $new = (int) (($num / 2) + 19750806 - 300000000);
+        if (strlen($new) == $len) {
+            return $new;
+        }
+    }
+    return 0;
+}
+function ctoValueNumDecode($int = 0, $type = 'DECODE')
+{
+    return ctoValueNumEncode($int, 'DECODE');
+}

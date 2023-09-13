@@ -77,7 +77,7 @@ class OpenAppAccess
          * 是否解密token
          */
         if (!true) {
-            $aes = new \shiyunUtils\libs\LibsAes();
+            $aes = new \shiyunUtils\libs\LibsSymmAES();
             $token_access = $aes->decrypt(syOpenAppsAuth('syOpenAppToken'));
         }
         $tokenCache = $this->sCacheGet(md5($token_access));

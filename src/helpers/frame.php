@@ -16,23 +16,23 @@ function frameGetEnv(string $name = null, $default = null)
 {
     return Env::get($name, $default);
 }
-function frameLogs($channel = '', $info = '')
+function frameLogs($channel = '', mixed $info = '')
 {
     if (!empty($channel)) {
         if (is_string($info)) {
             Log::channel($channel)->write($info);
         } else if (is_array($info)) {
-            Log::channel($channel)->info($info);
+            Log::channel($channel)->write($info);
         } else if (is_object($info)) {
-            Log::channel($channel)->info($info);
+            Log::channel($channel)->write($info);
         }
     } else {
         if (is_string($info)) {
             Log::write($info);
         } else if (is_array($info)) {
-            Log::info($info);
+            Log::write($info);
         } else if (is_object($info)) {
-            Log::info($info);
+            Log::write($info);
         }
     }
 }
@@ -56,6 +56,18 @@ function frameCacheSet($store = 'default', $key = '', $val = '', $time = null)
         Cache::store($store)->set($key, $val, $time);
     } else {
         Cache::store($store)->set($key, $val);
+    }
+}
+function frameCacheDel($store, $key = '')
+{
+    if (empty($store)) {
+        $store = 'default';
+    }
+    if (!empty($time)) {
+        // 缓存在3600秒之后过期
+        Cache::store($store)->delete($key);
+    } else {
+        Cache::store($store)->delete($key);
     }
 }
 function frameGetDbInit($settData = [], $database = '')
