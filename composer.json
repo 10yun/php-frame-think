@@ -40,6 +40,7 @@
     },
     "require": {
         "php": "^8",
+        "shiyun/php-utils": "@dev",
         "workerman/workerman": "^4",
         "workerman/gateway-worker": "^3",
         "workerman/gatewayclient": "^3",
