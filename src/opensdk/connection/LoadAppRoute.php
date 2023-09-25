@@ -17,7 +17,7 @@
 
 declare(strict_types=1);
 
-namespace shiyun\connection;
+namespace shiyunOpensdk\connection;
 
 use shiyun\support\Cache;
 use shiyun\support\Env;

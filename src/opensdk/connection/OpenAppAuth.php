@@ -1,6 +1,6 @@
 <?php
 
-namespace shiyun\connection;
+namespace shiyunOpensdk\connection;
 
 class OpenAppAuth
 {

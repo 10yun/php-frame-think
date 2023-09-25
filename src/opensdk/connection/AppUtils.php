@@ -1,6 +1,6 @@
 <?php
 
-namespace think\addons;
+namespace shiyunOpensdk\connection;
 
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;

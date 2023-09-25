@@ -17,7 +17,7 @@
 
 declare(strict_types=1);
 
-namespace shiyun\connection;
+namespace shiyunOpensdk\connection;
 
 use think\App;
 use shiyun\support\Cache;

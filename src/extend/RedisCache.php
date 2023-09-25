@@ -8,8 +8,6 @@ use shiyun\support\Cache;
 
 class RedisCache
 {
-    use \shiyun\libs\TraitModeInstance;
-
     protected $redis_store = 'CACHE_STORES_RD2';
     protected $redis_handle = null;
 

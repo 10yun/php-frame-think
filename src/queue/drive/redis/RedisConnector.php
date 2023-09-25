@@ -16,7 +16,7 @@ use Exception;
 use RedisException;
 use think\helper\Str;
 use shiyunQueue\drive\Connector;
-use shiyunQueue\InteractsWithTime;
+use shiyunQueue\libs\InteractsWithTime;
 
 class RedisConnector extends Connector
 {

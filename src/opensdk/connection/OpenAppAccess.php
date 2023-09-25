@@ -17,7 +17,7 @@
 
 declare(strict_types=1);
 
-namespace shiyun\connection;
+namespace shiyunOpensdk\connection;
 
 /**
  * 依赖注入，应用配置类

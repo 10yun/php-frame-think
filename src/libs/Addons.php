@@ -7,22 +7,15 @@ use shiyun\exception\AddonsLoadException;
 /**
  * @see \shiyun\libs\Addons
  * @package shiyun\libs\Addons
- * @method static \shiyun\libs\Addons getInstance get(mixed $name = '', string $default = null) 获取cookie
+ * @method static \shiyun\libs\Addons getMapInstance($key=null) 获取映射
  * @method static \shiyun\libs\Addons setType(string $type) 设置类型
  * @method static \shiyun\libs\Addons checkService(string $service, string $class = '') 验证服务
  * @method static string getService() 获取服务名称
  */
 class Addons
 {
-    protected static $instances = [];
-    public static function getInstance()
-    {
-        $class = get_called_class();
-        if (!isset(self::$instances[$class])) {
-            self::$instances[$class] = new static();
-        }
-        return self::$instances[$class];
-    }
+    use \shiyun\libs\TraitModeInstance;
+
     protected $addons_type = '';
     protected $addons_file = '';
     protected $addons_class = '';

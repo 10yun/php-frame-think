@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace shiyun\connection;
+namespace shiyunOpensdk\connection;
 
 /**
  * 使 模块 单独的 js、css、img 等资源 放置在一起

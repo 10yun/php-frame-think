@@ -2,8 +2,8 @@
 
 namespace shiyunQueue\process;
 
-use shiyunWorker\WorkermanServer;
 use Workerman\Worker;
+use shiyunWorker\WorkermanServer;
 use shiyunQueue\libs\ProcessWorker;
 
 class QueueRedis extends WorkermanServer
@@ -58,14 +58,14 @@ class QueueRedis extends WorkermanServer
                 }
             }
         } catch (\Throwable $e) {
-            $this->queueLogEerror('执行消息队列发生错误,错误原因: Throwable ' . $e->getMessage());
+            $this->queueLogError('执行消息队列发生错误,错误原因: Throwable ' . $e->getMessage());
         } catch (\PDOException $e) {
-            $this->queueLogEerror('执行消息队列发生错误,错误原因: PDOException ' . $e->getMessage());
+            $this->queueLogError('执行消息队列发生错误,错误原因: PDOException ' . $e->getMessage());
         } catch (\Exception $e) {
-            $this->queueLogEerror('执行消息队列发生错误,错误原因: Exception ' . $e->getMessage());
+            $this->queueLogError('执行消息队列发生错误,错误原因: Exception ' . $e->getMessage());
         }
     }
-    protected function queueLogEerror($info = '')
+    protected function queueLogError($info = '')
     {
         \shiyunUtils\libs\LibsLogger::getInstance()
             ->setGroup('queue_redis')

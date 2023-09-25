@@ -13,6 +13,9 @@ use think\console\Output;
 use shiyun\route\annotation\RouteFlag;
 use shiyun\route\annotation\RouteRestful;
 
+/**
+ * 根据注解生成 FLAG：url
+ */
 class CreateApiFlag extends Command
 {
     protected function configure()
@@ -34,7 +37,7 @@ class CreateApiFlag extends Command
         $orgArr = [];
         $businessArr = [];
         $agentArr = [];
-        $platformArr = [];
+        $operatorArr = [];
         $ucenterArr = [];
         $touristArr = [];
 
@@ -47,7 +50,7 @@ class CreateApiFlag extends Command
             $this->writeAttrApiFlag($orgArr, $dirItem, 'org', $version, $need_write);
             $this->writeAttrApiFlag($businessArr, $dirItem, 'business', $version, $need_write);
             $this->writeAttrApiFlag($agentArr, $dirItem, 'agent', $version, $need_write);
-            $this->writeAttrApiFlag($platformArr, $dirItem, 'platform', $version, $need_write);
+            $this->writeAttrApiFlag($operatorArr, $dirItem, 'operator', $version, $need_write);
             $this->writeAttrApiFlag($ucenterArr, $dirItem, 'ucenter', $version, $need_write);
             $this->writeAttrApiFlag($touristArr, $dirItem, 'tourist', $version, $need_write);
         }
@@ -56,7 +59,7 @@ class CreateApiFlag extends Command
         $this->writeMergeApiFlag('org', $orgArr, $version);
         $this->writeMergeApiFlag('business', $businessArr, $version);
         $this->writeMergeApiFlag('agent', $agentArr, $version);
-        $this->writeMergeApiFlag('platform', $platformArr, $version);
+        $this->writeMergeApiFlag('operator', $operatorArr, $version);
         $this->writeMergeApiFlag('ucenter', $ucenterArr, $version);
         $this->writeMergeApiFlag('tourist', $touristArr, $version);
         // 

@@ -3,7 +3,7 @@
 namespace shiyunQueue\drive;
 
 use think\Cache;
-use shiyunQueue\InteractsWithTime;
+use shiyunQueue\libs\InteractsWithTime;
 
 /**
  * @method $this setJobServer(string $job)     设置任务执行类名

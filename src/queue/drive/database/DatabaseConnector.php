@@ -16,7 +16,7 @@ use think\Db;
 use think\db\ConnectionInterface;
 use think\db\Query;
 use shiyunQueue\drive\Connector;
-use shiyunQueue\InteractsWithTime;
+use shiyunQueue\libs\InteractsWithTime;
 
 class DatabaseConnector extends Connector
 {

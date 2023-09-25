@@ -22,7 +22,7 @@ class SyAuthAppMiddle
     {
         $isCheckApi = Request::isCheckApi();
 
-        $OpenAppAuthObj = new \shiyun\connection\OpenAppAuth();
+        $OpenAppAuthObj = new \shiyunOpensdk\connection\OpenAppAuth();
         $OpenAppAuthObj->initAuthData();
         $authAppData = $OpenAppAuthObj->getAuthData();
         /**

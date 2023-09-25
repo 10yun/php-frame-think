@@ -10,15 +10,8 @@ use shiyun\model\exception\ModelCacheException;
  */
 class ModelExtCache
 {
-    protected static $instances = [];
-    public static function getInstance()
-    {
-        $class = get_called_class();
-        if (!isset(self::$instances[$class])) {
-            self::$instances[$class] = new static();
-        }
-        return self::$instances[$class];
-    }
+    use \shiyun\libs\TraitModeInstance;
+
     protected $cacheLevel = 1;
     protected $cacheGroup = '_cache_';
     protected $cacheTime = 60 * 60 * 24 * 3;
@@ -44,7 +37,7 @@ class ModelExtCache
             $className = (new \ReflectionClass($this))->getShortName();
             throw new ModelCacheException(" {$className} needId 参数不能为空");
         }
-        $modelRedis = ModelCacheRedis::getInstance($this->instancesKey);
+        $modelRedis = ModelCacheRedis::getMapInstance($this->instancesKey);
         $modelRedis->setLevel($this->cacheLevel)
             ->setTime($this->cacheTime)
             ->setGroup($this->cacheGroup)
@@ -84,7 +77,7 @@ class ModelExtCache
             $className = (new \ReflectionClass($this))->getShortName();
             throw new ModelCacheException(" {$className} data 参数不能为空");
         }
-        $modelRedis = ModelCacheRedis::getInstance($this->instancesKey);
+        $modelRedis = ModelCacheRedis::getMapInstance($this->instancesKey);
         $modelRedis->setLevel($this->cacheLevel)
             ->setTime($this->cacheTime)
             ->setGroup($this->cacheGroup)
@@ -101,7 +94,7 @@ class ModelExtCache
             $className = (new \ReflectionClass($this))->getShortName();
             throw new ModelCacheException(" {$className} needId 参数不能为空");
         }
-        $modelRedis = ModelCacheRedis::getInstance($this->instancesKey);
+        $modelRedis = ModelCacheRedis::getMapInstance($this->instancesKey);
         $modelRedis->setLevel($this->cacheLevel)
             ->setTime($this->cacheTime)
             ->setGroup($this->cacheGroup)

@@ -9,6 +9,7 @@ use shiyun\extend\RedisCache;
  */
 class TokenRedis extends RedisCache
 {
+    use \shiyun\libs\TraitModeInstance;
     /**
      * 生成临时ken
      * 获取token

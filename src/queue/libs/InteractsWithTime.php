@@ -1,6 +1,6 @@
 <?php
 
-namespace shiyunQueue;
+namespace shiyunQueue\libs;
 
 use DateInterval;
 use DateTimeInterface;

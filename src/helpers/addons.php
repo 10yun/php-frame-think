@@ -6,26 +6,6 @@ use shiyun\libs\Addons;
 /**
  * 遗弃
  */
-function loadAddonsCurrCache($fileDir = null)
-{
-    if (empty($fileDir)) {
-        $trace  = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
-        $callArr   = isset($trace[1]) ? $trace[1] : $trace[0];
-        if (empty($callArr['file'])) {
-            throw new \Exception('loadAddonsCurrCache 错误');
-        }
-        $filePath = $callArr['file'];
-        $fileDir = dirname($filePath);
-    }
-    $classFile = $fileDir . '/cache.php';
-    $className = get_class_from_file($classFile);
-    require_once $classFile;
-    $classObj = new $className();
-    return $classObj;
-}
-/**
- * 遗弃
- */
 function loadAddonsCurrModel($fileDir = null)
 {
     if (empty($fileDir)) {
@@ -51,13 +31,14 @@ function loadAddonsCurrModel($fileDir = null)
 function loadAddonsCache($service, $class)
 {
     try {
-        $className = Addons::getInstance()
+        $className = Addons::getMapInstance()
             ->setType('cache')
             ->checkService($service, $class)
             ->getService();
 
         // $classObj = new $className();
-        $classObj = $className::getInstance();
+
+        $classObj = $className::getMapInstance();
         return $classObj;
     } catch (\Exception $exception) {
         return sendRespError($exception->getMessage());
@@ -71,13 +52,13 @@ function loadAddonsCache($service, $class)
 function loadAddonsModel($service = '', $class = '')
 {
     try {
-        $className = Addons::getInstance()
+        $className = Addons::getMapInstance()
             ->setType('model')
             ->checkService($service, $class)
             ->getService();
 
         $classObj = new $className();
-        // $classObj = $className::getInstance();
+        // $classObj = $className::getMapInstance();
         return $classObj;
     } catch (\Exception $exception) {
         return sendRespError($exception->getMessage());
@@ -93,7 +74,7 @@ function loadAddonsModel($service = '', $class = '')
 function loadAddonRpc($service = '', $class = '', $forceCloseRpc = false)
 {
     try {
-        $className = Addons::getInstance()
+        $className = Addons::getMapInstance()
             ->setType('Rpc')
             ->checkService($service, $class)
             ->getService();
@@ -109,7 +90,7 @@ function loadAddonRpc($service = '', $class = '', $forceCloseRpc = false)
         // }
 
         // $classObj = new $className();
-        $classObj = $className::getInstance();
+        $classObj = $className::getMapInstance();
         return $classObj;
     } catch (\Exception $exception) {
         dd($exception->getMessage());

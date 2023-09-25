@@ -12,21 +12,21 @@ class ConnectApp extends BaseService
     {
         // var_dump('ConnectApp   register');
         // 应用接入参数
-        // $this->app->bind('SyOpenAppsAuth', \shiyun\connection\OpenAppAuth::class);
+        // $this->app->bind('SyOpenAppsAuth', \shiyunOpensdk\connection\OpenAppAuth::class);
         $this->app->bind('SyOpenAppsAuth', function () {
-            $class = new \shiyun\connection\OpenAppAuth();
+            $class = new \shiyunOpensdk\connection\OpenAppAuth();
             $class->initAuthData();
             return $class;
         });
-        $this->app->bind('SyOpenAppsConfig', \shiyun\connection\OpenAppConfig::class);
+        $this->app->bind('SyOpenAppsConfig', \shiyunOpensdk\connection\OpenAppConfig::class);
         // 应用信息
-        $this->app->bind('SyOpenAppsAccess', \shiyun\connection\OpenAppAccess::class);
+        $this->app->bind('SyOpenAppsAccess', \shiyunOpensdk\connection\OpenAppAccess::class);
         /**
          * 注册资源
          */
         $this->registerRoutes(function (\think\Route $route) {
             // $route->get('captcha/[:config]', "\\think\\captcha\\CaptchaController@index");
-            $route->get('/ui/<addons>/<resource>', "\\shiyun\\connection\\LoadAppResource@getUI")
+            $route->get('/ui/<addons>/<resource>', "\\shiyunOpensdk\\connection\\LoadAppResource@getUI")
                 ->ext('css|js|jpg|jpeg|png|gif|ico');;
         });
     }
@@ -38,11 +38,11 @@ class ConnectApp extends BaseService
         /**
          * 注册路由
          */
-        new \shiyun\connection\LoadAppRoute($this->app);
+        new \shiyunOpensdk\connection\LoadAppRoute($this->app);
         /**
          * 注册事件
          */
-        // new \shiyun\connection\LoadAppEvent($this->app);
+        // new \shiyunOpensdk\connection\LoadAppEvent($this->app);
         /**
          * 默认数据库切换
          */

@@ -9,15 +9,5 @@ use shiyun\extend\RedisCache;
  */
 class ModelCacheRedis extends RedisCache
 {
-    protected static $instances = [];
-    public static function getInstance($key = null)
-    {
-        if (empty($key)) {
-            $key = get_called_class();
-        }
-        if (!isset(self::$instances[$key])) {
-            self::$instances[$key] = new static();
-        }
-        return self::$instances[$key];
-    }
+    use \shiyun\libs\TraitModeInstance;
 }

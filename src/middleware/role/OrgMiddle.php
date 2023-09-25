@@ -10,7 +10,7 @@ class OrgMiddle
     protected $log_role = '组织端';
     protected $orgArr = [
         'org-business' => '商家端',
-        'org-platform' => '平台端',
+        'org-operator' => '平台端',
         'org-agent' => 'agent端',
         'org-group' => '集团端',
         'org-admin' => '超管端',
@@ -40,14 +40,16 @@ class OrgMiddle
     {
         $currAppRole = syOpenAppsAuth('syOpenAppRole');
         $log_role = $this->orgArr[$currAppRole];
-
-        queue_producer('queue_connect_redis', '', 'RoleOrgLogAdd', [
-            'business_id' =>  syOpenAccess('business_id'),
-            'log_role' => $log_role,
-            'log_method' => request()->method(),
-            'log_remarks' => request()->pathinfo(),
-            'log_optid' => syOpenAccess('account_id'),
-            'log_name' => syOpenAccess('staff_name'),
-        ]);
+        $log_method = request()->method();
+        if ($log_method != 'GET') {
+            queue_producer('queue_connect_redis', '', 'RoleOrgLogAdd', [
+                'business_id' =>  syOpenAccess('business_id'),
+                'log_role' => $log_role,
+                'log_method' => request()->method(),
+                'log_remarks' => request()->pathinfo(),
+                'log_optid' => syOpenAccess('account_id'),
+                'log_name' => syOpenAccess('staff_name'),
+            ]);
+        }
     }
 }

@@ -1,6 +1,21 @@
 <?php
 
 /**
+ * xml的key做处理
+ */
+function _cc_parse_xml_key($string = '')
+{
+    // 使用正则表达式匹配驼峰命名规则
+    //  if (preg_match('/^(?:[A-Z][a-z]+|[a-z]+)(?:[A-Z][a-z]+)*$/', $string)) {
+    // }
+    // 驼峰转下划线
+    $str = \think\helper\Str::snake($string);
+    // 下划线转驼峰
+    $str = \think\helper\Str::studly($str);
+    return $str;
+}
+
+/**
  * 生成随机浮点数
  */
 function _cc_random_float($min, $max)

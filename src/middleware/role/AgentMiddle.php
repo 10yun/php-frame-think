@@ -30,13 +30,16 @@ class AgentMiddle
      */
     public function end(\think\Response $response)
     {
-        queue_producer('queue_connect_redis', '', 'RoleOrgLogAdd', [
-            'business_id' =>  syOpenAccess('business_id'),
-            'log_role' => 'agent端',
-            'log_method' => request()->method(),
-            'log_remarks' => request()->pathinfo(),
-            'log_optid' => syOpenAccess('account_id'),
-            'log_name' => syOpenAccess('staff_name'),
-        ]);
+        $log_method = request()->method();
+        if ($log_method != 'GET') {
+            queue_producer('queue_connect_redis', '', 'RoleOrgLogAdd', [
+                'business_id' =>  syOpenAccess('business_id'),
+                'log_role' => 'agent端',
+                'log_method' => request()->method(),
+                'log_remarks' => request()->pathinfo(),
+                'log_optid' => syOpenAccess('account_id'),
+                'log_name' => syOpenAccess('staff_name'),
+            ]);
+        }
     }
 }

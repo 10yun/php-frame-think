@@ -81,6 +81,7 @@ class Response
     {
         return json_encode($data, true);
     }
+
     // xml格式
     protected function encodeXml(array $data = [])
     {
@@ -89,19 +90,26 @@ class Response
         if (count($keyNodes) == 1) {
             $rootNode = $keyNodes[0];
         }
+        $rootNode = _cc_parse_xml_key($rootNode);
         $rootNoteXml = "<{$rootNode}></{$rootNode}>";
         // 创建 SimpleXMLElement 对象
-        /* '<?xml version="1.0"?><site></site>' */
-        $xml = new \SimpleXMLElement('<?xml version="1.0"?>' . $rootNoteXml);
+        $xml = new \SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?>' . $rootNoteXml);
         foreach ($data as $key => $value) {
             if (is_array($value)) {
                 foreach ($value as $k => $v) {
+                    $k = _cc_parse_xml_key($k);
                     $xml->addChild($k, $v);
                 }
             } else {
+                $key = _cc_parse_xml_key($key);
                 $xml->addChild($key, $value);
             }
-        }
-        return $xml->asXML();
+        } // 在 XML 的字符串表示中插入换行符
+        $dom = dom_import_simplexml($xml)->ownerDocument;
+        $dom->formatOutput = true;
+        $xmlString = $dom->saveXML();
+        return $xmlString;
+        $xxx2 = $xml->asXML();
+        dd($xxx2);
     }
 }

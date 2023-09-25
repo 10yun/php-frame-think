@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace shiyun\middleware;
 
 /**
- * 
  * https://www.cnblogs.com/luojie-/p/12963872.html
  */
 class CheckFormMiddle

@@ -17,6 +17,7 @@ use think\Response;
 use function sprintf;
 
 /**
+ * 限流
  * 访问频率限制中间件
  * Class Throttle
  * @package shiyun\middleware

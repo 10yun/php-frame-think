@@ -40,6 +40,8 @@ class BaseCrossMiddle
         $headerArr[] = 'syOpenAppRole';
         $headerArr[] = 'syOpenAppUuid';
         $headerArr[] = 'syOpenAppClientPlatform';
+        // $headerArr[] = 'syOpenAppClientDrive';
+        // $headerArr[] = 'syOpenAppClientOS';
         $headerStr = implode(",", $headerArr);
         // var_dump('---', $headerStr);
         header("Access-Control-Allow-Origin: * ");

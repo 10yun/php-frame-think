@@ -68,6 +68,7 @@
             "shiyunQueue\\": "src\\queue",
             "shiyunRpc\\": "src\\rpc",
             "shiyunWorker\\": "src\\worker",
+            "shiyunOpensdk\\": "src\\opensdk",
             "shiyun\\": "src"
         },
         "files": [

@@ -103,7 +103,7 @@ abstract class Connector
         $payload       = json_encode($payload);
 
         if (JSON_ERROR_NONE !== json_last_error()) {
-            throw new InvalidArgumentException('Unable to create payload: ' . json_last_error_msg());
+            throw new InvalidArgumentException('【queue】Unable to create payload: ' . json_last_error_msg());
         }
         return $payload;
     }
