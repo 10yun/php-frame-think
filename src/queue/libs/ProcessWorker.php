@@ -246,7 +246,9 @@ trait ProcessWorker
             $this->stopIfNecessary($consumeJobObj);
 
             $this->dealEchoDebug('⑦ 队列结果', $consumeClassOpt['queue_name'], $queueJobRes);
-            var_dump($queueJobRes);
+
+
+            var_dump("result : {$consumeClassOpt['queue_name']}", $queueJobRes);
 
             if ($queueJobRes) {
                 $this->dealEchoDebug('⑧ 成功-删除', '', '');

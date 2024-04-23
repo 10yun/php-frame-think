@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace shiyun\route\annotation;
 
-use shiyun\route\annotation\common\RouteAbstract;
+use shiyun\annotation\AnnotationAbstract;
 use Attribute;
 
 /**
@@ -12,7 +12,7 @@ use Attribute;
  * 注解资源路由
  */
 #[Attribute(Attribute::TARGET_CLASS | Attribute::TARGET_PARAMETER | Attribute::IS_REPEATABLE)]
-class RouteRestful extends RouteAbstract
+class RouteRestful extends AnnotationAbstract
 {
     protected array $attrMust = ['path'];
 

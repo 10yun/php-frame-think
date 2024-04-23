@@ -7,6 +7,14 @@ use shiyun\model\exception\ModelException;
 
 trait ModelTraitsCrud
 {
+    /**
+     * save并且获取主键ID
+     */
+    public function saveGetId($data)
+    {
+        $this->save($data);
+        return $this->getKey();
+    }
     public function sqlRead($sql = '')
     {
         if (empty($sql)) {
@@ -80,6 +88,13 @@ trait ModelTraitsCrud
     public function getRowData($wsql = [])
     {
         return $this->getListData($wsql, 'row');
+    }
+    public function getPageData($wsql = [])
+    {
+        return $this->getListData($wsql, 'page');
+    }
+    public function getCommonData($wsql = [], $type = '')
+    {
     }
     public function getListData($wsql = [], $type = '')
     {

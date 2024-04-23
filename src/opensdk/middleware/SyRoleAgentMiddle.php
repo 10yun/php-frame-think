@@ -1,11 +1,11 @@
 <?php
 
-namespace shiyun\middleware\role;
+namespace shiyunOpensdk\middleware;
 
 /**
- * 商家鉴权
+ * agent鉴权
  */
-class BizsMiddle
+class SyRoleAgentMiddle
 {
     /**
      * 前置
@@ -13,7 +13,7 @@ class BizsMiddle
     public function handle($request, \Closure $next)
     {
         $currAppRole = syOpenAppsAuth('syOpenAppRole');
-        if ($currAppRole != 'org-business') {
+        if ($currAppRole != 'org-agent') {
             return sendRespError('角色类型错误~');
         }
         $currTokenRole = syOpenAccess('token_role');
@@ -34,7 +34,7 @@ class BizsMiddle
         if ($log_method != 'GET') {
             queue_producer('queue_connect_redis', '', 'RoleOrgLogAdd', [
                 'business_id' =>  syOpenAccess('business_id'),
-                'log_role' => '商家端',
+                'log_role' => 'agent端',
                 'log_method' => request()->method(),
                 'log_remarks' => request()->pathinfo(),
                 'log_optid' => syOpenAccess('account_id'),

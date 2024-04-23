@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace shiyun\route\annotation;
 
-use shiyun\route\annotation\common\RouteAbstract;
+use shiyun\annotation\AnnotationAbstract;
 use Attribute;
 
 /**
  * 路由分组
  */
 #[Attribute(Attribute::TARGET_CLASS | Attribute::IS_REPEATABLE)]
-class RouteGroup extends RouteAbstract
+class RouteGroup extends AnnotationAbstract
 {
     protected array $attrMust = ['prefix'];
     protected string|array $methods = "*";

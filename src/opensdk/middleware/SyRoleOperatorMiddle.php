@@ -1,11 +1,11 @@
 <?php
 
-namespace shiyun\middleware\role;
+namespace shiyunOpensdk\middleware;
 
 /**
  * 平台鉴权
  */
-class OperatorMiddle
+class SyRoleOperatorMiddle
 {
     /**
      * 前置

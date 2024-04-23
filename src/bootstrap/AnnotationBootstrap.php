@@ -6,8 +6,8 @@ namespace shiyun\bootstrap;
 
 use shiyun\support\Service as BaseService;
 use shiyun\annotation\AnnotationParse;
-use shiyun\route\RouteAttriLoad;
-use think\Route;
+use shiyun\annotation\AnnotationLoad;
+use think\Route as FrameRoute;
 
 class AnnotationBootstrap extends BaseService
 {
@@ -38,46 +38,28 @@ class AnnotationBootstrap extends BaseService
         $config = array_merge($this->defaultConfig, $configOpt);
         return $config;
     }
-    protected function getUriFirst()
-    {
-        $requestObj = $this->app->request;
-        $request_uri = $requestObj->baseUrl();
-        // $request_uri = $requServer['REQUEST_URI'] ?? '';
-        if ($request_uri == '/') {
-        } else {
-            $requSerArr = explode("/", $request_uri);
-            $requSerArr2 = array_filter($requSerArr);
-            $requSerArr = array_merge($requSerArr2);
-            $requFirst = $requSerArr[0];
-        }
-        if (!empty($requFirst)) {
-            if (str_contains($requFirst, ".")) {
-                $companyArr = str_replace(".", "/", $requFirst);
-                return "addons/{$companyArr}/controller";
-            }
-            return "addons/{$requFirst}/controller";
-        }
-        return '';
-    }
+
     function is_cli()
     {
         return preg_match("/cli/i", php_sapi_name()) ? true : false;
+        // return PHP_SAPI == 'cli';
+        // return str_starts_with(PHP_SAPI, 'cgi');
     }
     public function boot()
     {
-        // var_dump('---AnnotationBootstrap---boot---');
         try {
             // 加载
-            RouteAttriLoad::loader();
+            AnnotationLoad::loader();
             // 获取配置
             $config = $this->getConfig();
-
             if (!empty($config['route']['load_type']) && $config['route']['load_type'] == 'current') {
                 if (!$this->is_cli()) {
                     $config['include_paths'] = '';
-                    if (!empty($this->getUriFirst())) {
+                    $supportCommon = new \shiyun\support\Common($this->app);
+                    $include_paths = $supportCommon->getRoutePath();
+                    if (!empty($include_paths)) {
                         $config['include_paths'] = [
-                            $this->getUriFirst()
+                            $include_paths
                         ];
                     }
                 }
@@ -90,15 +72,15 @@ class AnnotationBootstrap extends BaseService
                 /**
                  *  目前需要这么注册，才能生成缓存文件
                  */
-                $this->registerRoutes(function (Route $routeObj) use ($config) {
+                $this->registerRoutes(function (FrameRoute $routeObj) use ($config) {
 
-                    RouteAttriLoad::register($routeObj);
+                    AnnotationLoad::register($routeObj);
 
                     if (!empty($config['route']['debug']) && $config['route']['debug'] == 'html') {
                         /**
                          * 调试展示 - html
                          */
-                        RouteAttriLoad::debug($routeObj);
+                        AnnotationLoad::debug($routeObj);
                         dd();
                     } else if (!empty($config['route']['debug']) && $config['route']['debug'] == 'dump') {
                         /**

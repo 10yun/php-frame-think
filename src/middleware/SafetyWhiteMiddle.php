@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace shiyun\middleware\safety;
+namespace shiyun\middleware;
 
 use shiyun\support\Route;
 

@@ -251,7 +251,7 @@ abstract class Job
         if (empty($this->payload)) {
             $this->payload = json_decode($this->getJobRawBody(), true);
         }
-        // if (!empty($consumeJobMsg) && \shiyunUtils\helper\HelperType::isJson($consumeJobMsg)) {
+        // if (!empty($consumeJobMsg) && json_validate($consumeJobMsg)) {
         //     $consumeJobMsg = json_decode($consumeJobMsg, true);
         // }
         // /**
@@ -263,7 +263,7 @@ abstract class Job
         //     // $xxxx = \shiyunUtils\libs\LibEncryptArr::encrypt($jobData);
         //     $excuteData = \shiyunUtils\libs\LibEncryptArr::decrypt($excuteData);
         // }
-        // if (!empty($infoData) && \shiyunUtils\helper\HelperType::isJson($excuteData)) {
+        // if (!empty($infoData) && json_validate($excuteData)) {
         //     $excuteData = json_decode($excuteData, true);
         // }
 

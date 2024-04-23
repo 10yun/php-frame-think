@@ -20,7 +20,6 @@ class DomainCross
         header("Cache-Control:no-cache");
         // header ( 'Cache-Control: max-age=0' );
         header('X-Accel-Buffering:no'); // 关闭输出缓存
-        header('Pragma:no-cache');
     }
 
     /**

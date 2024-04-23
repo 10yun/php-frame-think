@@ -31,7 +31,7 @@ class ModelExtCache
      * @param $diyKey key
      * @param needField 需要的字段
      */
-    public function sCacheGet($needId = 0, $needField = [])
+    public function sCacheGet(int $needId = null, array $needField = [])
     {
         if (empty($needId)) {
             $className = (new \ReflectionClass($this))->getShortName();
@@ -67,7 +67,7 @@ class ModelExtCache
     /**
      * 设置缓存
      */
-    public function sCacheSet($needId = '', $data = null)
+    public function sCacheSet(int $needId = null, array|string|int $data = null)
     {
         if (empty($needId)) {
             $className = (new \ReflectionClass($this))->getShortName();
@@ -88,7 +88,7 @@ class ModelExtCache
     /**
      * 刷新一条缓存
      */
-    public function sCacheRefresh($needId = '')
+    public function sCacheRefresh(int $needId = null)
     {
         if (empty($needId)) {
             $className = (new \ReflectionClass($this))->getShortName();
@@ -107,15 +107,16 @@ class ModelExtCache
         }
         return $cacheData;
     }
-    protected function getCurrCacheData($needId)
+    protected function getCurrCacheData(int $needId = null)
     {
+        throw new ModelCacheException("  请实现 getCurrCacheData");
+        return [];
         $modelObj = loadAddonsCurrModel($this->filePath);
-        if (!method_exists($modelObj, 'getCacheData')) {
+        if (!method_exists($modelObj, 'getCurrCacheData')) {
             $modelName = (new \ReflectionClass($modelObj))->getShortName();
-            throw new ModelCacheException(" {$modelName} 请实现 getCacheData");
         }
         $infoData = [];
-        $infoData = $modelObj->getCacheData($needId);
+        $infoData = $modelObj->getCurrCacheData($needId);
         if (!empty($infoData)) {
             if (is_object($infoData)) {
                 $infoData = $infoData->toArray();

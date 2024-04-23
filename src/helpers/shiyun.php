@@ -7,18 +7,9 @@ use shiyun\support\Request;
 use shiyun\support\Config;
 use shiyun\support\Env;
 
-
-function syPathVendor()
-{
-    return _PATH_PROJECT_ . 'vendor/';
-}
 function syPathTemplate()
 {
     return _PATH_PROJECT_ . 'vendor/shiyun/php-think/src/template/';
-}
-function syPathConfig()
-{
-    return _PATH_PROJECT_ . 'config/';
 }
 function syPathStorage()
 {
@@ -45,14 +36,14 @@ function syGetHeader()
     return [
         'syOpenAppProject' => syOpenAppsAuth('syOpenAppProject'),
         'syOpenAppId' => syOpenAppsAuth('syOpenAppId'),
-        'syOpenAppKey' => syOpenAppsAuth('syOpenAppKey'),
+        'syOpenAppSecret' => syOpenAppsAuth('syOpenAppSecret'),
         'syOpenAppRole' => syOpenAppsAuth('syOpenAppRole'),
         'syOpenAppToken' => syOpenAppsAuth('syOpenAppToken'),
     ];
 }
 function syGetEnvironment()
 {
-    $envProjectEnvironment = frameGetEnv('ctocode.project_environment');
+    $envProjectEnvironment = frameGetEnv('ctocode.PROJECT_ENVIRONMENT');
     if (empty($envProjectEnvironment)) {
         return false;
     }
@@ -61,17 +52,46 @@ function syGetEnvironment()
     }
     return true;
 }
+function syGetEnvArr()
+{
+    $envFile = '/www/.env';
+    $envContent = file_get_contents($envFile);
+    $envArray = [];
+    if ($envContent !== false) {
+        $envLines = explode("\n", $envContent);
+        foreach ($envLines as $line) {
+            if (str_contains($line, '#')) {
+                continue;
+            }
+            $line = trim($line);
+            if (!empty($line) && str_contains($line, '=')) {
+                $parts = explode('=', $line, 2);
+                if (count($parts) === 2) {
+                    $key = trim($parts[0]);
+                    $value = trim($parts[1]);
+                    // 去除额外的双引号
+                    $value = trim($value, '"');
+                    $value = stripcslashes($value);
+                    $envArray[$key] = $value;
+                }
+            }
+        }
+    }
+    return $envArray;
+}
 /**
  * 获取项目路径
  */
-function syGetProjectPath($proStr = '')
+function syGetProjectPath($proStr = '', bool $isForcePathOpen = false)
 {
-    $envProjectPath = Env::get('ctocode.project_path', 'off');
+    $envProjectPath = Env::get('ctocode.PROJECT_PATH', 'off');
+    if ($isForcePathOpen) {
+        return root_path() . '/project/' . $proStr . '/';
+    }
     if ($envProjectPath == 'open') {
         return root_path() . '/project/' . $proStr . '/';
-    } else {
-        return root_path() . '/project/';
     }
+    return root_path() . '/project/';
 }
 /**
  * 

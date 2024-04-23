@@ -1,6 +1,6 @@
 <?php
 
-namespace shiyun\route\annotation\abstracts;
+namespace shiyun\route;
 
 use BadMethodCallException;
 use function sprintf;

@@ -1,11 +1,11 @@
 <?php
 
-namespace shiyun\middleware\role;
+namespace shiyunOpensdk\middleware;
 
 /**
  * 跑腿鉴权
  */
-class PaotuiMiddle
+class SyRolePaotuiMiddle
 {
     public function handle($request, \Closure $next)
     {

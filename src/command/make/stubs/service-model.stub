@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use shiyun\model\ModelExtend;
 
 class {%className%}Model extends ModelExtend

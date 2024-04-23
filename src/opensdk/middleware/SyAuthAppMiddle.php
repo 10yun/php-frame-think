@@ -1,6 +1,6 @@
 <?php
 
-namespace shiyun\middleware;
+namespace shiyunOpensdk\middleware;
 
 use shiyun\support\Db;
 use shiyun\support\Cache;
@@ -25,6 +25,7 @@ class SyAuthAppMiddle
         $OpenAppAuthObj = new \shiyunOpensdk\connection\OpenAppAuth();
         $OpenAppAuthObj->initAuthData();
         $authAppData = $OpenAppAuthObj->getAuthData();
+
         /**
          *  接收 appid + appkey
          *  验证 appsecret 
@@ -36,7 +37,7 @@ class SyAuthAppMiddle
             return sendRespCode401($isCheckApi ? '100105' : '100000');
         }
         /**
-         * 判断：appID
+         * 判断： syOpenAppId
          */
         if (empty($authAppData['syOpenAppId'])) {
             return sendRespCode401($isCheckApi ? '100106' : '100000');
@@ -49,10 +50,10 @@ class SyAuthAppMiddle
             return sendRespCode401($isCheckApi ? '100106' : '100000');
         }
         /**
-         * appKey
+         * appSecret
          */
-        if (empty($authAppData['syOpenAppKey'])) {
-            return sendRespCode401($isCheckApi ? '100107' : '100000');
+        if (empty($authAppData['syOpenAppSecret'])) {
+            // return sendRespCode401($isCheckApi ? '100107' : '100000');
         }
         /**
          * 判断：角色

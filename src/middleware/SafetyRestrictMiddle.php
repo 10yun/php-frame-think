@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace shiyun\middleware\safety;
+namespace shiyun\middleware;
 
 /**
  * 安全监控 - 限流

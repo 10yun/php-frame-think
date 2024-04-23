@@ -14,6 +14,7 @@ namespace shiyunQueue\drive;
 use DateTimeInterface;
 use InvalidArgumentException;
 use think\App;
+use think\helper\Str;
 use shiyunQueue\drive\TraitBase;
 use shiyunQueue\drive\TraitConnect;
 use shiyunQueue\drive\TraitChannel;
@@ -52,39 +53,37 @@ abstract class Connector
     }
     protected function createPayload($job, $data = '')
     {
-        $payload = is_object($job)
-            ? $this->createObjectPayload($job)
-            : $this->createPlainPayload($job, $data);
-
+        if (is_object($job)) {
+            $payload =  [
+                'job'       => 'shiyunQueue\drive\CallQueuedHandler@call',
+                'maxTries'  => $job->tries ?? null,
+                'timeout'   => $job->timeout ?? null,
+                'timeoutAt' => $this->getJobExpiration($job),
+                'data'      => [
+                    'commandName' => get_class($job),
+                    'command'     => serialize(clone $job),
+                ],
+            ];
+        } else {
+            $payload = array_merge([
+                'job'      => $job,
+                'maxTries' => null,
+                'timeout'  => null,
+            ], $data);
+        }
+        /**
+         * 随机id
+         */
+        $randomID = Str::random(32);
+        $payload = array_merge($payload, [
+            'id'       => $randomID,
+            'attempts' => 0,
+        ]);
         $payload = json_encode($payload);
-
         if (JSON_ERROR_NONE !== json_last_error()) {
             throw new InvalidArgumentException('Unable to create payload: ' . json_last_error_msg());
         }
         return $payload;
-    }
-    protected function createPlainPayload($job, $data)
-    {
-        return [
-            'job'      => $job,
-            'maxTries' => null,
-            'timeout'  => null,
-            'data'     => $data,
-        ];
-    }
-
-    protected function createObjectPayload($job)
-    {
-        return [
-            'job'       => 'shiyunQueue\drive\CallQueuedHandler@call',
-            'maxTries'  => $job->tries ?? null,
-            'timeout'   => $job->timeout ?? null,
-            'timeoutAt' => $this->getJobExpiration($job),
-            'data'      => [
-                'commandName' => get_class($job),
-                'command'     => serialize(clone $job),
-            ],
-        ];
     }
 
     public function getJobExpiration($job)

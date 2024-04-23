@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace shiyun\route\annotation;
 
-use shiyun\route\annotation\common\RouteAbstract;
+use shiyun\annotation\AnnotationAbstract;
 use Attribute;
 
 #[Attribute(Attribute::TARGET_METHOD | Attribute::TARGET_PARAMETER | Attribute::IS_REPEATABLE)]
-class RouteGet extends RouteAbstract
+class RouteGet extends AnnotationAbstract
 {
     protected array $attrMust = ['path'];
     protected array $_defaultValues = ['methods' => ['OPTIONS', 'GET']];
@@ -16,7 +16,6 @@ class RouteGet extends RouteAbstract
 
     /**
      * @param string|array $path 路由路径 使用"/"开始则忽略控制器分组路径
-     * 
      * @param string $name 路由名称 用于生成url的别名
      * @param array $params 路由参数
      * @param array $pattern 路由规则

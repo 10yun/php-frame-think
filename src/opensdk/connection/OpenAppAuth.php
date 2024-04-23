@@ -19,7 +19,7 @@ class OpenAppAuth
         $fwParam['syOpenAppProject'] = $this->getAppProject();
         $fwParam['syOpenAppRole'] = $this->getAppRole();
         $fwParam['syOpenAppId'] = $this->getAppId();
-        $fwParam['syOpenAppKey'] = $this->getAppKey();
+        $fwParam['syOpenAppSecret'] = $this->getAppKey();
         $fwParam['syOpenAppToken'] = $this->getAppToken();
         // 设备 类型：ios、android
         $fwParam['syAppClientPlatform'] = $this->getAppClient();
@@ -75,17 +75,17 @@ class OpenAppAuth
     public function getAppKey()
     {
         /**
-         * 处理 syOpenAppKey
-         * 如果没有header数据，获取 $reqParam['syOpenAppKey'] 数据
+         * 处理 syOpenAppSecret
+         * 如果没有header数据，获取 $reqParam['syOpenAppSecret'] 数据
          */
-        $reqVal = request()->param('syOpenAppKey');
-        $headVal = request()->header('syOpenAppKey') ?: '';
+        $reqVal = request()->param('syOpenAppSecret');
+        $headVal = request()->header('syOpenAppSecret') ?: '';
         $lastVal = $headVal ?: ($reqVal ?? '');
         return $lastVal;
     }
     public function setAppKey($str = '')
     {
-        $this->authData['syOpenAppKey'] = $str;
+        $this->authData['syOpenAppSecret'] = $str;
         return $this;
     }
     public function getAppRole()
@@ -113,14 +113,14 @@ class OpenAppAuth
     public function getAppClient()
     {
         $reqVal = '';
-        $headVal = request()->header('syOpenAppClientPlatform') ?: '';
+        $headVal = request()->header('syOpenClientPlatform') ?: '';
         $lastVal = $headVal ?: ($reqVal ?? '');
         return $lastVal;
     }
     public function getAppClientUuid()
     {
         $reqVal = '';
-        $headVal = request()->header('syOpenAppUuid') ?: '';
+        $headVal = request()->header('syOpenClientUuid') ?: '';
         $lastVal = $headVal ?: ($reqVal ?? '');
         return $lastVal;
     }

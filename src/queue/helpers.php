@@ -33,6 +33,17 @@ if (!function_exists('queue_producer')) {
     }
 }
 /**
+ * 获取消息
+ */
+if (!function_exists('queue_get_message')) {
+    function queue_get_message(
+        string $connectName,
+        string $exchangeName = '',
+        string|array $queueName = null,
+    ) {
+    }
+}
+/**
  * 响应错误
  */
 function queue_resp_error(string $msg = '')

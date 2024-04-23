@@ -243,26 +243,6 @@ class RedisConnector extends Connector
         }
     }
 
-    protected function createPayload($job, $data = '')
-    {
-        $payload = is_object($job)
-            ? $this->createObjectPayload($job)
-            : $this->createPlainPayload($job, $data);
-
-        /**
-         * 随机id
-         */
-        $randomID =  Str::random(32);
-        $payload = array_merge($payload, [
-            'id'       => $randomID,
-            'attempts' => 0,
-        ]);
-        $payload = json_encode($payload);
-        if (JSON_ERROR_NONE !== json_last_error()) {
-            throw new \InvalidArgumentException('Unable to create payload: ' . json_last_error_msg());
-        }
-        return $payload;
-    }
 
     /**
      * 获取队列名

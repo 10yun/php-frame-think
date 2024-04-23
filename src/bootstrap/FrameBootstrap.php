@@ -23,13 +23,21 @@ class FrameBootstrap extends BaseService
         /**
          * 注册 事件
          */
+        /**
+         * 是否启动事务
+         */
         $isDbAutoTA = syGetConfig('shiyun.app.db_auto_transaction');
-
         if (!empty($isDbAutoTA)  && ($isDbAutoTA == true || $isDbAutoTA == 'on')) {
             $this->app->loadEvent([
                 'subscribe' => [
                     \shiyun\extend\DbAutoTransaction::class,
                 ]
+            ]);
+            /**
+             * 除了get其他事务
+             */
+            $this->app->middleware->import([
+                \shiyun\middleware\CheckRestMiddle::class
             ]);
         }
     }

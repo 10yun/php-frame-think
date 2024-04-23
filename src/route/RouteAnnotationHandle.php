@@ -19,14 +19,11 @@ use shiyun\route\annotation\{
     RouteRule,
     RouteMiddleware,
 };
-use shiyun\validate\annotation\Validate;
-use shiyun\validate\annotation\ValidateMiddleware;
-use shiyun\validate\ValidateAnnotationHandle;
+use shiyun\validate\annotation\ValidateForm;
 
-// use shiyun\support\Route as frameRoute;
-// use shiyun\support\Rule as frameRule;
 use think\route\Rule as frameRule;
-use think\Route as frameRoute;
+use think\Route as FrameRoute;
+
 
 abstract class RouteAnnotationHandle implements IntfAnnotationHandle
 {
@@ -52,6 +49,11 @@ abstract class RouteAnnotationHandle implements IntfAnnotationHandle
      */
     protected static array $routes = [];
     protected static array $routesLast = [];
+
+    /**
+     * 表单验证
+     */
+    protected static array $validateForm = [];
 
     /**
      * 处理路由注解
@@ -146,6 +148,13 @@ abstract class RouteAnnotationHandle implements IntfAnnotationHandle
                 $middlewares = static::$middlewares[$className . ':' . $method] ??= [];
                 static::$middlewares[$className . ':' . $method] = array_merge($middlewares, (array)$parameters['middlewares']);
                 break;
+            case ValidateForm::class:
+                static::$validateForm[$className . '@' . $method] ??= [];
+                static::$validateForm[$className . '@' . $method] = $item;
+                // static::$validateForm[$className] ??= [];
+                // static::$restArr[$className] = $item;
+                // dd(static::$validateForm);
+                break;
         }
     }
 
@@ -155,11 +164,12 @@ abstract class RouteAnnotationHandle implements IntfAnnotationHandle
      * @param bool $isClear 是否清除路由
      * @return void
      */
-    public static function createRoute(frameRoute $routeObj, bool $isClear = true)
+    public static function createRoute(FrameRoute $routeObj, bool $isClear = true)
     {
         // $useDefaultMethod = AnnotationBootstrap::$config['route']['use_default_method'] ?? true;
         $useDefaultMethod = true;
         // var_dump(self::$restArr);
+
         foreach (self::$routes as $item) {
             $parameters = $item['parameters'];
 
@@ -211,7 +221,7 @@ abstract class RouteAnnotationHandle implements IntfAnnotationHandle
                     self::addRoute($parameters['path'] . "/<id>", array_merge($item, [
                         'parameters' => array_merge($parameters, [
                             'methods' => 'GET',
-                            'pattern' => ['id' => '\d+'],
+                            'pattern' => ['id' => '[1-9]\d*'],
                         ]),
                         'method' => $funcName,
                         'methods' => 'GET',
@@ -236,7 +246,7 @@ abstract class RouteAnnotationHandle implements IntfAnnotationHandle
                     self::addRoute($parameters['path'], array_merge($item, [
                         'parameters' => array_merge($parameters, [
                             'methods' => 'POST',
-                            'pattern' => ['id' => '\d+'],
+                            'pattern' => ['id' => '[1-9]\d*'],
                         ]),
                         'method' => $funcName,
                         'methods' => 'POST',
@@ -245,7 +255,7 @@ abstract class RouteAnnotationHandle implements IntfAnnotationHandle
                     self::addRoute($parameters['path'] . "/<id>", array_merge($item, [
                         'parameters' => array_merge($parameters, [
                             'methods' => 'PUT',
-                            'pattern' => ['id' => '\d+'],
+                            'pattern' => ['id' => '[1-9]\d*'],
                         ]),
                         'method' => $funcName,
                         'methods' => 'PUT',
@@ -262,7 +272,7 @@ abstract class RouteAnnotationHandle implements IntfAnnotationHandle
                     self::addRoute($parameters['path'] . "/<id>", array_merge($item, [
                         'parameters' => array_merge($parameters, [
                             'methods' => 'PATCH',
-                            'pattern' => ['id' => '\d+'],
+                            'pattern' => ['id' => '[1-9]\d*'],
                         ]),
                         'method' => $funcName,
                         'methods' => 'PATCH',
@@ -279,7 +289,7 @@ abstract class RouteAnnotationHandle implements IntfAnnotationHandle
                     self::addRoute($parameters['path'] . "/<id>", array_merge($item, [
                         'parameters' => array_merge($parameters, [
                             'methods' => 'DELETE',
-                            'pattern' => ['id' => '\d+'],
+                            'pattern' => ['id' => '[1-9]\d*'],
                         ]),
                         'method' => $funcName,
                         'methods' => 'DELETE',
@@ -367,7 +377,7 @@ abstract class RouteAnnotationHandle implements IntfAnnotationHandle
      * @access public
      * @return void
      */
-    protected static function registerRoute(frameRoute $routeObj)
+    protected static function registerRoute(FrameRoute $routeObj)
     {
         foreach (self::$routesLast as $item) {
             $parameters = $item['parameters'];
@@ -386,40 +396,55 @@ abstract class RouteAnnotationHandle implements IntfAnnotationHandle
                 $item['class'] = ltrim($item['class'], "\\");
             }
             $route_addr = "{$item['class']}@{$item['method']}";
+
             // var_dump('----registerRoute--', $method_str, $route_addr);
-            $route = $routeObj->rule(($item['path'] ?: '/'), $route_addr, $method_str);
-            // $route = frameRoute::rule(($item['path'] ?: '/'), $route_addr, $method_str);
+            /**
+             * 注册路由
+             */
+            $ruleObj = $routeObj->rule(($item['path'] ?: '/'), $route_addr, $method_str);
+            // $rule = frameRoute::rule(($item['path'] ?: '/'), $route_addr, $method_str);
 
             // 路由参数
             // if (!empty($parameters['params'])) {
-            //     $route->setName($parameters['params']);
+            //     $rule->setName($parameters['params']);
             // }
             // 路由名称
             if (!empty($parameters['name'])) {
-                $route->setName($parameters['name']);
-            }
-            // 路由规则
-            if (!empty($parameters['pattern'])) {
-                $route->pattern($parameters['pattern']);
+                $ruleObj->setName($parameters['name']);
             }
             if (!empty($parameters['append'])) {
-                $route->append($parameters['append']);
+                $ruleObj->append($parameters['append']);
             }
             if (!empty($parameters['ext'])) {
-                $route->ext($parameters['ext']);
+                $ruleObj->ext($parameters['ext']);
+            }
+
+            // 变量规则
+            if (!empty($parameters['pattern'])) {
+                $ruleObj->pattern($parameters['pattern']);
             }
             // 路由中间件
-            self::addMiddleware($route, $item['class'], $item['method']);
+            self::addMiddleware($ruleObj, $item['class'], $item['method']);
+            /**
+             * 验证
+             */
+            if (!empty(self::$validateForm[$route_addr])) {
+                $valdateData = self::$validateForm[$route_addr];
+                $validateParam = $valdateData['parameters'] ?? [];
+                if (!empty($validateParam['validate']) && !empty($validateParam['scene'])) {
+                    $ruleObj->validate($validateParam['validate'], $validateParam['scene']);
+                }
+            }
         }
     }
     /**
      * 添加中间件
-     * @param frameRule $route
+     * @param $ruleObj
      * @param string $class
      * @param string $method
      * @return void
      */
-    protected static function addMiddleware(frameRule $route, string $class, string $method)
+    protected static function addMiddleware($ruleObj, string $class, string $method)
     {
         $ruleMiddlewate = [];
         // 类中间件
@@ -443,7 +468,7 @@ abstract class RouteAnnotationHandle implements IntfAnnotationHandle
         if (!empty($methodMiddlewares)) {
             $ruleMiddlewate = array_merge($ruleMiddlewate, $methodMiddlewares);
         }
-        $route->middleware($ruleMiddlewate);
+        $ruleObj->middleware($ruleMiddlewate);
 
         // 如果有验证器注解则添加验证器中间件
         // if (ValidateAnnotationHandle::isExistValidate($class, $method)) {
@@ -467,5 +492,12 @@ abstract class RouteAnnotationHandle implements IntfAnnotationHandle
         self::$controllers = [];
         // 清空控制器中间件注解
         self::$middlewares = [];
+
+        self::$flags = [];
+        self::$restArr = [];
+        self::$routes = [];
+        self::$routesLast = [];
+        //
+        self::$validateForm = [];
     }
 }

@@ -15,23 +15,20 @@ class ModelCheckExt extends Model
     /**
      * 当前验证场景
      */
-    protected string $currentScene;
-
-    protected array $only = [];
-    protected array $append = [];
-    protected array $remove = [];
-
+    protected string $checkCurrentScene;
+    protected array $checkOnly = [];
+    protected array $checkAppend = [];
+    protected array $checkRemove = [];
     /**
      * 验证失败错误信息
      */
-    protected string|array $error = [];
-
+    protected array|string $checkError;
     /**
      * 获取错误信息
      */
     public function getError(): array|string
     {
-        return $this->error;
+        return $this->checkError;
     }
     /**
      * 设置验证场景
@@ -42,7 +39,7 @@ class ModelCheckExt extends Model
     public function scene(string $name)
     {
         // 设置当前场景
-        $this->currentScene = $name;
+        $this->checkCurrentScene = $name;
         return $this;
     }
     /**
@@ -55,10 +52,10 @@ class ModelCheckExt extends Model
     public function check(array $data, array $rules = []): bool
     {
         $this->checkProperty();
-        $this->error = [];
+        $this->checkError = [];
 
-        if ($this->currentScene) {
-            $this->getScene($this->currentScene);
+        if ($this->checkCurrentScene) {
+            $this->getScene($this->checkCurrentScene);
         }
         // if (empty($this->table) || empty($this->pk)) {
         //     return true;
@@ -67,10 +64,10 @@ class ModelCheckExt extends Model
             // 读取验证规则
             $rules = $this->checkRule;
         }
-        foreach ($this->append as $key => $rule) {
+        foreach ($this->checkAppend as $key => $rule) {
             if (!isset($rules[$key])) {
                 $rules[$key] = $rule;
-                unset($this->append[$key]);
+                unset($this->checkAppend[$key]);
             }
         }
         $currentWhere = [];
@@ -81,7 +78,7 @@ class ModelCheckExt extends Model
             if (empty($this->checkMessage)) {
                 throw new ModelCheckException('model验证 message 不能为空');
             }
-            $currentWhere = $this->checkWhere[$this->currentScene];
+            $currentWhere = $this->checkWhere[$this->checkCurrentScene];
         }
         $dbObj = $this->db();
         // 增加 where
@@ -92,10 +89,10 @@ class ModelCheckExt extends Model
                 ]);
             }
         }
-        $onlyKeys = array_keys($this->only);
+        $onlyKeys = array_keys($this->checkOnly);
         foreach ($rules as $key => $rule) {
             // 场景检测
-            if (!empty($this->only) && !in_array($key, $onlyKeys)) {
+            if (!empty($this->checkOnly) && !in_array($key, $onlyKeys)) {
                 continue;
             }
             $itemRules = $rule;
@@ -115,7 +112,7 @@ class ModelCheckExt extends Model
                         if (!empty($this->checkMessage[$key]['repeat'])) {
                             $currMesage = $this->checkMessage[$key]['repeat'];
                         }
-                        $this->error = $currMesage;
+                        $this->checkError = $currMesage;
                         return false;
                         throw new ModelCheckException($currMesage);
                     }
@@ -158,13 +155,13 @@ class ModelCheckExt extends Model
      */
     protected function getScene(string $scene): void
     {
-        $this->only = $this->append = $this->remove = [];
+        $this->checkOnly = $this->checkAppend = $this->checkRemove = [];
 
         if (method_exists($this, 'scene' . $scene)) {
             call_user_func([$this, 'scene' . $scene]);
         } elseif (isset($this->checkScene[$scene])) {
             // 如果设置了验证适用场景
-            $this->only = $this->checkScene[$scene];
+            $this->checkOnly = $this->checkScene[$scene];
         }
     }
 }

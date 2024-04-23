@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace shiyun\route\annotation;
 
-use shiyun\route\annotation\common\RouteAbstract;
+use shiyun\annotation\AnnotationAbstract;
 use Attribute;
 
 #[Attribute(Attribute::TARGET_METHOD | Attribute::TARGET_PARAMETER | Attribute::IS_REPEATABLE)]
-class RoutePost extends RouteAbstract
+class RoutePost extends AnnotationAbstract
 {
     protected array $attrMust = ['path'];
     protected string|array $methods = ['OPTIONS', 'POST'];

@@ -62,7 +62,7 @@ function sendRespError(string $msg = '', int $code = 404, mixed $data = []): Res
         $data = $temp_msg;
     }
     // throw new ApiException($msg, $code, $data);
-    // throw new \app\common\exception\ApiException($msg, $code, $data);
+    throw new \app\common\exception\ApiException($msg, $code, $data);
     return sendRespInfo([
         'status' => $code,
         'success' => false,

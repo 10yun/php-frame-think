@@ -1,6 +1,6 @@
 <?php
 
-namespace shiyun\middleware;
+namespace shiyunOpensdk\middleware;
 
 /**
  * 权限鉴权

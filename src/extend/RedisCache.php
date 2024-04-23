@@ -4,6 +4,7 @@ namespace shiyun\extend;
 
 use shiyunUtils\helper\HelperRandom;
 use shiyunUtils\helper\HelperType;
+use shiyunUtils\helper\HelperArr;
 use shiyun\support\Cache;
 
 class RedisCache
@@ -86,7 +87,19 @@ class RedisCache
     {
         $last_data = $data;
         if (!empty($data)) {
+
             if (is_array($data)) {
+                if (HelperArr::isArrayObject($data)) {
+                    $data['__cache_date__'] = date('Y-m-d H:i:s', time());
+                }
+                ksort($data);
+                $last_data = json_encode($data, true);
+            } else if (is_string($data) && _cc_is_json($data)) {
+                $data = json_decode($data, true);
+                if (HelperArr::isArrayObject($data)) {
+                    $data['__cache_date__'] = date('Y-m-d H:i:s', time());
+                }
+                ksort($data);
                 $last_data = json_encode($data, true);
             }
         }
@@ -139,7 +152,7 @@ class RedisCache
     public function delCache()
     {
         $this->parseCacheKey();
-        $this->redis_handle->rm($this->cache_key);
+        $this->redis_handle->del($this->cache_key);
     }
 
     protected function parseCacheKey()

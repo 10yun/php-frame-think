@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace shiyun\route\annotation;
 
-use shiyun\route\annotation\common\RouteAbstract;
+use shiyun\annotation\AnnotationAbstract;
 use Attribute;
 
 #[Attribute(Attribute::TARGET_CLASS | Attribute::TARGET_METHOD
     | Attribute::TARGET_PARAMETER
     | Attribute::IS_REPEATABLE)]
-class RouteFlag extends RouteAbstract
+class RouteFlag extends AnnotationAbstract
 {
     protected array $attrMust = ['flag'];
     /**

@@ -1,11 +1,11 @@
 <?php
 
-namespace shiyun\middleware\role;
+namespace shiyunOpensdk\middleware;
 
 /**
  * 用户鉴权
  */
-class UserMiddle
+class SyRoleUserMiddle
 {
     public function handle($request, \Closure $next)
     {

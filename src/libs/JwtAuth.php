@@ -214,6 +214,8 @@ class JwtAuth
 
     /**
      * 验证令牌是否有效
+     * 验证令牌在生成后是否被修改
+     * 验证最后一串是否一致
      * @return bool
      */
     public function validate()
@@ -243,15 +245,6 @@ class JwtAuth
             return false;
         }
         return true;
-    }
-    /**
-     * 验证令牌在生成后是否被修改
-     * 验证最后一串是否一致
-     * @return bool
-     */
-    public function verify()
-    {
-        $res = $this->decode()->verify(new Sha256(), $this->secrect);
-        return $res;
+        // return $this->decode()->verify(new Sha256(), $this->secrect);
     }
 }

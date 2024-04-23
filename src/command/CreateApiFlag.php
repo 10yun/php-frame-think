@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace shiyun\command;
 
 use ReflectionClass;
@@ -38,6 +40,7 @@ class CreateApiFlag extends Command
         $businessArr = [];
         $agentArr = [];
         $operatorArr = [];
+        $adminArr = [];
         $ucenterArr = [];
         $touristArr = [];
 
@@ -51,6 +54,7 @@ class CreateApiFlag extends Command
             $this->writeAttrApiFlag($businessArr, $dirItem, 'business', $version, $need_write);
             $this->writeAttrApiFlag($agentArr, $dirItem, 'agent', $version, $need_write);
             $this->writeAttrApiFlag($operatorArr, $dirItem, 'operator', $version, $need_write);
+            $this->writeAttrApiFlag($adminArr, $dirItem, 'admin', $version, $need_write);
             $this->writeAttrApiFlag($ucenterArr, $dirItem, 'ucenter', $version, $need_write);
             $this->writeAttrApiFlag($touristArr, $dirItem, 'tourist', $version, $need_write);
         }
@@ -60,6 +64,7 @@ class CreateApiFlag extends Command
         $this->writeMergeApiFlag('business', $businessArr, $version);
         $this->writeMergeApiFlag('agent', $agentArr, $version);
         $this->writeMergeApiFlag('operator', $operatorArr, $version);
+        $this->writeMergeApiFlag('admin', $adminArr, $version);
         $this->writeMergeApiFlag('ucenter', $ucenterArr, $version);
         $this->writeMergeApiFlag('tourist', $touristArr, $version);
         // 

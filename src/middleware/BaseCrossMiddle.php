@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace shiyun\middleware;
 
 use Closure;
@@ -20,7 +22,6 @@ class BaseCrossMiddle
     public function handle(Request $request, Closure $next): Response
     {
         $maxAge = 1800;
-
         // $headerArr .= 'x-token, Cache-Control, Content-Disposition, Host, Sign, Auth-Token, Auth-Identity';
         $headerArr = [
             'Authorization',
@@ -33,15 +34,25 @@ class BaseCrossMiddle
 
         // 自定义请求方式，解决 无PUT、POST、DELETE 问题
         $headerArr[] = 'x-http-method-override';
+        /**
+         * 自定义
+         */
+        $headerArr[] = 'Sy-Response-Type';
+        $headerArr[] = 'Sy-Client-Platform';
+        $headerArr[] = 'Sy-Client-Uuid';
+
         $headerArr[] = 'syOpenAppProject';
         $headerArr[] = 'syOpenAppId';
-        $headerArr[] = 'syOpenAppKey';
-        $headerArr[] = 'syOpenAppToken';
+        $headerArr[] = 'syOpenAppSecret';
         $headerArr[] = 'syOpenAppRole';
-        $headerArr[] = 'syOpenAppUuid';
-        $headerArr[] = 'syOpenAppClientPlatform';
+        $headerArr[] = 'syOpenAppToken';
+        $headerArr[] = 'syOpenClientPlatform';
+        $headerArr[] = 'syOpenClientUuid';
         // $headerArr[] = 'syOpenAppClientDrive';
         // $headerArr[] = 'syOpenAppClientOS';
+        /**
+         * 
+         */
         $headerStr = implode(",", $headerArr);
         // var_dump('---', $headerStr);
         header("Access-Control-Allow-Origin: * ");

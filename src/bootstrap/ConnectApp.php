@@ -22,12 +22,16 @@ class ConnectApp extends BaseService
         // 应用信息
         $this->app->bind('SyOpenAppsAccess', \shiyunOpensdk\connection\OpenAppAccess::class);
         /**
-         * 注册资源
+         * 注册路由
          */
         $this->registerRoutes(function (\think\Route $route) {
             // $route->get('captcha/[:config]', "\\think\\captcha\\CaptchaController@index");
+
+            /**
+             * 注册资源路由
+             */
             $route->get('/ui/<addons>/<resource>', "\\shiyunOpensdk\\connection\\LoadAppResource@getUI")
-                ->ext('css|js|jpg|jpeg|png|gif|ico');;
+                ->ext('css|js|jpg|jpeg|png|gif|ico');
         });
     }
     public function boot()
@@ -46,5 +50,6 @@ class ConnectApp extends BaseService
         /**
          * 默认数据库切换
          */
+        new \shiyunOpensdk\connection\LoadAddonsDb($this->app);
     }
 }

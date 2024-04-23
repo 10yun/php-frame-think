@@ -4,7 +4,6 @@
     "type": "library",
     "description": "shiyun ctocode frame extend thinkphp  shiyun/php-think",
     "description2": "php worker for shiyun，workerman的一些二次封装",
-    "description3": "php worker for shiyun，workerman的一些二次封装",
     "keywords": [
         "mqtt",
         "mqtt_client",
@@ -33,10 +32,10 @@
     ],
     "support": {
         "email": "343196936@qq.com",
-        "issues": "https://github.com/10yun/php-think/issues",
+        "issues": "https://github.com/10yun/php-frame-think/issues",
         "forum": "http://docs.10yun.com/php/",
         "wiki": "http://docs.10yun.com/php/",
-        "source": "https://github.com/10yun/php-think"
+        "source": "https://github.com/10yun/php-frame-think"
     },
     "require": {
         "php": "^8",

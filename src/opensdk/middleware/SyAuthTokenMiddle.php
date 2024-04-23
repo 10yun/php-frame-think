@@ -1,6 +1,6 @@
 <?php
 
-namespace shiyun\middleware;
+namespace shiyunOpensdk\middleware;
 
 use shiyun\support\Request;
 

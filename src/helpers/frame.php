@@ -111,7 +111,8 @@ function frameGetDbInit($settData = [], $database = '')
         // 字段缓存路径
         'schema_cache_path' => root_path() . '/runtime/schema' . DIRECTORY_SEPARATOR
     ];
-    return array_merge($initData, array(
+    return array_merge($initData, $settData, array(
+        'break_reconnect' => $settData['break_reconnect'] ?? false,
         'hostport' => $settData['hostport'] ?? '3306',
         'hostname' => $settData['hostname'] ?? '', // 服务器地
         'username' => $settData['username'] ?? '', // 用户

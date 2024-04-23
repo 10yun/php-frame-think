@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace shiyun\route;
+namespace shiyun\annotation;
 
 use shiyun\annotation\IntfAnnotationLoad;
 
@@ -20,13 +20,14 @@ use shiyun\route\annotation\{
 };
 use shiyun\route\RouteAnnotationHandle;
 use shiyun\annotation\AnnotationParse;
-use shiyun\validate\annotation\Validate;
-use shiyun\validate\ValidateAnnotationHandle;
+use shiyun\validate\annotation\ValidateForm;
+// use shiyun\validate\ValidateAnnotationHandle;
+use think\Route as FrameRoute;
 
 /**
  * 路由注解加载
  */
-class RouteAttriLoad implements IntfAnnotationLoad
+class AnnotationLoad implements IntfAnnotationLoad
 {
     public static function loader(): void
     {
@@ -51,10 +52,9 @@ class RouteAttriLoad implements IntfAnnotationLoad
         // 中间件注解
         AnnotationParse::addHandle(RouteMiddleware::class, RouteAnnotationHandle::class);
         // 验证器注解
-        AnnotationParse::addHandle(Validate::class, RouteAnnotationHandle::class);
+        AnnotationParse::addHandle(ValidateForm::class, RouteAnnotationHandle::class);
     }
-
-    public static function register($routeObj): void
+    public static function register(FrameRoute $routeObj): void
     {
         RouteAnnotationHandle::createRoute($routeObj);
     }

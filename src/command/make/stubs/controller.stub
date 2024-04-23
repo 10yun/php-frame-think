@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace {%namespaceClass%};
 
 use shiyun\route\annotation\RouteFlag;
@@ -15,9 +17,9 @@ use shiyun\support\Db;
 #[RouteFlag('CHANNEL_MOD_BUS_XXX_XXX')]
 #[RouteRestful('/channle.module/business/xxx_xxx')]
 #[RouteMiddleware([
-    \shiyun\middleware\SyAuthAppMiddle::class,
-    \shiyun\middleware\SyAuthTokenMiddle::class,
-    \shiyun\middleware\role\BizsMiddle::class,
+    \shiyunOpensdk\middleware\SyAuthAppMiddle::class,
+    \shiyunOpensdk\middleware\SyAuthTokenMiddle::class,
+    \shiyunOpensdk\middleware\SyRoleBizsMiddle::class,
 ])]
 class {%className%}
 {
