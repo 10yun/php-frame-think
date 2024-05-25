@@ -9,6 +9,7 @@ class SyAuthRbacMiddle
 {
     public function handle($request, \Closure $next)
     {
+        return $next($request);
         // 1、获取前端传递的权限标识位
         // 2、判断标识位是否为空
         // 3、判断 是否拥有改标识位

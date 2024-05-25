@@ -42,12 +42,12 @@ function _cc_array_extract($arr, $extract_key)
     return $res;
 }
 
-function _array_ksort($list)
+function _cc_array_ksort($list)
 {
     ksort($list);
     foreach ($list as $k => $v) {
         if (is_array($v)) {
-            $list[$k] = _array_ksort($v);
+            $list[$k] = _cc_array_ksort($v);
         }
     }
     return $list;

@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use think\Response;
+use think\facade\Request;
 use shiyunUtils\helper\HelperArr;
 
 /**
@@ -69,6 +70,23 @@ function sendRespError(string $msg = '', int $code = 404, mixed $data = []): Res
         'error' => 'Not Found',
         'msg' => $msg
     ]);
+}
+/**
+ * Ajax 错误返回
+ * @param $msg
+ * @param array $data
+ * @param int $ret
+ * @param int $abortCode
+ * @return array
+ */
+function sendAjaxError($msg, $data = [], $ret = 0, $abortCode = 404)
+{
+    if (Request::header('Content-Type') === 'application/json') {
+        return sendRespError($msg, $ret, $data);
+    } else {
+        abort($abortCode, $msg);
+    }
+    return [];
 }
 /**
  * 响应码

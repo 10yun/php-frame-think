@@ -23,7 +23,7 @@ trait ModelTraitsCrud
         if (empty($sql)) {
             return false;
         }
-        $sql_result =  Db::query($sql);
+        $sql_result = Db::query($sql);
         return $sql_result;
     }
     public function whereDelete($wsql = [])

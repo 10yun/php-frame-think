@@ -274,6 +274,12 @@ trait ProcessWorker
                     $consumeJobObj->release();
                 }
             }
+
+            $queueEndRes = \call_user_func(
+                [$consumeClassObj, 'onQueueEnd'],
+                $consumeJobMsg,
+                $consumeJobObj
+            );
         } catch (MaxAttemptsExceededException | TimeoutException $e) {
             //  $this->failJob($consumeQeObj, $consumeJobObj, $e);
         } catch (JobFailedException $e) {

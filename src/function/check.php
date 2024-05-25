@@ -57,7 +57,50 @@ function _cc_check_timestamp($timestamp)
         return false;
     }
 }
-
+/**
+ * @action 验证手机号码
+ * @version 2016-10-17
+ * @author ctocode-zhw
+ * @link https://www.10yun.com
+ */
+function _cc_check_mobile($str = null)
+{
+    // $regex = '#^13[\d]{9}$|^14[5,7]{1}\d{8}$|^15[^4]{1}\d{8}$|^17[0,1,3,5,6,7,8]{1}\d{8}$|^18[\d]{9}$#';
+    // $regex ="/^(13[0-9]|14[5|7]|15[0|1|2|3|5|6|7|8|9]|18[0|1|2|3|5|6|7|8|9])\d{8}$/"
+    // $regex = "/^1[34578]{1}\d{9}$/";
+    // $regex = '/^((0\d{2,3}-\d{7,8})|(\d{7,8})|(1[35847]\d{9}))$/';
+    // '/^0?(13|14|15|17|18)[0-9]{9}$/'
+    $regex = '/^1[3|4|5|6|7|8|9][0-9]\d{4,8}$/';
+    if (strlen($str) != 11) {
+        return false;
+    }
+    if (!is_numeric($str)) {
+        return false;
+    }
+    return preg_match($regex, $str) ? true : false;
+}
+/**
+ * @action 邮箱验证
+ * @author ctocode-zhw
+ * @version 2017-06-21
+ * @param string $type 邮箱
+ * @return boolean
+ */
+function _cc_check_email($str = null)
+{
+    // $regex = "/^[a-z0-9]+[.a-z0-9_-]*@[a-z0-9]+[.a-z0-9_-]*\.[a-z0-9]+$/i"
+    // $regex = "/[a-za-z0-9]+@[a-za-z0-9]+.[a-z]{2,4}/"
+    $regex = '/^[a-z0-9!#$%&\'*+\/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&\'*+\/=?^_`{|}~-]+)*@(?:[-_a-z0-9][-_a-z0-9]*\.)*(?:[a-z0-9][-a-z0-9]{0,62})\.(?:(?:[a-z]{2}\.)?[a-z]{2,})$/i';
+    return preg_match($regex, $str) ? true : false;
+}
+/**
+ * 身份证验证
+ */
+function _cc_check_idcard($str = null)
+{
+    $regex = '/^(\d{15}$|^\d{18}$|^\d{17}(\d|X|x))$/';
+    return preg_match($regex, $str) ? true : false;
+}
 /**
  * 验证方法
  * @author ctocode-zhw
@@ -78,61 +121,26 @@ function ctoCheck($type = NULL, $str = NULL)
             // 验证是否以字母开头
             $regex = "/^[a-za-z]{1}([a-za-z0-9]|[._]){3,19}$/";
             break;
-
-            /*
-		 * @action 验证手机号码
-		 * @version 2016-10-17
-		 * @author ctocode-zhw
-		 * @link https://www.10yun.com
-		 */
-        case 'mobile':
-        case 'phone':
-            // 验证手机号码
-            // $regex = '#^13[\d]{9}$|^14[5,7]{1}\d{8}$|^15[^4]{1}\d{8}$|^17[0,1,3,5,6,7,8]{1}\d{8}$|^18[\d]{9}$#';
-            // $regex ="/^(13[0-9]|14[5|7]|15[0|1|2|3|5|6|7|8|9]|18[0|1|2|3|5|6|7|8|9])\d{8}$/"
-            // $regex = "/^1[34578]{1}\d{9}$/";
-            // $regex = '/^((0\d{2,3}-\d{7,8})|(\d{7,8})|(1[35847]\d{9}))$/';
-            // '/^0?(13|14|15|17|18)[0-9]{9}$/'
-            $regex = '/^1[3|4|5|6|7|8|9][0-9]\d{4,8}$/';
-            if (strlen($str) != 11) {
-                return false;
-            }
-            if (!is_numeric($str)) {
-                return false;
-            }
-            break;
-            /*
-		 * 验证数字
-		 */
-        case 'number':
-            // 必须为不为0开头的纯数字,请重新填写
-            $regex = "/^(0|[1-9][0-9]*)$/";
-            break;
-            /*
-		 * 检测域名格式
-		 */
-        case 'url':
-            $regex = "/^http(s?):\/\/(?:[A-za-z0-9-]+\.)+[A-za-z]{2,4}(?:[\/\?#][\/=\?%\-&~`@[\]\':+!\.#\w]*)?$/";
-            // $regex = "^http://[_a-zA-Z0-9-]+(.[_a-zA-Z0-9-]+)*$";
-            // $regex = "/^(?:[A-za-z0-9-]+\.)+[A-za-z]{2,4}(?:[\/\?#][\/=\?%\-&~`@[\]\':+!\.#\w]*)?$/";
-            break;
-            /*
-		 * @action 邮箱验证
-		 * @author ctocode-zhw
-		 * @version 2017-06-21
-		 * @param string $type 邮箱
-		 * @return boolean
-		 */
-        case 'email':
-            // $regex = "/^[a-z0-9]+[.a-z0-9_-]*@[a-z0-9]+[.a-z0-9_-]*\.[a-z0-9]+$/i"
-            // $regex = "/[a-za-z0-9]+@[a-za-z0-9]+.[a-z]{2,4}/"
-            $regex = '/^[a-z0-9!#$%&\'*+\/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&\'*+\/=?^_`{|}~-]+)*@(?:[-_a-z0-9][-_a-z0-9]*\.)*(?:[a-z0-9][-a-z0-9]{0,62})\.(?:(?:[a-z]{2}\.)?[a-z]{2,})$/i';
-            break;
-            // 身份证验证
-        case 'idcard':
-            $regex = '/^(\d{15}$|^\d{18}$|^\d{17}(\d|X|x))$/';
-            break;
     }
+    return preg_match($regex, $str) ? true : false;
+}
+/**
+ * 验证数字
+ */
+function _cc_check_number($str = null)
+{
+    // 必须为不为0开头的纯数字,请重新填写
+    $regex = "/^(0|[1-9][0-9]*)$/";
+    return preg_match($regex, $str) ? true : false;
+}
+/**
+ * 检测域名格式
+ */
+function _cc_check_url($str = null)
+{
+    $regex = "/^http(s?):\/\/(?:[A-za-z0-9-]+\.)+[A-za-z]{2,4}(?:[\/\?#][\/=\?%\-&~`@[\]\':+!\.#\w]*)?$/";
+    // $regex = "^http://[_a-zA-Z0-9-]+(.[_a-zA-Z0-9-]+)*$";
+    // $regex = "/^(?:[A-za-z0-9-]+\.)+[A-za-z]{2,4}(?:[\/\?#][\/=\?%\-&~`@[\]\':+!\.#\w]*)?$/";
     return preg_match($regex, $str) ? true : false;
 }
 /**
@@ -142,7 +150,7 @@ function ctoCheck($type = NULL, $str = NULL)
  * @link https://www.10yun.com
  * @return boolean
  */
-function ctoCheckBrowser()
+function _cc_check_browser()
 {
     // 下列几个数组，用^^^分割，减少代码行数
 
@@ -207,15 +215,15 @@ function ctoCheckBrowser()
     // 方法2
     $user_agent_commentsblock = preg_match('|\(.*?\)|', $user_agent, $matches) > 0 ? $matches[0] : '';
 
-    $found_mobile = ctoCheckSubstrs($mobile_os_arr, $user_agent_commentsblock)
-        || ctoCheckSubstrs($mobile_token_arr, $user_agent);
+    $found_mobile = _cc_check_substrs($mobile_os_arr, $user_agent_commentsblock)
+        || _cc_check_substrs($mobile_token_arr, $user_agent);
     if ($found_mobile) {
         return true;
     } else {
         return false;
     }
 }
-function ctoCheckSubstrs($substrs, $text)
+function _cc_check_substrs($substrs, $text)
 {
     foreach ($substrs as $substr) {
         if (false !== strpos($text, $substr)) {
@@ -224,7 +232,7 @@ function ctoCheckSubstrs($substrs, $text)
     }
     return false;
 }
-function ctoCheckOS()
+function _cc_check_os()
 {
     $agent = strtolower($_SERVER['HTTP_USER_AGENT']);
     if (strpos($agent, 'windows nt')) {
