@@ -42,7 +42,7 @@ class {%className%}
     }
     public function postData()
     {
-        $post_param = request()->filter(['trim'])->only([
+        $post_param = request()->filter(['trim'])->post([
             'unit_name', 'unit_sort'
         ]);
         $post_param['business_id'] = syOpenAccess('business_id');
@@ -67,7 +67,7 @@ class {%className%}
     }
     public function putById(int $id = 0)
     {
-        $put_param = request()->filter(['trim'])->only([
+        $put_param = request()->filter(['trim'])->put([
             'unit_name', 'unit_sort'
         ]);
         $put_param['business_id'] = syOpenAccess('business_id');

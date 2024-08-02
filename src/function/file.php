@@ -32,7 +32,7 @@ function ctoFileDel($dir, $type = TRUE)
  * @action: 写入文件
  * 【文件】 $path,文件存放路径; $type,模式; $content,文件内容;
  */
-function ctoFileFopen($content = NULL, $open_type = "w+", $is_root)
+function ctoFileFopen($content = null, $open_type = "w+", $is_root = false)
 {
     $put_content = '';
     $put_content .= "<?php \n";

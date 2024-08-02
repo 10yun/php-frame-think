@@ -30,9 +30,14 @@ class SyAuthTokenMiddle
         if (empty($syAppsAccess)) {
             return sendRespCode401('100109');
         }
-        if ($syAppsAccess && $syAppsAccess['ucenter_state'] == 9) {
+        if (
+            $syAppsAccess
+            && ($syAppsAccess['ucenter_state'] == 9 || $syAppsAccess['ucenter_state'] == 'disable')
+        ) {
             return sendRespCode200('100400');
         }
+
+
         // 获取全部的禁用用户名单
         // $ucenterBlackDatas = loadAddonsModel('v210916_ucenter', 'Black')->getListData(array(
         //     'field' => 'a.account_id'

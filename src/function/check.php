@@ -1,6 +1,20 @@
 <?php
 
 /**
+ * 判断是否域名格式
+ * @param $domain
+ * @return bool
+ */
+function __cc_is_domain($domain = '')
+{
+    $str = "/^(?:[A-za-z0-9-]+\.)+[A-za-z]{2,4}(?:[\/\?#][\/=\?%\-&~`@[\]\':+!\.#\w]*)?$/";
+    if (!preg_match($str, $domain)) {
+        return false;
+    } else {
+        return true;
+    }
+}
+/**
  * 检查是否为内网ip
  * @param $ip
  * @return int

@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use shiyun\ffi\ShiyunSO;
 use think\Response;
 use think\facade\Request;
 use shiyunUtils\helper\HelperArr;
@@ -22,6 +23,9 @@ function sendRespInfo($send_data = [])
     if (empty($send_data['code'])) {
         $send_data['code'] = !empty($send_data['status']) ? $send_data['status'] : '';
     }
+    if (!empty($send_data['data'])) {
+        $send_data['data'] = _parse_resp_data_int($send_data['data']);
+    }
     $send_data = HelperArr::unsetNull($send_data);
 
     if ($send_data['code'] == 200) {
@@ -35,7 +39,26 @@ function sendRespInfo($send_data = [])
         return Response::create($send_data, 'json', 200)->send();
     }
 }
-
+function _parse_resp_data_int($data = [])
+{
+    if (is_array($data)) {
+        if (!empty($data)) {
+            foreach ($data as $key => $value) {
+                if ($value === null) {
+                    $data[$key] = '';
+                } else {
+                    $data[$key] = _parse_resp_data_int($value); // 递归再去执行
+                }
+            }
+        } else {
+            $data = '';
+        }
+    }
+    if (is_int($data) && strlen((string)$data) > 16) {
+        return (string)$data;
+    }
+    return $data;
+}
 /**
  * 成功
  */
@@ -45,7 +68,9 @@ function sendRespSucc(string $msg = '操作成功~', int $status = 200, mixed $d
         'status' => $status,
         'success' => true,
         'msg' => $msg,
-        'data' => $data
+        'data' => $data,
+        // 'ret' => -1,
+        // 'msg' => ShiyunSO::translate($msg),
     ]);
 }
 /**
@@ -62,13 +87,14 @@ function sendRespError(string $msg = '', int $code = 404, mixed $data = []): Res
         unset($temp_msg['msg']);
         $data = $temp_msg;
     }
-    // throw new ApiException($msg, $code, $data);
-    throw new \app\common\exception\ApiException($msg, $code, $data);
+    throw new \app\exceptions\ApiException($msg, $code, $data);
     return sendRespInfo([
         'status' => $code,
         'success' => false,
         'error' => 'Not Found',
-        'msg' => $msg
+        'msg' => $msg,
+        // 'ret' => 0,
+        // 'msg' => ShiyunSO::translate($msg),
     ]);
 }
 /**

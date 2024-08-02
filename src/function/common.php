@@ -106,7 +106,7 @@ function ctoStrStrcut($str, $max_length, $istags = true)
  * @param string $replace 替换成什么
  * @param mixed $array
  */
-function ctoArrayStrReplace($search = '', $replace = '', &$array)
+function ctoArrayStrReplace($search = '', $replace = '', &$array = [])
 {
     $array = str_replace($search, $replace, $array);
     if (is_array($array)) {

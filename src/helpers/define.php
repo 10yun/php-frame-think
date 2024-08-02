@@ -1,11 +1,11 @@
 <?php
 
 define('__CTOCODE__', [
-    '_version_' => 'ctocode-v8.24.0520',
+    '_version_' => 'ctocode-v8.24.0802',
     /* 软件名称 */
     '_frame_name_' => 'ctocode-frame',
     /* 版本号等信息 */
-    '_frame_build_' => '8.24.0520',
+    '_frame_build_' => '8.24.0802',
     '_frame_author_' => 'ctocode',
     '_frame_link_' => 'http://ctocode.com/',
     /* 版权 */

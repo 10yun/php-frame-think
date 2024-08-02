@@ -132,7 +132,7 @@ class RedisCache
             $this->parseCacheKey();
         }
         $cache = $this->redis_handle->get($this->cache_key);
-        if (HelperType::isJson($cache)) {
+        if (json_validate($cache)) {
             $cache = json_decode($cache, true);
         }
         return $cache;

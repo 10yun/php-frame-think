@@ -37,19 +37,19 @@ class BaseCrossMiddle
         /**
          * 自定义
          */
-        $headerArr[] = 'Sy-Response-Type';
-        $headerArr[] = 'Sy-Client-Platform';
-        $headerArr[] = 'Sy-Client-Uuid';
+        $headerArr[] = 'sy-response-type';
+        $headerArr[] = 'sy-client-uuid';
+        $headerArr[] = 'sy-client-id';
+        $headerArr[] = 'sy-client-platform';
+        // $headerArr[] = 'sy-client-drive';
+        // $headerArr[] = 'sy-client-os';
 
         $headerArr[] = 'syOpenAppProject';
         $headerArr[] = 'syOpenAppId';
         $headerArr[] = 'syOpenAppSecret';
         $headerArr[] = 'syOpenAppRole';
         $headerArr[] = 'syOpenAppToken';
-        $headerArr[] = 'syOpenClientPlatform';
-        $headerArr[] = 'syOpenClientUuid';
-        // $headerArr[] = 'syOpenAppClientDrive';
-        // $headerArr[] = 'syOpenAppClientOS';
+
         /**
          * 
          */

@@ -4,6 +4,24 @@ namespace shiyun\model;
 
 trait ModelTraitParse
 {
+    /**
+     * 字符串转引号。如：  "xxx-aaa,xxx-bbb" 变成 'xxx-aaa','xxx-bbb'
+     */
+    public function whereStrToIn($str = '')
+    {
+        if (empty($str)) {
+            return '';
+        }
+        $str = trim($str);
+        if (str_contains($str, ",")) {
+            // 使用explode()函数按逗号分割字符串  
+            $parts = explode(',', $str);
+            // 使用implode()函数将分割后的数组元素用带有引号的逗号重新组合  
+            $output = "'" . implode("','", $parts) . "'";
+            return $output;
+        }
+        return '';
+    }
     // and fieldName = '%'
     public function whereEqual($fieldName = '', $value = null, $isIsset = false)
     {

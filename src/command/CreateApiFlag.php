@@ -34,7 +34,9 @@ class CreateApiFlag extends Command
         $addonsDir1 = glob(_PATH_PROJECT_ . 'addons/*/*/controller/');
         $addonsDir2 = glob(_PATH_PROJECT_ . 'addons/*/controller/');
         $addonsDir = array_merge($addonsDir1, $addonsDir2);
+
         // dd($addonsDir);
+        $baseArr = [];
         $commonArr = [];
         $orgArr = [];
         $businessArr = [];
@@ -49,6 +51,7 @@ class CreateApiFlag extends Command
             if (!is_dir($dirItem)) {
                 continue;
             }
+            $this->writeAttrApiFlag($baseArr, $dirItem, '', $version, $need_write);
             $this->writeAttrApiFlag($commonArr, $dirItem, 'common', $version, $need_write);
             $this->writeAttrApiFlag($orgArr, $dirItem, 'org', $version, $need_write);
             $this->writeAttrApiFlag($businessArr, $dirItem, 'business', $version, $need_write);
@@ -58,7 +61,7 @@ class CreateApiFlag extends Command
             $this->writeAttrApiFlag($ucenterArr, $dirItem, 'ucenter', $version, $need_write);
             $this->writeAttrApiFlag($touristArr, $dirItem, 'tourist', $version, $need_write);
         }
-
+        $this->writeMergeApiFlag('base', $baseArr, $version);
         $this->writeMergeApiFlag('common', $commonArr, $version);
         $this->writeMergeApiFlag('org', $orgArr, $version);
         $this->writeMergeApiFlag('business', $businessArr, $version);
@@ -108,51 +111,59 @@ class CreateApiFlag extends Command
     protected function parseAttrApiFlag($fileArr = [])
     {
         $flagArr = [];
-        foreach ($fileArr as $key => $val) {
-            $namespace = get_namespace_class_form_file($val);
-            if (empty($namespace)) {
-                continue;
-            }
-            if (!str_starts_with("\\", $namespace)) {
-                $namespace = "\\$namespace";
-            }
-            if (!class_exists($namespace)) {
-                continue;
-            }
-            // echo $val . "\n";
 
-            $reflectionClass = new ReflectionClass($namespace);
-            $RouteFlagAttrs = $reflectionClass->getAttributes(RouteFlag::class);
-            $RouteRestfulAtts = $reflectionClass->getAttributes(RouteRestful::class);
+        $error_controller = '';
+        try {
+            foreach ($fileArr as $key => $val) {
+                $error_controller = $val;
+                $namespace = get_namespace_class_form_file($val);
+                if (empty($namespace)) {
+                    continue;
+                }
+                if (!str_starts_with("\\", $namespace)) {
+                    $namespace = "\\$namespace";
+                }
+                if (!class_exists($namespace)) {
+                    continue;
+                }
+                // echo $val . "\n";
 
-            if (empty($RouteFlagAttrs) || empty($RouteRestfulAtts)) {
-                continue;
+                $reflectionClass = new ReflectionClass($namespace);
+                $RouteFlagAttrs = $reflectionClass->getAttributes(RouteFlag::class);
+                $RouteRestfulAtts = $reflectionClass->getAttributes(RouteRestful::class);
+
+                if (empty($RouteFlagAttrs) || empty($RouteRestfulAtts)) {
+                    continue;
+                }
+                $routeFlagStr = '';
+                $routeRestfulStr = '';
+                foreach ($RouteFlagAttrs as $attribute) {
+                    // 拿到一个新的 Route 实例
+                    $route = $attribute->newInstance();
+                    // 拿到注解上的参数
+                    $params = $attribute->getArguments();
+                    // var_dump($route, $params);
+                    $routeFlagStr = $params[0] ?? '';
+                }
+                foreach ($RouteRestfulAtts as $attribute) {
+                    // 拿到一个新的 Route 实例
+                    $route = $attribute->newInstance();
+                    // 拿到注解上的参数
+                    $params = $attribute->getArguments();
+                    // var_dump($route, $params);    
+                    $routeRestfulStr = $params[0] ?? '';
+                }
+                if (empty($routeFlagStr) || empty($routeRestfulStr)) {
+                    continue;
+                }
+                $flagArr[] = [
+                    'flag' => $routeFlagStr,
+                    'restfule' => $routeRestfulStr
+                ];
             }
-            $routeFlagStr = '';
-            $routeRestfulStr = '';
-            foreach ($RouteFlagAttrs as $attribute) {
-                // 拿到一个新的 Route 实例
-                $route = $attribute->newInstance();
-                // 拿到注解上的参数
-                $params = $attribute->getArguments();
-                // var_dump($route, $params);
-                $routeFlagStr = $params[0] ?? '';
-            }
-            foreach ($RouteRestfulAtts as $attribute) {
-                // 拿到一个新的 Route 实例
-                $route = $attribute->newInstance();
-                // 拿到注解上的参数
-                $params = $attribute->getArguments();
-                // var_dump($route, $params);    
-                $routeRestfulStr = $params[0] ?? '';
-            }
-            if (empty($routeFlagStr) || empty($routeRestfulStr)) {
-                continue;
-            }
-            $flagArr[] = [
-                'flag' => $routeFlagStr,
-                'restfule' => $routeRestfulStr
-            ];
+        } catch (\Throwable $th) {
+            echo "{$error_controller} " . $th->getMessage() . "\n";
+            //throw $th;
         }
         return $flagArr;
     }

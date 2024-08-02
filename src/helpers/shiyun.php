@@ -96,7 +96,7 @@ function syGetProjectPath($proStr = '', bool $isForcePathOpen = false)
 /**
  * 
  */
-function syGetProjectConfig($projectName = '', $configFile)
+function syGetProjectConfig(string $projectName = '', string $configFile = '')
 {
     $sett_path2 = syGetProjectPath($projectName) . "/{$configFile}.yml";
     if (file_exists($sett_path2)) {

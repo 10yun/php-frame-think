@@ -42,7 +42,7 @@ trait TraitMessage
     {
         $now = time();
         $this->msgCurrTime = $now;
-        $this->msgIp = ctoIpGet();
+        $this->msgIp = __cc_ip_getAddr();
     }
     public function clearMsgSett()
     {

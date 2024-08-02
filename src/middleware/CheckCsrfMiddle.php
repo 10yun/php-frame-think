@@ -45,7 +45,6 @@ class CheckCsrfMiddle
             } else {
                 // 验证不通过
                 return sendRespCode200('100030');
-                // 
                 return json([
                     'code' => 422,
                     'msg' => '表单token错误',

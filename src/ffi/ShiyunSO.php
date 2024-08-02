@@ -2,7 +2,7 @@
 
 namespace shiyun\ffi;
 
-// use App\Exceptions\ApiException;
+use app\exceptions\ApiException;
 // use App\Models\User;
 use shiyun\support\Cache;
 use Carbon\Carbon;
@@ -60,6 +60,7 @@ class ShiyunSO
                 char* macs();
                 char* loadSN();
                 char* pgpGenerateKeyPair(char* name, char* email, char* passphrase);
+                //  char* pgpGenerateKeyPair(char* name, char* email, char* passphrase, char* privateKeyPath, char* publicKeyPath);
                 char* pgpEncrypt(char* plainText, char* publicKey);
                 char* pgpDecrypt(char* cipherText, char* privateKey, char* passphrase);
             EOF, "/www/project/shiyun.so");
@@ -76,25 +77,37 @@ class ShiyunSO
      */
     public static function license(): array
     {
-        $array = __cc_json2array(self::chartToString(self::get_ffi_instance()->license()));
+        $array = __cc_json2array(self::chartToString(self::get_ffi_instance()->license() ?? ''));
 
+        if (empty($array['ip'])) {
+            $array['ip'] = __cc_ip_getAddr();
+        }
+
+        if (empty($array['people'])) {
+            $array['people'] = '';
+        }
+        if (empty($array['expired_at'])) {
+            $array['expired_at'] = '2025-01-01';
+        }
+        if (empty($array['sn'])) {
+            $array['sn'] = '6666';
+        }
         $ips = explode(",", $array['ip']);
         $array['ip'] = [];
         foreach ($ips as $ip) {
-            if (__cc_is_ipv4($ip)) {
+            if (__cc_ip_is_ipv4($ip)) {
                 $array['ip'][] = $ip;
             }
         }
-
-        $domains = explode(",", $array['domain']);
+        $domains = explode(",", $array['domain'] ?? '');
         $array['domain'] = [];
         foreach ($domains as $domain) {
-            if (Base::is_domain($domain)) {
+            if (__cc_is_domain($domain)) {
                 $array['domain'][] = $domain;
             }
         }
 
-        $macs = explode(",", $array['mac']);
+        $macs = explode(",", $array['mac'] ?? '');
         $array['mac'] = [];
         foreach ($macs as $mac) {
             if (__cc_isMac($mac)) {
@@ -102,7 +115,7 @@ class ShiyunSO
             }
         }
 
-        $emails = explode(",", $array['email']);
+        $emails = explode(",", $array['email'] ?? '');
         $array['email'] = [];
         foreach ($emails as $email) {
             if (__cc_isEmail($email)) {
@@ -155,6 +168,7 @@ class ShiyunSO
     public static function licenseSave($license): void
     {
         $res = self::chartToString(self::get_ffi_instance()->licenseSave($license));
+
         if ($res != 'success') {
             throw new ApiException($res ?: 'LICENSE 保存失败');
         }
