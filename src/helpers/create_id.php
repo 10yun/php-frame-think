@@ -1,5 +1,7 @@
 <?php
 
+use shiyunUtils\helper\HelperStr;
+
 /**
  * PHP生成唯一RequestID类
  * Date:    2018-04-10
@@ -119,4 +121,37 @@ function create_id_session()
         return implode('-', $tmp);
     }
     return _format($request_id);
+}
+
+/**
+ * 生成唯一的交易流水号、订单号
+ * @return 交易流水号，格式如：XXX-20190101202010 - 100001
+ */
+function create_tradeno($codeNoFirst = '', $subLen = 4)
+{
+    $orderNo = '';
+    $regex = '/^[A-Za-z0-9-]+$/i'; // 只能 大小写字母+数字
+    if (preg_match($regex, $codeNoFirst)) {
+        if (is_numeric($codeNoFirst)) {
+            $orderNo .= $codeNoFirst;
+        } else {
+            $orderNo .= strtoupper($codeNoFirst) . '';
+            // 截取字符串
+        }
+        $orderNo = HelperStr::substr($orderNo, 0, $subLen);
+    } else {
+        // $orderNo .= 'CTOCODE' . '-';
+    }
+    $orderNo .= date("ymdHis", time()); // 前12位：年月日十分秒
+    $orderNo .= sprintf("%02d", rand(0, 99)); // 后4位 随机数
+    $orderNo .= mt_rand(10, 99);
+    // 阿里云最大 20位
+
+    // dd($orderNo, strlen($orderNo));
+    // $time = time () + 8 * 3600;
+
+    return $orderNo;
+    // 生成订单号
+    return date('Ymd') . substr(implode('', array_map('ord', str_split(substr(uniqid(), 7, 13), 1))), 0, 8);
+    return date('YmdHis') . substr(implode('', array_map('ord', str_split(substr(uniqid(), 7, 13), 1))), 0, 8);
 }

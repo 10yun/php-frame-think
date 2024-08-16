@@ -34,6 +34,11 @@ trait ModelTraitsCrud
     }
     /**
      * 存在即更新
+     * 数据库更新或插入
+     * @param $where
+     * @param array $update 存在时更新的内容
+     * @param array $insert 不存在时插入的内容，如果没有则插入更新内容
+     * @param bool $isInsert 是否是插入数据
      */
     public function insertOrUpdate(array $requestData = [])
     {

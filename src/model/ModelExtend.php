@@ -107,4 +107,14 @@ class ModelExtend extends Model
     {
         return $this->id;
     }
+
+    public function orderBy($key, $sort)
+    {
+        return self::order($key, $sort);
+    }
+
+    public function selectArray()
+    {
+        return self::select()->toArray();
+    }
 }
