@@ -9,7 +9,7 @@ use Workerman\Worker;
  */
 abstract class WorkermanServer
 {
-    protected $worker;
+    protected $worker = null;
     protected $workerName = '';
     protected $socket   = '';
     protected $protocol = 'http';
@@ -19,9 +19,16 @@ abstract class WorkermanServer
     protected $option   = [];
     protected $context  = [];
     protected $workerEvent = [
-        'onWorkerStart', 'onConnect', 'onMessage', 'onClose', 'onError',
-        'onBufferFull', 'onBufferDrain',
-        'onWorkerStop', 'onWorkerReload', 'onWebSocketConnect'
+        'onWorkerStart',
+        'onConnect',
+        'onMessage',
+        'onClose',
+        'onError',
+        'onBufferFull',
+        'onBufferDrain',
+        'onWorkerStop',
+        'onWorkerReload',
+        'onWebSocketConnect'
     ];
     /**
      * 架构函数
@@ -46,12 +53,10 @@ abstract class WorkermanServer
                 $this->worker->$event = [$this, $event];
             }
         }
-        // 初始化
         $this->init();
     }
-    protected function init()
-    {
-    }
+    // 初始化
+    protected function init() {}
     // 设置进程数
     public function setCount(int $count = 1)
     {

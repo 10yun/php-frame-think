@@ -4,6 +4,7 @@ namespace shiyunQueue\drive;
 
 use think\Cache;
 use shiyunQueue\libs\InteractsWithTime;
+use think\Container;
 
 /**
  * @method $this setJobServer(string $job)     设置任务执行类名
@@ -64,9 +65,9 @@ trait TraitJob
      */
     public function retryJobAll()
     {
-        $config = $this->app->config->get('queue.failed', []);
+        $config = syGetConfig('queue.failed', []);
         $type = \think\helper\Arr::pull($config, 'type', 'none');
-        $queueFailerObj = $this->app->invokeClass("\\shiyunQueue\\drive\\{$type}Failed::class", [$config]);
+        $queueFailerObj = Container::getInstance()->invokeClass("\\shiyunQueue\\drive\\{$type}Failed::class", [$config]);
 
         $ids = \think\helper\Arr::pluck($queueFailerObj->all(), 'id');
         $this->retryJobIds($ids);
@@ -74,9 +75,9 @@ trait TraitJob
     protected function retryJobIds($ids)
     {
         foreach ($ids as $id) {
-            $config = $this->app->config->get('queue.failed', []);
+            $config = syGetConfig('queue.failed', []);
             $type = \think\helper\Arr::pull($config, 'type', 'none');
-            $queueFailerObj = $this->app->invokeClass("\\shiyunQueue\\drive\\{$type}Failed::class", [$config]);
+            $queueFailerObj = Container::getInstance()->invokeClass("\\shiyunQueue\\drive\\{$type}Failed::class", [$config]);
 
             $job = $queueFailerObj->find($id);
             if (is_null($job)) {
@@ -85,11 +86,11 @@ trait TraitJob
                 $this->retryJobItem($job);
                 // 失败的作业[{$id}]已被推回队列     
                 return '失败的作业[{$id}]已被推回队列';
-                $config = $this->app->config->get('queue.failed', []);
-                $type = \think\helper\Arr::pull($config, 'type', 'none');
-                $queueFailerObj = $this->app->invokeClass("\\shiyunQueue\\drive\\{$type}Failed::class", [$config]);
 
-                $queueFailerObj->forget($id);
+                // $config = syGetConfig('queue.failed', []);
+                // $type = \think\helper\Arr::pull($config, 'type', 'none');
+                // $queueFailerObj = Container::getInstance()->invokeClass("\\shiyunQueue\\drive\\{$type}Failed::class", [$config]);
+                // $queueFailerObj->forget($id);
             }
         }
     }

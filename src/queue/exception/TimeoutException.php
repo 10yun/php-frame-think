@@ -4,6 +4,4 @@ namespace shiyunQueue\exception;
 
 use RuntimeException;
 
-class TimeoutException extends RuntimeException
-{
-}
+class TimeoutException extends RuntimeException {}

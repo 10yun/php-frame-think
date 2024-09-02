@@ -43,7 +43,7 @@ class AmqpClient
     /**
      * 发送信息
      */
-    public function sendPublish($msg = '')
+    public function sendPublish(?array $msg = null)
     {
 
         /**

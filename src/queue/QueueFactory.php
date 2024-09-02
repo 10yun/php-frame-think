@@ -10,7 +10,6 @@ use shiyunQueue\exception\DriverException;
 use shiyunQueue\drive\database\DatabaseConnector;
 use shiyunQueue\drive\redis\RedisConnector;
 use shiyunQueue\drive\rabbitmq\RabbitmqConnector;
-use think\App;
 use InvalidArgumentException;
 
 /**
@@ -28,17 +27,10 @@ class QueueFactory
 {
     use \shiyun\libs\TraitModeInstance;
     /**
-     * @var App
-     */
-    protected $app;
-    /**
      * 驱动
      */
     protected array $driversHandle = [];
-    public function __construct()
-    {
-        $this->app = app();
-    }
+    public function __construct() {}
     /**
      * 默认驱动
      * @return string|null
@@ -91,7 +83,6 @@ class QueueFactory
                     throw new DriverException('【ctocode-queue】驱动类型错误');
                     break;
             }
-            $redisDrive->setApp($this->app);
             $redisDrive->baseInit();
             $redisDrive->setConnectName($name);
             $this->driversHandle[$name] = $redisDrive;

@@ -2,6 +2,8 @@
 
 namespace shiyunQueue\process;
 
+use shiyunWorker\WorkermanServer;
+
 /**
  * 常规job的方式
  */

@@ -22,16 +22,14 @@ class DatabaseConnector extends Connector
 {
     use InteractsWithTime;
     protected $db;
-
     /**
      * The database table that holds the jobs.
      */
     protected string $table;
-
     /**
-     * The name of the default queue.
+     * string 队列名称(在这里为表名字)
      */
-    protected string $default;
+    protected string|null $queueName = 'queue';
 
     /**
      * The expiration time of a job.
@@ -41,7 +39,6 @@ class DatabaseConnector extends Connector
     public function __construct(array $config = [])
     {
         $this->table      =  $config['table'];
-        $this->default    =  $config['queue'] ?? 'default';
         $this->retryAfter =  $config['retry_after'] ?? 60;
         $this->createDriver($config);
     }
@@ -62,22 +59,19 @@ class DatabaseConnector extends Connector
     {
         return $this->db
             ->name($this->table)
-            ->where('queue', $this->getQueue($queue))
+            ->where('queue', $this->getPrefixQueue($queue))
             ->count();
     }
     public function retryPublish($payload, $queue = null, array $options = [])
     {
         return $this->pushToDatabase($queue, $payload);
     }
-    public function sendPublish(?array $data = null, $job,)
+    public function sendPublish(?array $data = null, $job = null)
     {
         if (!empty($data)) {
             $this->addMessage($data);
         }
-        $msgData = $this->getMessage();
-
-        $payload = $this->createPayload($job, $msgData);
-
+        $payload = $this->createPayload($job);
         if (!empty($this->msgDelay)) {
             return $this->pushToDatabase($this->queueName, $payload,  $this->msgDelay);
         } else {
@@ -86,17 +80,18 @@ class DatabaseConnector extends Connector
     }
     public function bulk($jobs, $data = '', $queue = null)
     {
-        $queue = $this->getQueue($queue);
+        $queue = $this->getPrefixQueue($queue);
         $availableAt = $this->availableAt();
         return $this->db->name($this->table)->insertAll(collect((array) $jobs)->map(
             function ($job) use ($queue, $data, $availableAt) {
+                $this->addMessage($data);
                 return [
                     'queue'          => $queue,
                     'attempts'       => 0,
                     'reserve_time'   => null,
                     'available_time' => $availableAt,
                     'create_time'    => $this->currentTime(),
-                    'payload'        => $this->createPayload($job, $data),
+                    'payload'        => $this->createPayload($job),
                 ];
             }
         )->all());
@@ -127,7 +122,7 @@ class DatabaseConnector extends Connector
     protected function pushToDatabase($queue, $payload, $delay = 0, $attempts = 0)
     {
         return $this->db->name($this->table)->insertGetId([
-            'queue'          => $this->getQueue($queue),
+            'queue'          => $this->getPrefixQueue($queue),
             'attempts'       => $attempts,
             'reserve_time'   => null,
             'available_time' => $this->availableAt($delay),
@@ -136,16 +131,16 @@ class DatabaseConnector extends Connector
         ]);
     }
 
-    public function getPublish($queue = null)
+    public function getPublish()
     {
-        $queue = $this->getQueue($queue);
+        $queue = $this->getPrefixQueue();
         return $this->db->transaction(function () use ($queue) {
 
             if ($job = $this->getNextAvailableJob($queue)) {
 
                 $job = $this->markJobAsReserved($job);
 
-                return new DatabaseJob($this->app, $this, $job, $this->connection, $queue);
+                return new DatabaseJob($this, $job, $this->connection, $queue);
             }
         });
     }
@@ -162,7 +157,7 @@ class DatabaseConnector extends Connector
         $job = $this->db
             ->name($this->table)
             ->lock(true)
-            ->where('queue', $this->getQueue($queue))
+            ->where('queue', $this->getPrefixQueue($queue))
             ->where(function (Query $query) {
                 $query->where(function (Query $query) {
                     $query->whereNull('reserve_time')
@@ -217,8 +212,8 @@ class DatabaseConnector extends Connector
             }
         });
     }
-    protected function getQueue($queue)
+    protected function getPrefixQueue(?string $queue = null)
     {
-        return $queue ?: $this->default;
+        return $queue ?: $this->queueName;
     }
 }

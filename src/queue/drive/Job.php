@@ -12,13 +12,12 @@
 namespace shiyunQueue\drive;
 
 use Exception;
-use think\App;
 use think\helper\Arr;
 use think\helper\Str;
+use think\Container;
 
 abstract class Job
 {
-
     /**
      * 作业处理程序实例
      */
@@ -28,22 +27,19 @@ abstract class Job
      *  The JSON decoded version of "$job".
      */
     private array $payload;
-
-    /**
-     * @var App
-     */
-    protected $app;
-
-    /**
-     * 作业所属队列的名称
-     */
-    protected string $queue;
-
     /**
      * 作业所属连接的名称
      */
     protected  $connection;
 
+    /**
+     * 作业所属分组的名称
+     */
+    protected string $exchange;
+    /**
+     * 作业所属队列的名称
+     */
+    protected string $queue;
     /**
      * 指示作业是否已删除
      */
@@ -162,21 +158,21 @@ abstract class Job
     public function getResolvedJob()
     {
         if (empty($this->instance)) {
-
             [$class] = $this->getParsedJob();
-
-            // var_dump($class);
             $param  = $this->payload('data');
-
+            // var_dump('--getResolvedJob--', $param, $class);
             switch ($class) {
+                case 'sync':
+                    $this->instance = Container::getInstance()->make(\shiyunQueue\drive\sync\SyncJob::class, [$param], true);
+                    break;
                 case 'redis':
-                    $this->instance = $this->app->make(\shiyunQueue\drive\redis\RedisJob::class, [$param], true);
+                    $this->instance = Container::getInstance()->make(\shiyunQueue\drive\redis\RedisJob::class, [$param], true);
                     break;
                 case 'database':
-                    $this->instance = $this->app->make(\shiyunQueue\drive\database\DatabaseJob::class, [$param], true);
+                    $this->instance = Container::getInstance()->make(\shiyunQueue\drive\database\DatabaseJob::class, [$param], true);
                     break;
                 case 'rabbitmq':
-                    // $this->instance = $this->app->make(\shiyunQueue\drive\database\Rabb::class, [$param], true);
+                    // $this->instance = Container::getInstance()->make(\shiyunQueue\drive\database\RabbitmqJob::class, [$param], true);
                     break;
             }
         }

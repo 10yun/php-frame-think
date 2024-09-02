@@ -27,9 +27,7 @@ trait TraitChannel
 
 
 
-    public function initChannelSett()
-    {
-    }
+    public function initChannelSett() {}
     public function clearChannelSett()
     {
         $this->queueName = null;
@@ -42,6 +40,13 @@ trait TraitChannel
     {
         $this->exchangeName = $name;
         return $this;
+    }
+    /**
+     * 获取交换机
+     */
+    public function getExchangeName()
+    {
+        return $this->exchangeName;
     }
     /**
      * 设置交换机类型
@@ -69,6 +74,9 @@ trait TraitChannel
         $this->queueName = $qName;
         return $this;
     }
+    /**
+     * 获取队列名
+     */
     public function getQueueName()
     {
         return $this->queueName;

@@ -2,6 +2,10 @@
 
 namespace shiyunQueue\drive;
 
+use DateTimeInterface;
+use think\helper\Str;
+use InvalidArgumentException;
+
 /**
  * @method $this addMessage(...$data) 执行数据
  * @method $this setMsgDelay(int $delay) 延迟执行秒数
@@ -76,39 +80,15 @@ trait TraitMessage
         return $this;
     }
     /**
-     * 设置数据
+     * 设置 payload['data'] 数据
      */
-    public function setMessage($msg = null)
+    public function setMsgData($msg = null)
     {
         $this->msgOriginalData = $msg;
         return $this;
     }
-    public function getMessage()
-    {
-        $msgLast = [];
-        $msgLast['msgEncrypt'] = $this->msgEncrypt ?? false;
-        $msgLast['msgID'] = rand();
-        $msgLast['msgIp'] = $this->msgIp;
-        $msgLast['msgCurrTime'] = $this->msgCurrTime;
-        $msgLast['msgCurrDate'] = date('Y-m-d H:i:s', $this->msgCurrTime);
-        $msgLast['msgDelay'] = $this->msgDelay;
-        $msgLast['attempts'] = 0;
-        $msgLast['queueName'] = $this->queueName;
-        $msgLast['data'] = $this->msgOriginalData;
-        // $msgLast['jobFunc'] = $this->jobFunc ?? null;
-        // $msgLast['allowError'] = $this->allowError;
-        // $msgLast['log'] = $this->addLog;
-
-        // 是否加密
-        if ($this->msgEncrypt === true) {
-            $oldData = $msgLast['data'];
-            $encryptData = \shiyunUtils\libs\LibEncryptArr::encrypt($oldData);
-            $msgLast['data'] = $encryptData;
-            // $xxxx2 = \shiyunUtils\libs\LibEncryptArr::decrypt($encryptData);
-        }
-        return $msgLast;
-    }
     /**
+     * 设置 payload['msgDelay'] 数据
      * 设置延迟
      * 设置延迟时间
      * @param int $delay 延迟/秒
@@ -127,5 +107,79 @@ trait TraitMessage
     {
         $this->msgEncrypt = $flag;
         return $this;
+    }
+    /**
+     * 获取 payload 最后的数据体
+     */
+    protected function createPayload(string|object|null $job = null)
+    {
+        // 随机 ID
+        $randomID = Str::random(32);
+        $payload = [];
+        $payload['id'] = $randomID;
+        $payload['attempts'] = 0;
+        $payload['maxTries'] = null;
+        $payload['timeout'] = null;
+        $payload['exchangeName'] = $this->exchangeName;
+        $payload['queueName'] = $this->queueName;
+        // $payload['jobFunc'] = $this->jobFunc ?? null;
+        // $payload['allowError'] = $this->allowError;
+        // $payload['log'] = $this->addLog;
+
+        $payload['msgID'] = $randomID;
+        $payload['msgIp'] = $this->msgIp;
+        $payload['msgCurrTime'] = $this->msgCurrTime;
+        $payload['msgCurrDate'] = date('Y-m-d H:i:s', $this->msgCurrTime);
+        $payload['msgDelay'] = $this->msgDelay;
+        $payload['msgEncrypt'] = $this->msgEncrypt ?? false;
+        $payload['data'] = $this->msgOriginalData;
+
+        if (is_object($job)) {
+            $payload =  [
+                'job'       => 'shiyunQueue\drive\CallQueuedHandler@call',
+                'maxTries'  => $job->tries ?? null,
+                'timeout'   => $job->timeout ?? null,
+                'timeoutAt' => $this->getJobExpiration($job),
+                'data'      => [
+                    'commandName' => get_class($job),
+                    'command'     => serialize(clone $job),
+                ],
+            ];
+        } else {
+            $payload['job'] = $job;
+        }
+        // 是否加密
+        if ($this->msgEncrypt === true) {
+            $oldData = $payload['data'];
+            $encryptData = \shiyunUtils\libs\LibEncryptArr::encrypt($oldData);
+            $payload['data'] = $encryptData;
+            // $xxxx2 = \shiyunUtils\libs\LibEncryptArr::decrypt($encryptData);
+        }
+        $payload = json_encode($payload);
+        if (JSON_ERROR_NONE !== json_last_error()) {
+            throw new InvalidArgumentException('Unable to create payload: ' . json_last_error_msg());
+        }
+        return $payload;
+    }
+    public function getJobExpiration($job)
+    {
+        if (!method_exists($job, 'retryUntil') && !isset($job->timeoutAt)) {
+            return;
+        }
+        $expiration = $job->timeoutAt ?? $job->retryUntil();
+        return $expiration instanceof DateTimeInterface
+            ? $expiration->getTimestamp() : $expiration;
+    }
+
+    protected function setMeta($payload, $key, $value)
+    {
+        $payload       = json_decode($payload, true);
+        $payload[$key] = $value;
+        $payload       = json_encode($payload);
+
+        if (JSON_ERROR_NONE !== json_last_error()) {
+            throw new InvalidArgumentException('【queue】Unable to create payload: ' . json_last_error_msg());
+        }
+        return $payload;
     }
 }

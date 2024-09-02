@@ -26,10 +26,18 @@ class BaseCrossMiddle
         $headerArr = [
             'Authorization',
             'Content-Type',
-            'If-Match', 'If-Modified-Since', 'If-None-Match', 'If-Unmodified-Since',
-            'X-CSRF-TOKEN', 'X-Requested-With',
-            'Host', 'Origin', 'Accept',
-            'Sec-Fetch-Site', 'Sec-Fetch-Mode', 'Sec-Fetch-Dest'
+            'If-Match',
+            'If-Modified-Since',
+            'If-None-Match',
+            'If-Unmodified-Since',
+            'X-CSRF-TOKEN',
+            'X-Requested-With',
+            'Host',
+            'Origin',
+            'Accept',
+            'Sec-Fetch-Site',
+            'Sec-Fetch-Mode',
+            'Sec-Fetch-Dest'
         ];
 
         // 自定义请求方式，解决 无PUT、POST、DELETE 问题
@@ -44,9 +52,13 @@ class BaseCrossMiddle
         // $headerArr[] = 'sy-client-drive';
         // $headerArr[] = 'sy-client-os';
 
+        // $headerArr[] = 'sy-openapp-project';
+        // $headerArr[] = 'sy-openapp-id';
+        // $headerArr[] = 'sy-openapp-role';
+        // $headerArr[] = 'sy-openapp-token';
+
         $headerArr[] = 'syOpenAppProject';
         $headerArr[] = 'syOpenAppId';
-        $headerArr[] = 'syOpenAppSecret';
         $headerArr[] = 'syOpenAppRole';
         $headerArr[] = 'syOpenAppToken';
 

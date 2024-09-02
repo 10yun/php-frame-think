@@ -2,6 +2,8 @@
 
 return  [
     'site_name' => "mall",
+    'process_open' => true,
+    'process_count' => 1,
     // 开启注解
     'annotation_open' => true,
     'annotation_include_path' => [

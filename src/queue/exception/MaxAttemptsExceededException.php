@@ -4,6 +4,7 @@ namespace shiyunQueue\exception;
 
 use RuntimeException;
 
-class MaxAttemptsExceededException extends RuntimeException
-{
-}
+/**
+ * 超过重试次数
+ */
+class MaxAttemptsExceededException extends RuntimeException {}

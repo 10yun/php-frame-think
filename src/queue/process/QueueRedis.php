@@ -2,35 +2,52 @@
 
 namespace shiyunQueue\process;
 
-use Workerman\Worker;
+use Exception;
 use shiyunWorker\WorkermanServer;
+use shiyunUtils\libs\LibsLogger;
 use shiyunQueue\libs\ProcessWorker;
+use shiyunQueue\exception\QueueException;
 
 class QueueRedis extends WorkermanServer
 {
     use ProcessWorker;
 
     protected $processes    = 3;
-    protected $socket       = 'tcp://0.0.0.0:16020';
+    protected $socket       = 'tcp://0.0.0.0:16030';
     protected $workerName   = 'queue_redis';
-    // 心跳间隔40秒
-    protected $heartbeat_time = 40;
+    // 心跳间隔30秒
+    protected $heartbeat_time = 30;
     /**
      * 
      */
     protected $annoHandle;        // 注解工具类
     protected $_consumerDir = ''; // 队列消费目录
+    protected array $config = []; // 配置
     /**
      * 构造函数
      * @access public
      */
     public function __construct()
     {
-        $annoPath = syGetConfig('shiyun.queue.annotation_include_path');
-        $this->annoHandle = new \shiyunQueue\annotation\AnnotationParse();
-        $annoArr = $this->annoHandle->getDir($annoPath);
-        $this->_consumerDir = $annoArr;
-        parent::__construct();
+        $this->config = syGetConfig('shiyun.queue');
+        if (
+            !empty($this->config)
+            && !empty($this->config['process_open'])
+            && $this->config['process_open'] == true
+        ) {
+            $annoPath = syGetConfig('shiyun.queue.annotation_include_path');
+            $this->annoHandle = new \shiyunQueue\annotation\AnnotationParse();
+            $annoArr = $this->annoHandle->getDir($annoPath);
+            $this->_consumerDir = $annoArr;
+
+            if (!empty($this->config['process_count'])) {
+                $this->processes = $this->config['process_count'];
+            }
+            if (!empty($this->config['process_socket'])) {
+                $this->socket = $this->config['process_socket'];
+            }
+            parent::__construct();
+        }
     }
     //在进程开启之时
     public function onWorkerStart()
@@ -40,7 +57,7 @@ class QueueRedis extends WorkermanServer
                 $this->dealInit();
                 foreach ($this->_consumerDir as $itemDir) {
                     if (!is_dir($itemDir)) {
-                        echo "Consumer directory {$itemDir} not exists\r\n";
+                        $this->queueLogError('Consumer', "目录{$itemDir}不存在");
                         return;
                     }
                     $dir_iterator = new \RecursiveDirectoryIterator($itemDir);
@@ -49,27 +66,27 @@ class QueueRedis extends WorkermanServer
                         if (is_dir($file)) {
                             continue;
                         }
-                        if (
-                            !($itemRes = $this->dealItemCheck($file))
-                        ) {
+                        if (!$this->dealItemCheck($file)) {
                             continue;
                         }
                     }
                 }
             }
-        } catch (\Throwable $e) {
-            $this->queueLogError('执行消息队列发生错误,错误原因: Throwable ' . $e->getMessage());
-        } catch (\PDOException $e) {
-            $this->queueLogError('执行消息队列发生错误,错误原因: PDOException ' . $e->getMessage());
         } catch (\Exception $e) {
-            $this->queueLogError('执行消息队列发生错误,错误原因: Exception ' . $e->getMessage());
+            $this->queueLogError('Exception', $e->getMessage());
+        } catch (\Throwable $e) {
+            $this->queueLogError('Throwable', $e->getMessage());
         }
     }
-    protected function queueLogError($info = '')
+    protected function queueLogError(string $type = '', string $msg = '')
     {
-        \shiyunUtils\libs\LibsLogger::getInstance()
-            ->setGroup('queue_redis')
-            ->writeError($info);
+        $log = str_pad("__{$type}__", 40, " ") . $msg;
+        LibsLogger::getInstance()->setGroup('queue_redis')->writeError($log);
+    }
+    protected function queueLogInfo(string $type = '', string $msg = '')
+    {
+        $log = str_pad("__{$type}__", 40, " ") . $msg;
+        LibsLogger::getInstance()->setGroup('queue_redis')->writeInfo($log);
     }
     /**
      * 处理-=普通模式
@@ -77,4 +94,85 @@ class QueueRedis extends WorkermanServer
     /**
      * 处理 发布订阅
      */
+    public function dealInit($consumeClassOpt = []) {}
+    public function dealItemCheck($file)
+    {
+        $tryState = true;
+        try {
+            $fileinfo = new \SplFileInfo($file);
+            $ext = $fileinfo->getExtension();
+            if ($ext !== 'php') {
+                throw new QueueException($file . ' 不是php文件');
+            }
+            $pathname = $fileinfo->getPathname();
+            $class = str_replace(".php", "", $pathname);
+            $class = str_replace('/', "\\", $class);
+            // echo substr($file, strlen(_PATH_PROJECT_)) . "\n";
+            // $class = substr(substr($file, strlen(_PATH_PROJECT_)), 0, -4);
+            // $filePath = str_replace(['\\', '/'], DIRECTORY_SEPARATOR, _PATH_PROJECT_);
+            // $class = substr($pathname, strlen($filePath) + 0, -4);
+            if (!class_exists($class)) {
+                throw new QueueException($class . ' 类不存在');
+            }
+            // 消费者参数
+            $consumeClassOpt = [];
+            // 消费者类
+            $consumeClassObj = new $class;
+            $reflectionClass = new \ReflectionClass($class);
+            $properties = $reflectionClass->getProperties();
+
+            foreach ($properties as $property) {
+                $pro_key       = $property->getName();
+                $pro_val       = $property->getValue($consumeClassObj);
+                $consumeClassOpt[$pro_key] = $pro_val;
+            }
+            /**
+             * 方法是否存在
+             */
+            if (!method_exists($consumeClassObj, 'onQueueMessage')) {
+                throw new QueueException($class . ' -> onQueueMessage 执行方法不存在');
+            }
+            /**
+             * 判断参数是否存在
+             */
+            if (
+                empty($consumeClassOpt['connect_name']) || empty($consumeClassOpt['queue_name'])
+            ) {
+                throw new QueueException($class . ' connect 参数不存在');
+            }
+            $consumeClassOpt['exchange_name'] = !empty($consumeClassOpt['exchange_name']) ? $consumeClassOpt['exchange_name'] : 'queues';
+            // $consumeClassOpt['exchange_name'] = !empty($consumeClassOpt['exchange_name']) ? $consumeClassOpt['exchange_name'] : '';
+
+            $consumeQeObj = \shiyunQueue\QueueFactory::getInstance()
+                ->connection($consumeClassOpt['connect_name']);
+
+            $that = $this;
+
+            // 是否存在定时器
+            if (!empty($consumeClassOpt['execute_timing'])) {
+                $execute_timing = intval($consumeClassOpt['execute_timing']);
+                \Workerman\Timer::add(
+                    $execute_timing,
+                    function () use ($that, $consumeClassObj, $consumeClassOpt, $consumeQeObj) {
+                        return $that->dealItemData($consumeClassObj, $consumeClassOpt, $consumeQeObj);
+                    }
+                );
+                // \Workerman\Timer::add(intval($execute_timing), [$consumeClassObj, 'onQueueMessage'], [
+                //     ['msg1' => '队列消息的内容', 'msg2' => 2,],
+                //     '参数2'
+                // ]);
+            } else {
+                return $that->dealItemData($consumeClassObj, $consumeClassOpt, $consumeQeObj);
+            }
+            // $consumeQeObj->subscribe($queue, );
+        } catch (QueueException $e) {
+            $tryState = false;
+            $this->queueLogError('dealItemCheck__CrontabException', $e->getMessage());
+        } catch (\Throwable $e) {
+            $tryState = false;
+            $this->queueLogError('dealItemCheck__Throwable', $e->getMessage());
+        } finally {
+            return $tryState;
+        }
+    }
 }

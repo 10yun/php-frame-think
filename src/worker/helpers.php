@@ -19,9 +19,7 @@ function loadRpcServer($service, $class)
 /**
  * 
  */
-function worker_push_socket()
-{
-}
+function worker_push_socket() {}
 
 
 /**

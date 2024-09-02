@@ -17,7 +17,6 @@ class QueueWorker extends Command
             ->addArgument('action', Argument::OPTIONAL, "start|stop|restart|reload|status|connections", 'start')
             //->addOption('d', 'd', Option::VALUE_OPTIONAL, ' daemon ')
             ->addOption('daemon', 'd', Option::VALUE_NONE, 'Run the workerman server in daemon mode.')
-            ->addOption('processes', null, Option::VALUE_OPTIONAL, ' start num processes.', 1)
             ->setDescription(' Workerman queue start ');
     }
 
@@ -42,17 +41,14 @@ class QueueWorker extends Command
             $output->writeln('Starting Workerman server...');
         }
         try {
-            /**
-             * TODO 要么这里注册，要么在每个里面单独注册
-             */
-
-            $count = $input->getOption('processes');
-
             ini_set('display_errors', 'on');
+            // 设置时区，避免运行结果与预期不一致
+            date_default_timezone_set('PRC');
             // 标记是全局启动
             define('GLOBAL_START', 1);
-            (new \shiyunQueue\process\QueueRedis())->setCount($count);
-            // (new \shiyunQueue\process\QueueMqtt())->setCount($count);
+            new \shiyunQueue\process\QueueCrontab();
+            new \shiyunQueue\process\QueueRedis();
+            // new \shiyunQueue\process\QueueMqtt();
             // new \shiyunQueue\process\QueueAmqp();
             // Worker::$pidFile = syPathRuntime() . 'workerman_queue_pid';
             \Workerman\Worker::runAll();

@@ -11,7 +11,6 @@
 
 namespace shiyunQueue\drive\sync;
 
-use think\App;
 use shiyunQueue\drive\Job;
 
 class SyncJob extends Job
@@ -21,9 +20,8 @@ class SyncJob extends Job
      */
     protected string $job;
 
-    public function __construct(App $app, $job, $connection, $queue)
+    public function __construct($job, $connection, $queue)
     {
-        $this->app        = $app;
         $this->connection = $connection;
         $this->queue      = $queue;
         $this->job        = $job;

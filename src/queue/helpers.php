@@ -30,6 +30,7 @@ if (!function_exists('queue_producer')) {
             ->setMsgDelay($delay)
             ->setMsgEncrypt(false)
             ->sendPublish();
+        return true;
     }
 }
 /**
@@ -40,8 +41,7 @@ if (!function_exists('queue_get_message')) {
         string $connectName,
         string $exchangeName = '',
         string|array $queueName = null,
-    ) {
-    }
+    ) {}
 }
 /**
  * 响应错误

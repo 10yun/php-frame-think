@@ -38,13 +38,14 @@
         "source": "https://github.com/10yun/php-frame-think"
     },
     "require": {
+        "ext-fileinfo": "*",
+        "ext-json": "*",
         "php": "^8",
         "shiyun/php-utils": "@dev",
+        "workerman/crontab": "^1.0",
         "workerman/workerman": "^4",
         "workerman/gateway-worker": "^3",
-        "workerman/gatewayclient": "^3",
-        "ext-fileinfo": "*",
-        "ext-json": "*"
+        "workerman/gatewayclient": "^3"
     },
     "require-dev": {
         "ext-json": "*",

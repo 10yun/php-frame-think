@@ -3,7 +3,6 @@
 namespace shiyunQueue\process;
 
 use shiyunWorker\WorkermanServer;
-use Workerman\Worker;
 
 class QueueRedisProducer
 {

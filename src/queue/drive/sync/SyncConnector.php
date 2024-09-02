@@ -4,17 +4,12 @@ namespace shiyunQueue\drive\sync;
 
 use Exception;
 use shiyunQueue\drive\Connector;
-use shiyunQueue\drive\IntfDrive;
-use shiyunQueue\libs\JobFailed;
-use shiyunQueue\libs\JobProcessed;
-use shiyunQueue\libs\JobProcessing;
+use shiyunQueue\drive\InterfaceConnector;
 use Throwable;
 
-//  implements IntfDrive
-class SyncConnector extends Connector
+class SyncConnector extends Connector implements InterfaceConnector
 {
     protected $connectHandle;
-
 
     public function createConnect()
     {
@@ -30,26 +25,37 @@ class SyncConnector extends Connector
      */
     public function retryPublish($payload, $queue = null, array $options = [])
     {
-        // if ($this->connectHandle->rPush($this->getQueue($queue), $payload)) {
+        // if ($this->connectHandle->rPush($this->getPrefixQueue($queue), $payload)) {
         //     return json_decode($payload, true)['id'] ?? null;
         // }
     }
-    public function sendPublish()
+    public function sendPublish(?array $msg = null)
     {
+        if (!empty($msg)) {
+            $this->addMessage($msg);
+        }
+        $job = null;
+        $payload = $this->createPayload($job);
         if (!empty($this->msgDelay) && $this->msgDelay > 0) {
         } else {
-            $payload = $this->createPayload($job, $data);
-            $queueJob = new SyncJob($this->app, $payload, $this->connectionName, $queue);
+            $queueJob = new SyncJob($payload, $this->connectionName, $queue);
         }
         try {
-            $jobObj = new JobProcessing($this->connectionName, $job);
-            $jobObj->handle();
+            // $this->addMessage([
+            //     'aaaa' => 1,
+            //     'bbbb' => 2,
+            // ]);
+            //     // $logArr = [
+            //     //     'type' => 'comment',
+            //     //     'job_id' => $job->getJobId(),
+            //     //     'job_name' => $job->getName(),
+            //     //     'status' => 'Processing',
+            //     //     'date' => date('Y-m-d H:i:s'),
+            //     // ];
             $queueJob->onQueueMessage();
-            $jobObj = new JobProcessed($this->connectionName, $job);
-            $jobObj->handle();
+            $this->addLogComplete($this->connectionName, $job);
         } catch (Exception | Throwable $e) {
-            $jobObj = new JobFailed($this->connectionName, $job, $e);
-            $jobObj->handle();
+            $this->addLogFailed($this->connectionName, $job, $e);
             throw $e;
         }
         return 0;

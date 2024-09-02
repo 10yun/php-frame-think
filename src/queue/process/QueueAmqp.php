@@ -2,8 +2,6 @@
 
 namespace shiyunQueue\process;
 
-use Workerman\Timer;
-use Workerman\Worker;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Exchange\AMQPExchangeType;
 use PhpAmqpLib\Message\AMQPMessage;

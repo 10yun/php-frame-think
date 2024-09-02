@@ -11,7 +11,6 @@
 
 namespace shiyunQueue\drive\redis;
 
-use think\App;
 use shiyunQueue\drive\Job;
 
 class RedisJob extends Job
@@ -33,14 +32,14 @@ class RedisJob extends Job
      */
     protected mixed $reserved;
 
-    public function __construct(App $app, RedisConnector $redis, $job, $reserved, $connection = '', $queue = '')
+    public function __construct(RedisConnector $redis, $job, $reserved, $connection = '', $queue = '', $exchange = '')
     {
-        $this->app        = $app;
         $this->redis      = $redis;
         $this->job        = $job;
-        $this->queue      = $queue;
-        $this->connection = $connection;
         $this->reserved   = $reserved;
+        $this->connection = $connection;
+        $this->queue      = $queue;
+        $this->exchange   = $exchange;
     }
 
     /**
@@ -58,10 +57,13 @@ class RedisJob extends Job
      *
      * @return void
      */
-    public function delete()
+    public function delete($eName = '', $qName = '')
     {
         parent::delete();
+        $this->redis->setExchangeName($this->exchange);
+        // $this->redis->setQueueName($this->queue);
         $this->redis->deleteReserved($this->queue, $this);
+        // $this->redis->deleteReserved(null, $this);
     }
 
     /**
@@ -72,7 +74,10 @@ class RedisJob extends Job
     public function release($delay = 0)
     {
         parent::release($delay);
+        $this->redis->setExchangeName($this->exchange);
+        // $this->redis->setQueueName($this->queue);
         $this->redis->deleteAndRelease($this->queue, $this, $delay);
+        // $this->redis->deleteAndRelease(null, $this, $delay);
     }
 
     /**

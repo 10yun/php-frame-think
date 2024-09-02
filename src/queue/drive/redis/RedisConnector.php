@@ -13,11 +13,12 @@ namespace shiyunQueue\drive\redis;
 
 use Closure;
 use Exception;
-use RedisException;
-use think\helper\Str;
 use shiyunQueue\drive\Connector;
+use shiyunQueue\drive\InterfaceConnector;
 use shiyunQueue\libs\InteractsWithTime;
+use shiyunQueue\drive\redis\RedisLib;
 
+// implements InterfaceConnector
 class RedisConnector extends Connector
 {
     use InteractsWithTime;
@@ -41,8 +42,6 @@ class RedisConnector extends Connector
     public function __construct(
         array $config = [],
     ) {
-
-        $this->default    = $config['queue_name'] ?? '';
         $this->retryAfter =  $config['retry_after'] ?? 60;
         $this->blockFor   =  $config['block_for'] ?? null;
 
@@ -53,82 +52,42 @@ class RedisConnector extends Connector
         if (!extension_loaded('redis')) {
             throw new Exception('redis扩展未安装');
         }
-        $redis = new class($config)
-        {
-            protected $config;
-            protected $client;
-            public function __construct($config)
-            {
-                $this->config = $config;
-                $this->client = $this->createClient();
-            }
-            protected function createClient()
-            {
-                $config = $this->config;
-                $func   = $config['persistent'] ? 'pconnect' : 'connect';
-
-                $client = new \Redis;
-                $client->$func($config['connect_host'], $config['connect_port'], $config['timeout']);
-
-                if ('' != $config['connect_password']) {
-                    $client->auth($config['connect_password']);
-                }
-
-                if (0 != $config['select']) {
-                    $client->select($config['select']);
-                }
-                return $client;
-            }
-
-            public function __call($name, $arguments)
-            {
-                try {
-                    return call_user_func_array([$this->client, $name], $arguments);
-                } catch (RedisException $e) {
-                    if (Str::contains($e->getMessage(), 'went away')) {
-                        $this->client = $this->createClient();
-                    }
-
-                    throw $e;
-                }
-            }
-        };
-        $this->redis = $redis;
+        $this->redis = new RedisLib($config);
     }
     public function size($queue = null)
     {
-        $queue = $this->getQueue($queue);
-        return $this->redis->lLen($queue) + $this->redis->zCard("{$queue}:delayed") + $this->redis->zCard("{$queue}:reserved");
+        $prefixedQueue = $this->getPrefixQueue($queue);
+        return $this->redis->lLen($prefixedQueue)
+            + $this->redis->zCard("{$prefixedQueue}:delayed")
+            + $this->redis->zCard("{$prefixedQueue}:reserved");
     }
 
-
-    public function getPublish($queue = null)
+    public function getPublish()
     {
-        if (empty($queue)) {
-            $queue = $this->getQueueName();
-        }
-        $this->migrate($prefixed = $this->getQueue($queue));
+        $prefixedQueue = $this->getPrefixQueue();
+        $exchange = $this->getExchangeName();
+        $queue = $this->getQueueName();
+        $this->migrate($prefixedQueue);
 
-        if (empty($nextJob = $this->retrieveNextJob($prefixed))) {
+        if (empty($nextJob = $this->retrieveNextJob($prefixedQueue))) {
             return;
         }
         [$job, $reserved] = $nextJob;
         if ($reserved) {
-            return new RedisJob($this->app, $this, $job, $reserved, $this->connection, $queue);
+            return new RedisJob($this, $job, $reserved, $this->connection, $queue, $exchange);
         }
     }
 
     /**
-     * Migrate any delayed or expired jobs onto the primary queue.
-     *
-     * @param string $queue
+     * 将所有延迟或过期的作业迁移到主队列。
+     * @param string $prefixedQueue
      * @return void
      */
-    protected function migrate($queue)
+    protected function migrate($prefixedQueue)
     {
-        $this->migrateExpiredJobs($queue . ':delayed', $queue);
+        $this->migrateExpiredJobs($prefixedQueue . ':delayed', $prefixedQueue);
         if (!is_null($this->retryAfter)) {
-            $this->migrateExpiredJobs($queue . ':reserved', $queue);
+            $this->migrateExpiredJobs($prefixedQueue . ':reserved', $prefixedQueue);
         }
     }
 
@@ -156,72 +115,70 @@ class RedisConnector extends Connector
     }
 
     /**
-     * Retrieve the next job from the queue.
      * 从队列中检索下一个作业。
-     * @param string $queue
+     * @param string $prefixedQueue
      * @return array
      */
-    protected function retrieveNextJob($queue)
+    protected function retrieveNextJob($prefixedQueue)
     {
         if (!is_null($this->blockFor)) {
-            return $this->blockingPop($queue);
+            return $this->blockingPop($prefixedQueue);
         }
-        $job      = $this->redis->lpop($queue);
+        $job      = $this->redis->lpop($prefixedQueue);
         $reserved = false;
         if ($job) {
             $reserved = json_decode($job, true);
             $reserved['attempts']++;
             $reserved = json_encode($reserved);
-            $this->redis->zAdd($queue . ':reserved', $this->availableAt($this->retryAfter), $reserved);
+            $this->redis->zAdd($prefixedQueue . ':reserved', $this->availableAt($this->retryAfter), $reserved);
         }
         return [$job, $reserved];
     }
 
     /**
-     * Retrieve the next job by blocking-pop.
-     *
-     * @param string $queue
+     * 通过阻止弹出来检索下一个作业。
+     * @param string $prefixedQueue
      * @return array
      */
-    protected function blockingPop($queue)
+    protected function blockingPop($prefixedQueue)
     {
-        $rawBody = $this->redis->blpop($queue, $this->blockFor);
+        $rawBody = $this->redis->blpop($prefixedQueue, $this->blockFor);
         if (!empty($rawBody)) {
             $payload = json_decode($rawBody[1], true);
             $payload['attempts']++;
             $reserved = json_encode($payload);
-            $this->redis->zadd($queue . ':reserved', $this->availableAt($this->retryAfter), $reserved);
+            $this->redis->zadd($prefixedQueue . ':reserved', $this->availableAt($this->retryAfter), $reserved);
             return [$rawBody[1], $reserved];
         }
         return [null, null];
     }
 
     /**
-     * 删除任务
-     *
+     * 删除保留任务
      * @param string $queue
      * @param RedisJob $job
      * @return void
      */
-    public function deleteReserved($queue, $job)
+    public function deleteReserved($queue = null, $job = null)
     {
-        $this->redis->zRem($this->getQueue($queue) . ':reserved', $job->getJobReserved());
+        $prefixedQueue = $this->getPrefixQueue($queue);
+        $this->redis->zRem($prefixedQueue . ':reserved', $job->getJobReserved());
     }
 
     /**
-     * Delete a reserved job from the reserved queue and release it.
+     * 从保留队列中删除保留作业并释放它。
      *
      * @param string $queue
      * @param RedisJob $job
      * @param int $delay
      * @return void
      */
-    public function deleteAndRelease($queue, $job, $delay)
+    public function deleteAndRelease($queue = null, $job = null, $delay = 0)
     {
-        $queue = $this->getQueue($queue);
+        $prefixedQueue = $this->getPrefixQueue($queue);
         $reserved = $job->getJobReserved();
-        $this->redis->zRem($queue . ':reserved', $reserved);
-        $this->redis->zAdd($queue . ':delayed', $this->availableAt($delay), $reserved);
+        $this->redis->zRem($prefixedQueue . ':reserved', $reserved);
+        $this->redis->zAdd($prefixedQueue . ':delayed', $this->availableAt($delay), $reserved);
 
         // $this->redis->rPush($queueName, $msg);
     }
@@ -243,17 +200,16 @@ class RedisConnector extends Connector
         }
     }
 
-
     /**
      * 获取队列名
      *
      * @param string|null $queue
      * @return string
      */
-    protected function getQueue($queue)
+    protected function getPrefixQueue(string|null $queue = '')
     {
         $exchange = $this->exchangeName ?: 'queues';
-        $queue = $queue ?: $this->default;
+        $queue = !empty($queue) ? $queue : $this->queueName;
         return "{$exchange}:{$queue}";
     }
     /**
@@ -288,22 +244,20 @@ class RedisConnector extends Connector
         //     ];
         // }
         if (!empty($msg)) {
-            $this->setMessage($msg);
+            $this->setMsgData($msg);
         }
-        $msgData = $this->getMessage();
-        $payload =  $this->createPayload($this->jobServer, $msgData);
-
+        $payload =  $this->createPayload($this->jobServer);
         // 判断是否 定时队列
-        $queueName = $this->getQueue($this->queueName);
+        $prefixedQueue = $this->getPrefixQueue($this->queueName);
         if (!empty($this->msgDelay) && $this->msgDelay) {
             // return $this->redis->zAdd($queue_delay, $this->msgActualTime, $payload);
-            if ($this->redis->zadd("{$queueName}:delayed", $this->availableAt($this->msgDelay), $payload)) {
+            if ($this->redis->zadd("{$prefixedQueue}:delayed", $this->availableAt($this->msgDelay), $payload)) {
                 $res = json_decode($payload, true)['id'] ?? null;
             }
         } else {
-            // return $this->redis->lPush($queueName, $payload);
+            // return $this->redis->lPush($prefixedQueue, $payload);
             // $this->redis->lPush(['some', 'data']);
-            if ($this->redis->rPush($queueName, $payload)) {
+            if ($this->redis->rPush($prefixedQueue, $payload)) {
                 $res = json_decode($payload, true)['id'] ?? null;
             }
         }
@@ -317,7 +271,7 @@ class RedisConnector extends Connector
      */
     public function retryPublish($payload, $queue = null, array $options = [])
     {
-        if ($this->redis->rPush($this->getQueue($queue), $payload)) {
+        if ($this->redis->rPush($this->getPrefixQueue($queue), $payload)) {
             return json_decode($payload, true)['id'] ?? null;
         }
     }
@@ -344,11 +298,7 @@ class RedisConnector extends Connector
         $data = $this->connection->rPop('send_captcha');
     }
     // 订阅
-    public function subscribe(mixed $queue, callable $callback)
-    {
-    }
+    public function subscribe(mixed $queue, callable $callback) {}
     // 取消订阅
-    public function unsubscribe(mixed $queue, callable $callback)
-    {
-    }
+    public function unsubscribe(mixed $queue, callable $callback) {}
 }

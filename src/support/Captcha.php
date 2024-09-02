@@ -8,8 +8,7 @@ use think\Facade;
 
 /**
  * Class Captcha
- * @package think\captcha\facade
- * @mixin \think\captcha\Captcha
+ * @package shiyun\libs\facade
  * @mixin \shiyun\libs\Captcha
  */
 class Captcha extends Facade

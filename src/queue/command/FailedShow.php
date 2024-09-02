@@ -5,6 +5,7 @@ namespace shiyunQueue\command;
 use think\console\Command;
 use think\console\Table;
 use think\helper\Arr;
+use think\Container;
 
 class FailedShow extends Command
 {
@@ -40,9 +41,10 @@ class FailedShow extends Command
      */
     protected function getFailedJobs()
     {
-        $config = $this->app->config->get('queue.failed', []);
+        $config = syGetConfig('queue.failed', []);
         $type = \think\helper\Arr::pull($config, 'type', 'none');
-        $queueFailerObj = $this->app->invokeClass("\shiyunQueue\drive\{$type}Failed::class", [$config]);
+
+        $queueFailerObj = Container::getInstance()->invokeClass("\shiyunQueue\drive\{$type}Failed::class", [$config]);
 
         $failed = $queueFailerObj->all();
         return collect($failed)->map(function ($failed) {

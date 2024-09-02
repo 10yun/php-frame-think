@@ -11,21 +11,15 @@
 
 namespace shiyunQueue\drive;
 
-use think\App;
 use shiyunQueue\drive\Job;
+use think\Container;
 
 class CallQueuedHandler
 {
-    protected $app;
-
-    public function __construct(App $app)
-    {
-        $this->app = $app;
-    }
     public function call(Job $job, array $data)
     {
         $command = unserialize($data['command']);
-        $this->app->invoke([$command, 'handle']);
+        Container::getInstance()->invoke([$command, 'handle']);
         if (!$job->isDeletedOrReleased()) {
             $job->delete();
         }

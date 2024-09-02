@@ -3,7 +3,6 @@
 namespace shiyunQueue\process;
 
 use shiyunWorker\WorkermanServer;
-use Workerman\Worker;
 
 class QueueMqtt extends WorkermanServer
 {
@@ -20,9 +19,7 @@ class QueueMqtt extends WorkermanServer
     {
         parent::__construct();
     }
-    protected function init()
-    {
-    }
+    protected function init() {}
     public function onWorkerStart()
     {
         // $mqtt = new QueueClient('mqtt://test.mosquitto.org:1883');

@@ -7,6 +7,7 @@ use think\console\Input;
 use think\console\input\Argument;
 use think\console\input\Option;
 use think\console\Output;
+use think\Container;
 
 class FailedFlush extends Command
 {
@@ -18,9 +19,10 @@ class FailedFlush extends Command
     // 删除所有失败的队列作业
     public function deleteData()
     {
-        $config = $this->app->config->get('queue.failed', []);
+        $config = syGetConfig('queue.failed', []);
         $type = \think\helper\Arr::pull($config, 'type', 'none');
-        $queueFailerObj = $this->app->invokeClass("\shiyunQueue\drive\{$type}Failed::class", [$config]);
+
+        $queueFailerObj = Container::getInstance()->invokeClass("\shiyunQueue\drive\{$type}Failed::class", [$config]);
         $queueFailerObj->flush();
 
         return sendRespSucc('所有失败的作业已成功删除');
@@ -34,9 +36,9 @@ class FailedFlush extends Command
         if (empty($id)) {
             return sendRespError('没有与给定ID匹配的失败作业。');
         }
-        $config = $this->app->config->get('queue.failed', []);
+        $config = syGetConfig('queue.failed', []);
         $type = \think\helper\Arr::pull($config, 'type', 'none');
-        $queueFailerObj = $this->app->invokeClass("\shiyunQueue\drive\{$type}Failed::class", [$config]);
+        $queueFailerObj = Container::getInstance()->invokeClass("\shiyunQueue\drive\{$type}Failed::class", [$config]);
 
         if ($queueFailerObj->forget($this->input->getArgument('id'))) {
             $this->output->info('Failed job deleted successfully!');

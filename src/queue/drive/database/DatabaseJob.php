@@ -10,7 +10,6 @@
 // +----------------------------------------------------------------------
 namespace shiyunQueue\drive\database;
 
-use think\App;
 use shiyunQueue\drive\Job;
 
 class DatabaseJob extends Job
@@ -27,9 +26,8 @@ class DatabaseJob extends Job
      */
     protected $job;
 
-    public function __construct(App $app, DatabaseConnector $database, $job, $connection, $queue)
+    public function __construct(DatabaseConnector $database, $job, $connection, $queue)
     {
-        $this->app        = $app;
         $this->job        = $job;
         $this->queue      = $queue;
         $this->database   = $database;
@@ -53,9 +51,7 @@ class DatabaseJob extends Job
     public function release($delay = 0)
     {
         parent::release($delay);
-
         $this->delete();
-
         $this->database->release($this->queue, $this->job, $delay);
     }
     /**

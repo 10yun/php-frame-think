@@ -41,7 +41,5 @@ class JobExceptionOccurred
         $this->connectionName = $connectionName;
     }
 
-    public function handle()
-    {
-    }
+    public function handle() {}
 }
