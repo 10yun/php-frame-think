@@ -14,6 +14,12 @@ use think\console\input\Option;
 use think\console\Output;
 use shiyun\route\annotation\RouteFlag;
 use shiyun\route\annotation\RouteRestful;
+use shiyun\route\annotation\RouteGroup;
+use shiyun\route\annotation\RouteGet;
+use shiyun\route\annotation\RoutePost;
+use shiyun\route\annotation\RoutePut;
+use shiyun\route\annotation\RoutePatch;
+use shiyun\route\annotation\RouteDelete;
 
 /**
  * 根据注解生成 FLAG：url
@@ -130,40 +136,115 @@ class CreateApiFlag extends Command
 
                 $reflectionClass = new ReflectionClass($namespace);
                 $RouteFlagAttrs = $reflectionClass->getAttributes(RouteFlag::class);
-                $RouteRestfulAtts = $reflectionClass->getAttributes(RouteRestful::class);
+                $RouteRestfulAttrs = $reflectionClass->getAttributes(RouteRestful::class);
+                $RouteGroupAttrs = $reflectionClass->getAttributes(RouteGroup::class);
+                $methods = $reflectionClass->getMethods();
 
-                if (empty($RouteFlagAttrs) || empty($RouteRestfulAtts)) {
-                    continue;
-                }
-                $routeFlagStr = '';
-                $routeRestfulStr = '';
-                foreach ($RouteFlagAttrs as $attribute) {
-                    // 拿到一个新的 Route 实例
-                    $route = $attribute->newInstance();
-                    // 拿到注解上的参数
-                    $params = $attribute->getArguments();
-                    // var_dump($route, $params);
-                    $routeFlagStr = $params[0] ?? '';
-                }
-                foreach ($RouteRestfulAtts as $attribute) {
-                    // 拿到一个新的 Route 实例
-                    $route = $attribute->newInstance();
-                    // 拿到注解上的参数
-                    $params = $attribute->getArguments();
-                    // var_dump($route, $params);    
-                    $routeRestfulStr = $params[0] ?? '';
-                }
-                if (empty($routeFlagStr) || empty($routeRestfulStr)) {
-                    continue;
-                }
+                $classFlagArr = $this->parseFlagClass($RouteFlagAttrs, $RouteRestfulAttrs);
+                $methodFlagArr = $this->parseFlagMethod($RouteGroupAttrs, $methods);
+
+                $flagArr = array_merge($flagArr, $classFlagArr, $methodFlagArr);
+            }
+        } catch (\Throwable $th) {
+            echo "{$error_controller} " . $th->getMessage() . "\n";
+            //throw $th;
+        }
+        return $flagArr;
+    }
+    // 处理【类级别】的注解
+    // 处理【类】上的 RouteFlag 和 RouteRestful 注解
+    protected function parseFlagClass($RouteFlagAttrs, $RouteRestfulAttrs)
+    {
+        $flagArr = [];
+        if (!empty($RouteFlagAttrs) && !empty($RouteRestfulAttrs)) {
+            $routeFlagStr = '';
+            $routeRestfulStr = '';
+            foreach ($RouteFlagAttrs as $attribute) {
+                // 拿到一个新的 Route 实例
+                // $route = $attribute->newInstance();
+                // 拿到注解上的参数
+                $params = $attribute->getArguments();
+                $routeFlagStr = $params[0] ?? '';
+            }
+            foreach ($RouteRestfulAttrs as $attribute) {
+                // 拿到一个新的 Route 实例
+                // $route = $attribute->newInstance();
+                // 拿到注解上的参数
+                $params = $attribute->getArguments();
+                $routeRestfulStr = $params[0] ?? '';
+            }
+            if (!empty($routeFlagStr) && !empty($routeRestfulStr)) {
                 $flagArr[] = [
                     'flag' => $routeFlagStr,
                     'restfule' => $routeRestfulStr
                 ];
             }
-        } catch (\Throwable $th) {
-            echo "{$error_controller} " . $th->getMessage() . "\n";
-            //throw $th;
+        }
+        return $flagArr;
+    }
+    // 处理【方法级别】的注解
+    protected function parseFlagMethod($RouteGroupAttrs, $methods)
+    {
+        $flagArr = [];
+        $groupPath = '';
+        if (!empty($RouteGroupAttrs)) {
+            foreach ($RouteGroupAttrs as $attribute) {
+                $params = $attribute->getArguments();
+                $groupPath = $params[0] ?? '';
+            }
+        }
+        foreach ($methods as $method) {
+            $RouteFlagAttrs = $method->getAttributes(RouteFlag::class);
+            $RouteGetAttrs = $method->getAttributes(RouteGet::class);
+            $RoutePostAttrs = $method->getAttributes(RoutePost::class);
+            $RoutePutAttrs = $method->getAttributes(RoutePut::class);
+            $RoutePatchAttrs = $method->getAttributes(RoutePatch::class);
+            $RouteDeleteAttrs = $method->getAttributes(RouteDelete::class);
+
+            if (empty($RouteFlagAttrs)) {
+                continue;
+            }
+
+            $routeFlagStr = '';
+            $routeMethodStr = '';
+            foreach ($RouteFlagAttrs as $attribute) {
+                $params = $attribute->getArguments();
+                $routeFlagStr = $params[0] ?? '';
+            }
+
+            if (!empty($RouteGetAttrs)) {
+                foreach ($RouteGetAttrs as $attribute) {
+                    $params = $attribute->getArguments();
+                    $routeMethodStr = $groupPath . '/' . ($params[0] ?? '');
+                }
+            } elseif (!empty($RoutePostAttrs)) {
+                foreach ($RoutePostAttrs as $attribute) {
+                    $params = $attribute->getArguments();
+                    $routeMethodStr = $groupPath . '/' . ($params[0] ?? '');
+                }
+            } elseif (!empty($RoutePutAttrs)) {
+                foreach ($RoutePutAttrs as $attribute) {
+                    $params = $attribute->getArguments();
+                    $routeMethodStr = $groupPath . '/' . ($params[0] ?? '');
+                }
+            } elseif (!empty($RoutePatchAttrs)) {
+                foreach ($RoutePatchAttrs as $attribute) {
+                    $params = $attribute->getArguments();
+                    $routeMethodStr = $groupPath . '/' . ($params[0] ?? '');
+                }
+            } elseif (!empty($RouteDeleteAttrs)) {
+                foreach ($RouteDeleteAttrs as $attribute) {
+                    $params = $attribute->getArguments();
+                    $routeMethodStr = $groupPath . '/' . ($params[0] ?? '');
+                }
+            }
+
+            if (!empty($routeFlagStr) && !empty($routeMethodStr)) {
+                $flagArr[] = [
+                    'flag' => $routeFlagStr,
+                    'restfule' => $routeMethodStr
+                ];
+            }
         }
         return $flagArr;
     }
