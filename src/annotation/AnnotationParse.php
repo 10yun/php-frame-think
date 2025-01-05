@@ -442,7 +442,7 @@ abstract class AnnotationParse
      * @param array|Closure|null $data
      * @return array|Closure|false|mixed
      */
-    public static function cacheAnnotation(string $className, string $tag, array|Closure $data = null)
+    public static function cacheAnnotation(?string $className, ?string $tag, array|Closure|null $data = null)
     {
         if (is_null($data)) {
             return self::$annotations[$className][$tag] ?? false;
@@ -465,7 +465,7 @@ abstract class AnnotationParse
      */
     protected static function filterScanAnnotations(array $annotations, array $scanAnnotations): array
     {
-        return $scanAnnotations ? array_filter($annotations, fn ($key, $class) => in_array($class, $scanAnnotations)) : $annotations;
+        return $scanAnnotations ? array_filter($annotations, fn($key, $class) => in_array($class, $scanAnnotations)) : $annotations;
     }
 
     /**
@@ -485,7 +485,7 @@ abstract class AnnotationParse
      * @param string|null $annotation
      * @return array|string|null
      */
-    public static function getHandle(string $annotation = null): array|string|null
+    public static function getHandle(?string $annotation = null): array|string|null
     {
         return $annotation ? self::$handle[$annotation] ?? null : self::$handle;
     }
@@ -509,7 +509,7 @@ abstract class AnnotationParse
      * @param string|null $handleClass
      * @return array
      */
-    public static function removeHandle(string $annotationClass, string $handleClass = null): array
+    public static function removeHandle(string $annotationClass, ?string $handleClass = null): array
     {
         if ($handleClass) {
             $key = array_search($handleClass, self::$handle[$annotationClass] ?? []);

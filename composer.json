@@ -41,9 +41,10 @@
         "ext-fileinfo": "*",
         "ext-json": "*",
         "php": "^8",
+        "revolt/event-loop": "^1.0",
         "shiyun/php-utils": "@dev",
         "workerman/crontab": "^1.0",
-        "workerman/workerman": "^4",
+        "workerman/workerman": "^5",
         "workerman/gateway-worker": "^3",
         "workerman/gatewayclient": "^3"
     },
@@ -65,10 +66,12 @@
     },
     "autoload": {
         "psr-4": {
+            "shiyunHelpers\\": "src\\helpers",
+            "shiyunLibs\\": "src\\libs",
+            "shiyunOpensdk\\": "src\\opensdk",
             "shiyunQueue\\": "src\\queue",
             "shiyunRpc\\": "src\\rpc",
             "shiyunWorker\\": "src\\worker",
-            "shiyunOpensdk\\": "src\\opensdk",
             "shiyun\\": "src"
         },
         "files": [

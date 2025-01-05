@@ -8,11 +8,11 @@ use think\facade\Cache;
 use think\facade\Db;
 use think\facade\Route;
 
-function frameGetConfig($flag = null)
+function frameGetConfig(?string $flag = null)
 {
     return Config::get($flag);
 }
-function frameGetEnv(string $name = null, $default = null)
+function frameGetEnv(?string $name = null, ?string $default = null)
 {
     return Env::get($name, $default);
 }

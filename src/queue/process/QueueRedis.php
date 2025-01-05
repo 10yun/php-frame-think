@@ -123,6 +123,8 @@ class QueueRedis extends WorkermanServer
 
             foreach ($properties as $property) {
                 $pro_key       = $property->getName();
+                // 确保可以访问 protected 或 private 属性
+                $property->setAccessible(true);
                 $pro_val       = $property->getValue($consumeClassObj);
                 $consumeClassOpt[$pro_key] = $pro_val;
             }
@@ -135,11 +137,18 @@ class QueueRedis extends WorkermanServer
             /**
              * 判断参数是否存在
              */
+            if (!property_exists($consumeClassObj, 'connect_name')) {
+                throw new QueueException($class . ' -> connect_name 参数不存在');
+            }
+            if (!property_exists($consumeClassObj, 'queue_name')) {
+                throw new QueueException($class . ' -> queue_name 参数不存在');
+            }
             if (
                 empty($consumeClassOpt['connect_name']) || empty($consumeClassOpt['queue_name'])
             ) {
-                throw new QueueException($class . ' connect 参数不存在');
+                throw new QueueException($class . ' connect 参数为空');
             }
+
             $consumeClassOpt['exchange_name'] = !empty($consumeClassOpt['exchange_name']) ? $consumeClassOpt['exchange_name'] : 'queues';
             // $consumeClassOpt['exchange_name'] = !empty($consumeClassOpt['exchange_name']) ? $consumeClassOpt['exchange_name'] : '';
 

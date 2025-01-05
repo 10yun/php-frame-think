@@ -44,7 +44,7 @@ class LoadAppEvent
     {
         // 这边可以判断缓存是否存在
         $isDebug = $this->app->isDebug();
-        $envProjectEnvironment = frameGetEnv('ctocode.PROJECT_ENVIRONMENT');
+        $envProjectEnvironment = frameGetEnv('PROJECT_ENVIRONMENT');
 
         $loadCache = [];
         $cacheOptimizePath = _PATH_RUNTIME_ . '/shiyun_optimize/events.php';

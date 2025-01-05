@@ -1,19 +1,23 @@
 <?php
 
 define('__CTOCODE__', [
-    '_version_' => 'ctocode-v8.24.0802',
-    /* 软件名称 */
-    '_frame_name_' => 'ctocode-frame',
-    /* 版本号等信息 */
-    '_frame_build_' => '8.24.0802',
-    '_frame_author_' => 'ctocode',
-    '_frame_link_' => 'http://ctocode.com/',
-    /* 版权 */
-    '_copyright_' => 'http://ctocode.com/',
+    // 品牌
+    '_brand_' => 'ctocode',
+    // 版本
+    '_version_' => '8.25.0105',
+    // 官网
+    '_website_' => 'https://www.10yun.com/ctocode',
+    // 作者
+    '_author_' => [
+        'ctocode',
+        'Titanic'
+    ],
+    // 版权
+    '_copyright_' => 'Copyright © 2017 福州十云科技有限公司',
     /* 许可证 */
     '_license_type_' => '',
-    '_license_id_' => 'V20230713',
-    '_license_key_' => 'ctocodeV20230713',
+    '_license_id_' => 'v20250105',
+    '_license_key_' => 'ctocode-v20250105',
 ]);
 
 

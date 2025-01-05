@@ -80,7 +80,7 @@ class BaseCrossMiddle
         ];
 
         // $all_origin = array(
-        // 	'http://console.' . env('ctocode.url_domain_base')
+        // 	'http://console.' . env('URL_DOMAIN_BASE')
         // );
         // $request->header ( 'Origin',$all_origin );
         // OPTIONS请求返回204请求

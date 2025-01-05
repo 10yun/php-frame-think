@@ -39,8 +39,16 @@ abstract class Connector
             $this->push($job, $data, $queue);
         }
     }
-    public function getPublish()
-    {
-        return [];
-    }
+    /**
+     * 获取发布的内容
+     */
+    abstract public function getPublish();
+    // public function getPublish()
+    // {
+    //     return [];
+    // }
+    /**
+     * 发布内容
+     */
+    abstract public function sendPublish(array|string|int|null $msg = null);
 }

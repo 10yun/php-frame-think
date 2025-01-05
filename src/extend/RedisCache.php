@@ -3,7 +3,6 @@
 namespace shiyun\extend;
 
 use shiyunUtils\helper\HelperRandom;
-use shiyunUtils\helper\HelperType;
 use shiyunUtils\helper\HelperArr;
 use shiyun\support\Cache;
 

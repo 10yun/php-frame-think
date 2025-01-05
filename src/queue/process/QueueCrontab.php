@@ -115,6 +115,8 @@ class QueueCrontab extends WorkermanServer implements InterfaceProcess
 
             foreach ($properties as $property) {
                 $pro_key       = $property->getName();
+                // 确保可以访问 protected 或 private 属性
+                $property->setAccessible(true);
                 $pro_val       = $property->getValue($consumeClassObj);
                 $consumeClassOpt[$pro_key] = $pro_val;
             }
@@ -127,10 +129,14 @@ class QueueCrontab extends WorkermanServer implements InterfaceProcess
             /**
              * 判断参数是否存在
              */
-            if (
-                empty($consumeClassOpt['execute_timing'])
-            ) {
-                throw new CrontabException($class . ' execute_timing 参数不存在');
+            if (!property_exists($consumeClassObj, 'execute_timing')) {
+                throw new CrontabException($class . ' -> execute_timing 参数不存在');
+            }
+            /**
+             * 空值跳过
+             */
+            if (empty($consumeClassOpt['execute_timing'])) {
+                return false;
             }
 
             // $consumeQeObj = \shiyunQueue\QueueFactory::getInstance()

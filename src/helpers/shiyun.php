@@ -20,7 +20,7 @@ function syPathRuntime()
     return _PATH_PROJECT_ . 'runtime/';
 }
 // 获取配置
-function syGetConfig(string $key = null, $default = [])
+function syGetConfig(?string $key = null, $default = [])
 {
     $configPath = _PATH_PROJECT_ . 'config/';
     \shiyun\libs\Config::init($configPath);
@@ -29,7 +29,7 @@ function syGetConfig(string $key = null, $default = [])
 }
 function syGetVersion()
 {
-    return __CTOCODE__['_version_'];
+    return __CTOCODE__['_brand_'] . '-v' . __CTOCODE__['_version_'];
 }
 function syGetHeader()
 {
@@ -43,7 +43,7 @@ function syGetHeader()
 }
 function syGetEnvironment()
 {
-    $envProjectEnvironment = frameGetEnv('ctocode.PROJECT_ENVIRONMENT');
+    $envProjectEnvironment = frameGetEnv('PROJECT_ENVIRONMENT');
     if (empty($envProjectEnvironment)) {
         return false;
     }
@@ -84,7 +84,7 @@ function syGetEnvArr()
  */
 function syGetProjectPath($proStr = '', bool $isForcePathOpen = false)
 {
-    $envProjectPath = Env::get('ctocode.PROJECT_PATH', 'off');
+    $envProjectPath = Env::get('PROJECT_PATH', 'off');
     if ($isForcePathOpen) {
         return root_path() . '/project/' . $proStr . '/';
     }
@@ -174,7 +174,7 @@ function syOpenAppsAuth($key = '')
  * 支持多级获取 A.b.c
  * @param $name 
  */
-function syOpenAppsConfig(string $name = null)
+function syOpenAppsConfig(?string $name = null)
 {
     $data = app('SyOpenAppsConfig')->getSett();
     if (is_null($name)) {

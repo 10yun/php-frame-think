@@ -15,6 +15,6 @@ class Captcha extends Facade
 {
     protected static function getFacadeClass()
     {
-        return \shiyun\libs\Captcha::class;
+        return \shiyun\libs\LibCaptcha::class;
     }
 }

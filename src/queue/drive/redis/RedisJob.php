@@ -75,9 +75,7 @@ class RedisJob extends Job
     {
         parent::release($delay);
         $this->redis->setExchangeName($this->exchange);
-        // $this->redis->setQueueName($this->queue);
         $this->redis->deleteAndRelease($this->queue, $this, $delay);
-        // $this->redis->deleteAndRelease(null, $this, $delay);
     }
 
     /**

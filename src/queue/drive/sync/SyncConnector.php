@@ -4,10 +4,9 @@ namespace shiyunQueue\drive\sync;
 
 use Exception;
 use shiyunQueue\drive\Connector;
-use shiyunQueue\drive\InterfaceConnector;
 use Throwable;
 
-class SyncConnector extends Connector implements InterfaceConnector
+class SyncConnector extends Connector
 {
     protected $connectHandle;
 

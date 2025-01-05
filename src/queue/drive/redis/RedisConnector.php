@@ -14,16 +14,14 @@ namespace shiyunQueue\drive\redis;
 use Closure;
 use Exception;
 use shiyunQueue\drive\Connector;
-use shiyunQueue\drive\InterfaceConnector;
 use shiyunQueue\libs\InteractsWithTime;
 use shiyunQueue\drive\redis\RedisLib;
 
-// implements InterfaceConnector
 class RedisConnector extends Connector
 {
     use InteractsWithTime;
 
-    /** @var  \Redis */
+    /** @var \Redis */
     protected $redis;
 
     /**
@@ -68,8 +66,8 @@ class RedisConnector extends Connector
         $exchange = $this->getExchangeName();
         $queue = $this->getQueueName();
         $this->migrate($prefixedQueue);
-
-        if (empty($nextJob = $this->retrieveNextJob($prefixedQueue))) {
+        $nextJob = $this->retrieveNextJob($prefixedQueue);
+        if (empty($nextJob)) {
             return;
         }
         [$job, $reserved] = $nextJob;
@@ -101,7 +99,11 @@ class RedisConnector extends Connector
     public function migrateExpiredJobs($from, $to, $attempt = true)
     {
         $this->redis->watch($from);
-        $jobs = $this->redis->zRangeByScore($from, '-inf', $this->currentTime());
+        $currTime = $this->currentTime(); // 当前时间
+        // $currTime = $this->currentTime() + 600; // 未来10分钟
+        $jobs = $this->redis->zRangeByScore($from, '-inf', $currTime);
+
+        // $jobs = $this->redis->zRange($from, 0, -1, ['withscores' => true]);
         if (!empty($jobs)) {
             $this->transaction(function () use ($from, $to, $jobs, $attempt) {
                 $this->redis->zRemRangeByRank($from, 0, count($jobs) - 1);
@@ -113,7 +115,26 @@ class RedisConnector extends Connector
         }
         $this->redis->unwatch();
     }
-
+    /**
+     * redis事务
+     * @param Closure $closure
+     */
+    protected function transaction(Closure $closure)
+    {
+        $this->redis->multi();
+        try {
+            call_user_func($closure);
+            if (!$this->redis->exec()) {
+                // var_dump("Redis 事务执行失败，准备 discard。");
+                $this->redis->discard();
+            } else {
+                // var_dump("Redis 事务执行成功。");
+            }
+        } catch (Exception $e) {
+            // var_dump("Redis 事务抛出异常: " . $e->getMessage());
+            $this->redis->discard();
+        }
+    }
     /**
      * 从队列中检索下一个作业。
      * @param string $prefixedQueue
@@ -179,25 +200,7 @@ class RedisConnector extends Connector
         $reserved = $job->getJobReserved();
         $this->redis->zRem($prefixedQueue . ':reserved', $reserved);
         $this->redis->zAdd($prefixedQueue . ':delayed', $this->availableAt($delay), $reserved);
-
         // $this->redis->rPush($queueName, $msg);
-    }
-
-    /**
-     * redis事务
-     * @param Closure $closure
-     */
-    protected function transaction(Closure $closure)
-    {
-        $this->redis->multi();
-        try {
-            call_user_func($closure);
-            if (!$this->redis->exec()) {
-                $this->redis->discard();
-            }
-        } catch (Exception $e) {
-            $this->redis->discard();
-        }
     }
 
     /**
@@ -232,7 +235,7 @@ class RedisConnector extends Connector
      * @param 【第4参数】队列名称
      * 4.当任务归属的队列名称，如果为新队列，会自动创建
      */
-    public function sendPublish(?array $msg = null)
+    public function sendPublish(array|string|int|null $msg = null)
     {
         $queue_waiting = '{redis-queue}-waiting'; //1.0.5版本之前为redis-queue-waiting
         $queue_delay = '{redis-queue}-delayed'; //1.0.5版本之前为redis-queue-delayed

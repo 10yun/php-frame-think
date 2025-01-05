@@ -14,9 +14,7 @@ class NoneFailed extends FailedJob
      * @param string     $payload
      * @param \Exception $exception
      */
-    public function log($connection, $queue, $payload, $exception)
-    {
-    }
+    public function log($connection, $queue, $payload, $exception) {}
 
     /**
      * Get a list of all of the failed jobs.
@@ -33,9 +31,7 @@ class NoneFailed extends FailedJob
      *
      * @param mixed $id
      */
-    public function find($id)
-    {
-    }
+    public function find($id) {}
 
     /**
      * Delete a single failed job from storage.
@@ -53,7 +49,5 @@ class NoneFailed extends FailedJob
      *
      * @return void
      */
-    public function flush()
-    {
-    }
+    public function flush() {}
 }

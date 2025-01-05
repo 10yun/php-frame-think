@@ -32,7 +32,7 @@ class SyAuthTokenMiddle
         }
         if (
             $syAppsAccess
-            && ($syAppsAccess['ucenter_state'] == 9 || $syAppsAccess['ucenter_state'] == 'disable')
+            && ($syAppsAccess['account_state'] == 9 || $syAppsAccess['account_state'] == 'disable')
         ) {
             return sendRespCode200('100400');
         }

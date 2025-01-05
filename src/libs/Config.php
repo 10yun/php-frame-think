@@ -24,7 +24,7 @@ class Config
      * @param mixed $default
      * @return array|mixed|null
      */
-    public static function get(string $key = null, $default = null)
+    public static function get(?string $key = null, $default = null)
     {
         if ($key === null) {
             return static::$_config;

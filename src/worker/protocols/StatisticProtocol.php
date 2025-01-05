@@ -1,5 +1,7 @@
 <?php
 
+namespace shiyunWorker\protocols;
+
 /**
  *
  * struct statisticPortocol
@@ -68,7 +70,15 @@ class StatisticProtocol
      * @return string
      */
     public static function encode($module, $interface, $cost_time, $success,  $code = 0, $msg = '')
+    //public static function encode($data)
     {
+        //$module = $data['module'];
+        //$interface = $data['interface'];
+        //$cost_time = $data['cost_time'];
+        //$success = $data['success'];
+        //$code = isset($data['code']) ? $data['code'] : 0;
+        //$msg = isset($data['msg']) ? $data['msg'] : '';
+
         // 防止模块名过长
         if (strlen($module) > self::MAX_CHAR_VALUE) {
             $module = substr($module, 0, self::MAX_CHAR_VALUE);
@@ -93,7 +103,7 @@ class StatisticProtocol
 
     /**
      * 解包
-     * @param string $bin_data
+     * @param string $bin_data ($recv_buffer)
      * @return array
      */
     public static function decode($bin_data)

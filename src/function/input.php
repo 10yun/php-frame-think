@@ -16,46 +16,6 @@
  */
 
 /**
- * 类似 $_REQUEST，验证接收
- * 
- * @version 2017-06-22
- * @param  string $name   $key
- * @param  string $type   类型
- * @param  string $default 默认值
- * @return mixed
- */
-/**
- * 只接受想要的参数
- * @param array $needArr
- * @return array
- */
-function ctoRequestOnly($needArr = [])
-{
-    $requestData = [];
-    foreach ($needArr as $key => $val) {
-        $inputStr = '';
-        $inputDefault = '';
-        if (is_numeric($key)) {
-            $inputStr = $val;
-        } elseif (is_string($key)) {
-            $inputStr = $key;
-            $inputDefault = $val;
-        }
-        if (empty($inputStr)) {
-            continue;
-        }
-        $inputName = $inputStr;
-        $inputType = 'string';
-        if (strpos($inputStr, "/") !== false) {
-            $inputArr = explode("/", $inputStr);
-            $inputName = $inputArr[0]; // 接受字段
-            $inputType = $inputArr[1];
-        }
-        $requestData[$inputName] = ctoRequest($inputName, $inputType, $inputDefault);
-    }
-    return $requestData;
-}
-/**
  * @action 获取输入参数 自动判断get或者post,支持过滤和默认值
  *  验证 接受表单的name 的值是否符合sql字段中的类型，
  *  自动赋予默认值
@@ -159,40 +119,4 @@ function ctoValueCheck($value, $type = 'string', $default = null)
             break;
     }
     return $return;
-}
-/**
- * @action 金额 小数 转换 int
- * @version 2016-08-08 
- */
-function ctoValueMoneyEn($money = null)
-{
-    if (empty($money)) {
-        return 0;
-    }
-    if (is_numeric($money)) {
-        $int_money = ($money * 100);
-        // $int_money = intval ( $int_money );
-        $int_money = (float) ($int_money);
-    } else {
-        $int_money = 0;
-    }
-    return $int_money;
-}
-/**
- * @action int 转换 金额小数
- * @author zhw
- * @version 2016-08-08
- */
-function ctoValueMoneyDe($money = null)
-{
-    if (empty($money)) {
-        return '0.00';
-    }
-    if (is_numeric($money)) {
-        $int_money = $money / 100;
-        $int_money = sprintf("%.2f", $int_money);
-    } else {
-        $int_money = 0;
-    }
-    return $int_money;
 }

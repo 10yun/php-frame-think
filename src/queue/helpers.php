@@ -17,8 +17,8 @@ if (!function_exists('queue_producer')) {
     function queue_producer(
         string $connectName,
         string $exchangeName = '',
-        string|array $queueName = null,
-        string|array|int $msg = null,
+        string|array|null $queueName = null,
+        string|array|int|null $msg = null,
         int $delay = 0
     ) {
         \shiyunQueue\QueueFactory::getInstance()
@@ -40,7 +40,7 @@ if (!function_exists('queue_get_message')) {
     function queue_get_message(
         string $connectName,
         string $exchangeName = '',
-        string|array $queueName = null,
+        string|array|null $queueName = null,
     ) {}
 }
 /**

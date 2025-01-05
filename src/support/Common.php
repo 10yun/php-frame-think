@@ -44,7 +44,7 @@ class Common
         $pattern_test1 = '/^\/tests\/(\w+)\//'; // 正则 - 测试1
         $pattern_test2 = '/^\/tests\/(\w+)\.(\w+)\//'; // 正则 - 测试2
 
-        $envProjectEnvironment = frameGetEnv('ctocode.PROJECT_ENVIRONMENT');
+        $envProjectEnvironment = frameGetEnv('PROJECT_ENVIRONMENT');
         if ($envProjectEnvironment === 'development') {
             if (preg_match($pattern_test2, $request_uri, $matches)) {
                 $this->addonPath = "addons/{$matches[1]}/$matches[2]/";
@@ -72,12 +72,14 @@ class Common
     {
         $math_rule_type = $this->parseRouteRuleType();
         if (in_array($math_rule_type, [
-            'rule_test_1', 'rule_test_2'
+            'rule_test_1',
+            'rule_test_2'
         ])) {
             return $this->addonPath . 'tests';
         }
         if (in_array($math_rule_type, [
-            'rule_http_1', 'rule_http_2'
+            'rule_http_1',
+            'rule_http_2'
         ])) {
             return $this->addonPath . 'controller';
         }
@@ -89,8 +91,10 @@ class Common
     {
         $math_rule_type = $this->parseRouteRuleType();
         if (in_array($math_rule_type, [
-            'rule_test_1', 'rule_test_2',
-            'rule_http_1', 'rule_http_2'
+            'rule_test_1',
+            'rule_test_2',
+            'rule_http_1',
+            'rule_http_2'
         ])) {
             return $this->addonPath . 'config/database.php';
         }

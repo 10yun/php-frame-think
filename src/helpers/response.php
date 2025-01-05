@@ -119,7 +119,7 @@ function sendAjaxError($msg, $data = [], $ret = 0, $abortCode = 404)
  */
 function sendRespCode200($code = 0, $isReturn = false): Response
 {
-    $codeObj = new \app\common\lib\ResponseCode();
+    $codeObj = new \app\common\ResponseCode();
     $codeArr = $codeObj->getCodeArr();
     $msg = $codeArr[$code] ?? '暂无该状态码信息';
     $codeReturn = [
@@ -134,7 +134,7 @@ function sendRespCode200($code = 0, $isReturn = false): Response
 }
 function sendRespCode401($code = 0, $isReturn = false): Response
 {
-    $codeObj = new \app\common\lib\ResponseCode();
+    $codeObj = new \app\common\ResponseCode();
     $codeArr = $codeObj->getCodeArr();
     $msg = $codeArr[$code] ?? '暂无该状态码信息';
     $codeReturn = [

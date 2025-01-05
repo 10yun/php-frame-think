@@ -7,6 +7,7 @@ use Exception;
 use RuntimeException;
 use shiyun\support\Cache;
 use think\exception\Handle as ExceptHandle;
+use shiyunQueue\drive\Connector;
 use shiyunQueue\drive\Job;
 use shiyunQueue\exception\MaxAttemptsExceededException;
 use shiyunQueue\exception\TimeoutException;
@@ -55,16 +56,28 @@ trait ProcessWorker
         $this->item_logs = '';
 
         try {
+            /**
+             * @var Connector $consumeQeObj
+             * @var Job $consumeJobObj
+             */
             $consumeJobObj = $consumeQeObj
                 ->setExchangeName($consumeClassOpt['exchange_name'])
                 ->setQueueName($consumeClassOpt['queue_name'])
                 ->getPublish();
 
+            // if ($consumeClassOpt['queue_name'] == 'QueueCicdStart') {
+            //     var_dump(
+            //         '---$consumeJobObj----',
+            //         $consumeJobObj
+            //     );
+            //     // var_dump($consumeJobObj->getJobRawBody(), $consumeJobObj->getJobReserved(), $consumeJobObj->payload());
+            //     var_dump($consumeJobObj->payload());
+            // }
+
             if (empty($consumeJobObj) || is_null($consumeJobObj)) {
                 throw new JobObjNoMoreException($consumeClassOpt['queue_name'] . ' 队列对象，没有更多');
             }
             $consumeJobMsg = $consumeJobObj->payload();
-            // var_dump($consumeJobObj->getJobRawBody(), $consumeJobObj->getJobReserved(), $consumeJobObj->payload());
 
             if (empty($consumeJobMsg)) {
                 throw new JobMsgNoMoreException($consumeClassOpt['queue_name'] . ' 队列消息，没有更多');
@@ -73,19 +86,35 @@ trait ProcessWorker
             $job_id = $consumeJobObj->getJobId();
             $job_name = $consumeJobObj->getName();
 
-            if (!empty($this->jobState[$job_id])) {
+            if (!empty($this->jobState[$job_id]) && $this->jobState[$job_id] == 'ing') {
                 throw new JobMsgNoMoreException($consumeClassOpt['queue_name'] . ' 队列消息，在进行中');
             }
-            // $jobState[$consumeJobObj->]
             $this->dealEchoDebug($class_name, '① 开始', '');
-            $lastOption = $this->getLastPeizhi($consumeJobObj, $consumeClassOpt);
+
+            /**
+             * 获取任务配置参数
+             */
+
+            // 最大错误次数 20
+            $errorMaxAllow = $consumeJobObj->payload('allowError', 0);
+            // 允许最大的重试 20
+            $jobTriesMax = $consumeJobObj->payload('maxTries');
+            $_last_TriesMax = !is_null($jobTriesMax) ? $jobTriesMax : (int) ($consumeClassOpt['tries_max'] ?? 0);
+            // 已经重试
+            $_last_TriesAttempts = $consumeJobObj->getJobAttemptsNum();
+            // 允许超时
+            $_last_TimeoutAt = $consumeJobObj->getTimeoutAt();
+            // 最大的超时 20
+            $_last_TimeoutMax = $consumeClassOpt['timeout_max'] ?? 0;
+
+
             /**
              * 判断环境
              */
             if ($this->supportsAsyncSignals()) {
                 $this->listenForSignals();
                 // 注册超时
-                $this->registerTimeoutHandler($consumeJobObj, $lastOption['last_timeout_max']);
+                $this->registerTimeoutHandler($consumeJobObj, $_last_TimeoutMax);
             }
             /**
              * ② 参数判断
@@ -102,24 +131,24 @@ trait ProcessWorker
             /**
              * 是否超时
              */
-            if ($lastOption['last_timeout_at'] && $currTime <= $lastOption['last_timeout_at']) {
+            if ($_last_TimeoutAt && $currTime <= $_last_TimeoutAt) {
                 throw new TimeoutException($job_name . ' 作业可能已超时');
             }
             /**
              * 超过重试次数
              * 如果【已经】超过最大尝试次数，则将作业标记为失败
              */
-            if (!empty($lastOption['last_tries_max']) || $lastOption['last_tries_attempts'] <= $lastOption['last_tries_max']) {
+            if (!empty($_last_TriesMax) || $_last_TriesAttempts <= $_last_TriesMax) {
                 throw new MaxAttemptsExceededException($job_name . ' 尝试次数过多或运行时间过长');
             }
             /**
              * 如果【即将】超过最大尝试次数，则将作业标记为失败
              */
 
-            // if ($peizhiTimeoutAt && $peizhiTimeoutAt <= $currTime) {
+            // if ($_last_TimeoutAt && $_last_TimeoutAt <= $currTime) {
             //     $this->failJob($consumeQeObj, $consumeJobObj, $e);
             // }
-            // if ($peizhiTriesMax > 0 && $peizhiTriesAttempts >= $peizhiTriesMax) {
+            // if ($_last_TriesMax > 0 && $_last_TriesAttempts >= $_last_TriesMax) {
             //     $this->failJob($consumeQeObj, $consumeJobObj, $e);
             // }
 
@@ -161,7 +190,7 @@ trait ProcessWorker
                 }
             } else {
                 $currJobAttemptsNum  = $consumeJobObj->getJobAttemptsNum();
-                if ($currJobAttemptsNum >= $lastOption['last_error_max'] && $lastOption['last_error_max']) {
+                if ($currJobAttemptsNum >= $errorMaxAllow && $errorMaxAllow) {
                     /**
                      * 超过重试次数
                      */
@@ -169,7 +198,7 @@ trait ProcessWorker
 
                     $consumeJobObj->delete();
                     $this->dealItemLog($consumeClassObj, $consumeJobMsg);
-                    if (!empty($this->jobState[$job_id]) && $this->jobState[$job_id] == 'ing') {
+                    if (!empty($this->jobState[$job_id])) {
                         unset($this->jobState[$job_id]);
                     }
                 } else {
@@ -178,6 +207,10 @@ trait ProcessWorker
                      */
                     $this->dealEchoDebug($class_name, '⑦ 失败-重试', '');
                     $consumeJobObj->release();
+                    $this->jobState[$job_id] = 'retry';
+                    // if (!empty($this->jobState[$job_id]) && $this->jobState[$job_id] == 'ing') {
+                    //     unset($this->jobState[$job_id]);
+                    // }
                 }
             }
         } catch (MaxAttemptsExceededException $e) {
@@ -260,41 +293,13 @@ trait ProcessWorker
             \call_user_func([$consumeClassObj, 'onQueueLog'], $consumeJobMsg);
         }
     }
-
-    /**
-     * 获取任务配置参数
-     */
-    protected function getLastPeizhi(Job $jobObj, $consumeClassOpt = [])
-    {
-        // 最大错误次数 20
-        $errorMaxAllow = $jobObj->payload('allowError') ?? 0;
-        // 允许最大的重试 20
-        $jobTriesMax = $jobObj->payload('maxTries');
-        $peizhiTriesMax = !is_null($jobTriesMax) ? $jobTriesMax : (int) ($consumeClassOpt['tries_max'] ?? 0);
-        // 已经重试
-        $peizhiTriesAttempts = $jobObj->getJobAttemptsNum();
-        // 允许超时
-        $peizhiTimeoutAt = $jobObj->getTimeoutAt();
-        // 最大的超时 20
-        $peizhiTimeoutMax = $consumeClassOpt['timeout_max'] ?? 0;
-        // 设置的内存
-        $memory = 128;
-        return [
-            'last_sett_memory'      => $memory,
-            'last_error_max'        => $errorMaxAllow,
-            'last_tries_attempts'   => $peizhiTriesAttempts,
-            'last_tries_max'        => $peizhiTriesMax,
-            'last_timeout_at'       => $peizhiTimeoutAt,
-            'last_timeout_max'      => $peizhiTimeoutMax,
-        ];
-    }
     /**
      * 确定队列工作程序是否应重新启动
      */
     protected function stopIfNecessary($job)
     {
         // 获取内存
-        $memory = $lastOption['last_sett_memory'] ?? 128;
+        $memory = 128;
         // 获取队列重启时间
         $lastRestartTimer = null;
         $cacheRestartTimer = null;
