@@ -1,10 +1,11 @@
 {
     "name": "shiyun/php-think",
-    "version": "1.0.1",
     "type": "library",
+    "version": "1.0.1",
+    "license": "MIT",
     "description": "shiyun ctocode frame extend thinkphp  shiyun/php-think",
-    "description2": "php worker for shiyun，workerman的一些二次封装",
     "keywords": [
+        "shiyun",
         "mqtt",
         "mqtt_client",
         "mqtt3",
@@ -17,25 +18,26 @@
         "php",
         "workerman"
     ],
-    "homepage": "https://docs.10yun.com/php/",
-    "license2": "Apache-2.0",
-    "license": "MIT",
     "authors": [
         {
-            "name": "ctocode",
-            "email": "343196936@qq.com"
+            "name": "10yun",
+            "email": "git@10yun.com",
+            "homepage": "https://www.10yun.com/"
         },
         {
-            "name": "十云",
-            "email": "syky@10yun.com"
+            "name": "ctocode",
+            "email": "343196936@qq.com",
+            "homepage": "http://ctocode.com/"
         }
     ],
+    "homepage": "https://github.com/10yun/php-frame-think",
     "support": {
-        "email": "343196936@qq.com",
+        "source": "https://github.com/10yun/php-frame-think",
         "issues": "https://github.com/10yun/php-frame-think/issues",
-        "forum": "http://docs.10yun.com/php/",
-        "wiki": "http://docs.10yun.com/php/",
-        "source": "https://github.com/10yun/php-frame-think"
+        "package": "https://packagist.org/packages/shiyun/php-think",
+        "forum": "https://docs.10yun.com/php/",
+        "wiki": "https://docs.10yun.com/php/",
+        "email": "343196936@qq.com"
     },
     "require": {
         "ext-fileinfo": "*",
