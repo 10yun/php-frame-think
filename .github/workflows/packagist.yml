@@ -16,4 +16,4 @@ jobs:
           curl -X POST \
             -H "Content-Type: application/json" \
             "https://packagist.org/api/update-package?username=${{ secrets.PACKAGIST_USERNAME }}&apiToken=${{ secrets.PACKAGIST_SAFE_TOKEN }}" \
-            -d '{"repository":"https://github.com/shiyun/php-think"}'
+            -d '{"repository":"https://github.com/10yun/php-frame-think"}'
