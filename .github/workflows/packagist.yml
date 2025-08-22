@@ -1,0 +1,17 @@
+name: Update Packagist
+
+on:
+  push:
+    branches:
+      - main # 或者 master，看你项目默认分支
+    tags:
+      - "*" # 每次打 tag（发布新版本）也会触发
+
+jobs:
+  update-packagist:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify Packagist
+        run: |
+          curl -XPOST -u "${{ secrets.PACKAGIST_USERNAME}}:${{ secrets.PACKAGIST_TOKEN }}" \
+            https://packagist.org/api/update-package?package=shiyun/php-think
