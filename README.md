@@ -34,12 +34,6 @@ workerman,rpc,定时器,http,websocket,tcp
 https://docs.10yun.com/php/worker
 https://docs.10yun.com/php/rpc
 
-## 常用的一些方法工具
-
-- [数组](./docs/function_array.md)
-- [数字](./docs/function_num.md)
-- [随机生成](./docs/function_random.md)
-- [字符串](./docs/function_str.md)
 
   
 ## 常用的一些类库
