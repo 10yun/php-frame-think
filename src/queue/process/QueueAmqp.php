@@ -31,7 +31,7 @@ class QueueAmqp extends WorkermanServer
     {
         $this->cliCmd = $_SERVER['argv'][1];
         // $this->cliCmd = $_SERVER['argv'][2];
-        $this->connectConfig = syGetConfig('shiyun.queue.connections');
+        $this->connectConfig = syGetConfig('shiyun.process_queue.connections');
 
         $this->queue = $this->connectConfig['amqp1'] ?? [];
         parent::__construct();
@@ -89,7 +89,7 @@ class QueueAmqp extends WorkermanServer
     public function newConnection()
     {
         // 获取配置
-        $connectConfig = syGetConfig('shiyun.queue_amqp.channel.AMQP');
+        $connectConfig = syGetConfig('shiyun.process_queue.connections.AMQP');
         // 建立连接
         $this->connection = new AMQPStreamConnection(
             $connectConfig['connect_host'],

@@ -2,9 +2,7 @@
 
 namespace shiyunOpensdk\middleware;
 
-use shiyun\support\Db;
 use shiyun\support\Cache;
-use shiyun\support\Request;
 
 /**
  * ========== 中间件 ==========
@@ -20,8 +18,6 @@ class SyAuthAppMiddle
      */
     public function handle($request, \Closure $next)
     {
-        $isCheckApi = Request::isCheckApi();
-
         $OpenAppAuthObj = new \shiyunOpensdk\connection\OpenAppAuth();
         $OpenAppAuthObj->initAuthData();
         $authAppData = $OpenAppAuthObj->getAuthData();
@@ -34,32 +30,32 @@ class SyAuthAppMiddle
          * 判断：项目
          */
         if (empty($authAppData['syOpenAppProject'])) {
-            return sendRespCode401($isCheckApi ? '100105' : '100000');
+            return sendRespCode401(100201);
         }
         /**
          * 判断： syOpenAppId
          */
         if (empty($authAppData['syOpenAppId'])) {
-            return sendRespCode401($isCheckApi ? '100106' : '100000');
+            return sendRespCode401(100202);
         }
         /**
-         * 过滤 $syOpenAppId
+         * 过滤  $syOpenAppId
          */
-        $pass_appsid = syGetAppsArr();
-        if (!in_array($authAppData['syOpenAppId'], $pass_appsid)) {
-            return sendRespCode401($isCheckApi ? '100106' : '100000');
+        $isCheckApp = base_privatization_check_app($authAppData['syOpenAppProject'], $authAppData['syOpenAppId']);
+        if (!$isCheckApp) {
+            return sendRespCode401(100202);
         }
         /**
          * appSecret
          */
         if (empty($authAppData['syOpenAppSecret'])) {
-            // return sendRespCode401($isCheckApi ? '100107' : '100000');
+            // return sendRespCode401(100203);
         }
         /**
          * 判断：角色
          */
         if (empty($authAppData['syOpenAppRole'])) {
-            // return sendRespCode401($isCheckApi ? '100108' : '100000');
+            // return sendRespCode401(100206);
         }
         /**
          * 判断：token
@@ -69,8 +65,16 @@ class SyAuthAppMiddle
              * 这里要转移到鉴权token上
              * 转到 SyAuthTokenMiddle 中间件处理
              */
-            // return sendRespCode401('100101');
+            // return sendRespCode401(100101);
         }
+        /**
+         * 判断：是否在维护
+         */
+        // $maintainInfo = Cache::store('CACHE_STORES_RD2')->get($authAppData['syOpenAppProject'] . ":Maintain");
+        // if (!empty($maintainInfo) && $maintainInfo['weihu_open'] == 'on') {
+        //     return sendRespCode200('900000');
+        // }
+
         return $next($request);
     }
 }

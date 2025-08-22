@@ -183,8 +183,8 @@ class ModeSimple
             // );
 
             // echo "[Datetime: " . date('Y-m-d H:i:s') . "]\n";
-            // echo "[Received: channel->callbacks:" . count($channel->callbacks) . "]\n";;
-            // echo "[Received: " . date('Y-m-d H:i:s') . '$channel->callbacks:' . count($channel->callbacks) . "]\n";;
+            // echo "[Received: channel->callbacks:" . count($channel->callbacks) . "]\n";
+            // echo "[Received: " . date('Y-m-d H:i:s') . '$channel->callbacks:' . count($channel->callbacks) . "]\n";
 
 
             // register_shutdown_function(array($this, 'shutdown'), $channel, $connection);

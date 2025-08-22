@@ -1,21 +1,5 @@
 <?php
 
-use shiyunUtils\helper\HelperStr;
-
-/**
- * PHP生成唯一RequestID类
- * Date:    2018-04-10
- * Author:  fdipzone
- * Version: 1.0
- *
- * Description:
- * PHP实现生成唯一RequestID类，使用 session_create_id ()与uniqid()方法实现，保证唯一性。
- *
- * Func:
- * public  generate 生成唯一请求id
- * private format   格式化请求id
- */
-
 // use shiyun\libs\SnowflakeId;
 
 /**
@@ -51,7 +35,11 @@ function create_id_uuid()
         $charid = strtoupper(md5(uniqid(rand(), true))); //根据当前时间（微秒计）生成唯一id.
         $hyphen = chr(45); // "-"
         $uuid = '' . //chr(123)// "{"
-            substr($charid, 0, 8) . $hyphen . substr($charid, 8, 4) . $hyphen . substr($charid, 12, 4) . $hyphen . substr($charid, 16, 4) . $hyphen . substr($charid, 20, 12);
+            substr($charid, 0, 8)
+            . $hyphen . substr($charid, 8, 4)
+            . $hyphen . substr($charid, 12, 4)
+            . $hyphen . substr($charid, 16, 4)
+            . $hyphen . substr($charid, 20, 12);
         //.chr(125);// "}"
         return $uuid;
     }
@@ -83,6 +71,17 @@ function create_id_guid($namespace = '')
         substr($hash, 20, 12);
     return $guid;
 }
+
+/**
+ * PHP生成唯一RequestID类
+ * Date:    2018-04-10
+ * Description:
+ * PHP实现生成唯一RequestID类，使用 session_create_id ()与uniqid()方法实现，保证唯一性。
+ *
+ * Func:
+ * public  generate 生成唯一请求id
+ * private format   格式化请求id
+ */
 /**
  * session_create_id
  * 生成唯一请求id
@@ -97,13 +96,12 @@ function create_id_session()
     // 格式化请求id
     /**
      * 格式化请求id
-     * @param  String $request_id 请求id
-     * @param  Array  $format     格式
-     * @return String
+     * @param  string $request_id 请求id
+     * @param  array|string  $format     格式
+     * @return string
      */
     function _format($request_id, $format = '8,4,4,4,12')
     {
-
         $tmp = array();
         $offset = 0;
         $cut = explode(',', $format);
@@ -138,7 +136,7 @@ function create_tradeno($codeNoFirst = '', $subLen = 4)
             $orderNo .= strtoupper($codeNoFirst) . '';
             // 截取字符串
         }
-        $orderNo = HelperStr::substr($orderNo, 0, $subLen);
+        $orderNo = cc_str_substr($orderNo, 0, $subLen);
     } else {
         // $orderNo .= 'CTOCODE' . '-';
     }
@@ -154,4 +152,46 @@ function create_tradeno($codeNoFirst = '', $subLen = 4)
     // 生成订单号
     return date('Ymd') . substr(implode('', array_map('ord', str_split(substr(uniqid(), 7, 13), 1))), 0, 8);
     return date('YmdHis') . substr(implode('', array_map('ord', str_split(substr(uniqid(), 7, 13), 1))), 0, 8);
+}
+/**
+ * 生成随机字符串 - 不长于32位
+ * 生成随机字符串 - 最长为32位字符串
+ * @param int $length 长度，默认为32，最长为32字节
+ * @return string
+ */
+function create_noncestr(int $length = 32, $type = false)
+{
+    $str = cc_random_lowernum($length);
+    if ($type == true) {
+        return strtoupper(md5(time() . $str));
+    } else {
+        return $str;
+    }
+}
+
+/**
+ * 生成指定长度的随机字符串（支持纯数字或字母数字混合）
+ * @param int $length 字符串长度（默认6）
+ * @param bool $numeric 是否仅为数字（默认false）
+ * @param string $extraEntropy 额外熵源（可选）
+ * @return string
+ */
+function create_rand_ns(int $length = 6, bool $numeric = false, string $extraEntropy = ''): string
+{
+    $charset = $numeric
+        ? '0123456789'
+        : '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+    // 使用更安全的随机种子（PHP 8+）
+    $seed = $extraEntropy . bin2hex(random_bytes(16));
+    $seed = $numeric
+        ? str_replace('0', '', $seed) . '012340567890'
+        : $seed . 'zZ' . strtoupper($seed);
+
+    $hash = '';
+    $max = strlen($charset) - 1;
+    for ($i = 0; $i < $length; $i++) {
+        $hash .= $charset[random_int(0, $max)];
+    }
+    return $hash;
 }

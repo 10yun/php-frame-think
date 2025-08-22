@@ -4,56 +4,55 @@ declare(strict_types=1);
 
 namespace shiyun\middleware;
 
-use shiyun\support\Event;
+use think\Request;
 
 /**
+ * 
+ * RESTful 方法处理中间件
+ * 处理HTTP方法转换
  * 路由 method 处理
+ * @author 福州十云科技有限公司
+ * @version 2108
+ * @package shiyun\middleware
  */
 class CheckRestMiddle
 {
-    public function handle($request, \Closure $next)
+    /**
+     * 允许通过POST转换的方法
+     */
+    protected $allowedPostTypes = ['delete', 'put', 'patch'];
+    public function handle(Request $request, \Closure $next)
     {
-        $method = $request->method();
-
-        if ($method == 'GET') {
-            // redirect('index/think');
-            /*
-			 * 是否为 GET 请求
-			 */
-        } else if ($method == 'PUT') {
-            // 开启事务
-            Event::trigger('dbStartTask');
-        } else if ($method == 'PATCH') {
-            // 开启事务
-            Event::trigger('dbStartTask');
-        } else if ($method == 'DELETE') {
-            // 开启事务
-            Event::trigger('dbStartTask');
-        } else if ($method == 'POST') {
-            // 开启事务
-            Event::trigger('dbStartTask');
-            /**
-             *  '路由methods 转换';
-             */
-            $postType = $request->param('postType');
-            $postId = $request->param('id');
-
-            if (!empty($postType) && !empty($postId)) {
-                if ($postType == 'delete') {
-                    $request->setMethod('DELETE');
-                } else if ($postType == 'put') {
-                    $request->setMethod('PUT');
-                } else if ($postType == 'patch') {
-                    $request->setMethod('PATCH');
-                }
-            }
+        // 先处理请求方法转换
+        if ($request->isPost()) {
+            $this->convertPostMethod($request);
         }
-
         // 添加中间件执行代码
         return $next($request);
     }
-
-
+    /**
+     * 路由methods转换
+     */
+    protected function convertPostMethod(Request $request)
+    {
+        $postType = $request->param('postType', '');
+        $postType = strtolower($postType);
+        $postId = $request->param('id');
+        // if (!empty($postType) && $this->isValidId($postId)) {
+        if (!empty($postType) && !empty($postId)) {
+            if (in_array($postType, $this->allowedPostTypes)) {
+                $request->setMethod(strtoupper($postType));
+            }
+        }
+    }
+    /**
+     * 验证ID格式
+     */
+    protected function isValidId($id): bool
+    {
+        // 根据业务需求调整验证规则
+        return !empty($id) && (is_numeric($id) || preg_match('/^[a-f0-9]{24}$/i', $id));
+    }
     /**
      * @param $method
      * @param string $action

@@ -2,6 +2,8 @@
 
 namespace shiyunOpensdk\middleware;
 
+use shiyun\exception\AuthException;
+
 /**
  * 组织鉴权
  */
@@ -22,14 +24,14 @@ class SyRoleOrgMiddle
     {
         $currAppRole = syOpenAppsAuth('syOpenAppRole');
         if (!in_array($currAppRole, array_keys($this->orgArr))) {
-            return sendRespError('角色类型错误~');
+            throw new AuthException('角色类型错误', 100206);
         }
         $currTokenRole = syOpenAccess('token_role');
         if (empty($currTokenRole)) {
-            return sendRespError('角色类型错误~');
+            throw new AuthException('角色类型错误', 100206);
         }
         if ($currAppRole != $currTokenRole) {
-            return sendRespError('角色类型错误~');
+            throw new AuthException('角色类型错误', 100206);
         }
         return $next($request);
     }
@@ -43,7 +45,7 @@ class SyRoleOrgMiddle
         $log_method = request()->method();
         if ($log_method != 'GET') {
             queue_producer('queue_connect_redis', '', 'RoleOrgLogAdd', [
-                'business_id' =>  syOpenAccess('business_id'),
+                'business_id' => syOpenAccess('business_id'),
                 'log_role' => $log_role,
                 'log_method' => request()->method(),
                 'log_remarks' => request()->pathinfo(),

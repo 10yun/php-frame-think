@@ -3,7 +3,6 @@
 namespace shiyun\libs;
 
 use Exception;
-use shiyunUtils\base\TraitModeInstance;
 
 /**
  * 使用 Openssl 加密解密

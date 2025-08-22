@@ -81,7 +81,7 @@ class WebServer extends Worker
      *
      * @see Workerman.Worker::run()
      */
-    public function run()
+    public function run(): void
     {
         $this->_onWorkerStart = $this->onWorkerStart;
         $this->onWorkerStart  = array($this, 'onWorkerStart');

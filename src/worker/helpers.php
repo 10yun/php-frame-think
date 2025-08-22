@@ -17,13 +17,34 @@ function loadRpcServer($service, $class)
     $rpcObj = JsonRpcClient::instance($class, $service);
 }
 /**
- * 
+ * socket推送
+ * @version 2017-12-18
+ * @return bool
  */
-function worker_push_socket() {}
-
-
+function worker_push_socket(array $data = [], string|int $socket_port = 5556)
+{
+    $socket_host = '127.0.0.1';
+    $socket_port = '';
+    // 建立socket连接到内部推送端
+    $send_url = "{$socket_host}:{$socket_port}";
+    $client = stream_socket_client($send_url, $errno, $errmsg, 1);
+    // 发送数据，注意5556端口是Text协议的端口，Text协议需要在数据末尾加上换行
+    fwrite($client, json_encode($data) . "\n");
+    // fwrite ( $client, '<ctocode|202|' . $data['shipping_deliveryid'] . '>' . "\n" );
+    // 读取推送结
+    $result = fread($client, 8192);
+    // 读取推送结
+    // return fread ( $client, 8192 );
+    if ($result == "ok\n") {
+        return true;
+    } else {
+        return false;
+    }
+}
 /**
  * 异步任务
+ * @version 2017-12-18
+ * @return bool
  */
 function worker_async_task_producer(array $data, $Processing, $key = '')
 {
@@ -66,4 +87,19 @@ function worker_async_task_producer(array $data, $Processing, $key = '')
     } else {
         return false;
     }
+}
+/**
+ * 重启某个进程
+ * status 查看后
+ * 在worker里，使用 posix_getpid() 就可以获取到当前 worker 的 pid 了
+ */
+function worker_restart_pid($pid)
+{
+    // kill -SIGINT $pid
+    // kill -SIGUSR2 PID
+}
+
+function worker_restart_all()
+{
+    // php start.php restart
 }

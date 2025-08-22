@@ -46,7 +46,7 @@ trait TraitMessage
     {
         $now = time();
         $this->msgCurrTime = $now;
-        $this->msgIp = __cc_ip_getAddr();
+        $this->msgIp = cc_ip_getAddr();
     }
     public function clearMsgSett()
     {
@@ -151,9 +151,9 @@ trait TraitMessage
         // 是否加密
         if ($this->msgEncrypt === true) {
             $oldData = $payload['data'];
-            $encryptData = \shiyunUtils\libs\LibEncryptArr::encrypt($oldData);
+            $encryptData = \shiyun\libs\LibEncryptArr::encrypt($oldData);
             $payload['data'] = $encryptData;
-            // $xxxx2 = \shiyunUtils\libs\LibEncryptArr::decrypt($encryptData);
+            // $xxxx2 = \shiyun\libs\LibEncryptArr::decrypt($encryptData);
         }
         $payload = json_encode($payload);
         if (JSON_ERROR_NONE !== json_last_error()) {

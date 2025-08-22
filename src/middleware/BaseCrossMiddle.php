@@ -9,8 +9,22 @@ use think\Config;
 use think\Request;
 use think\Response;
 
+/**
+ * 【跨域】
+ * @author 福州十云科技有限公司
+ * @version 2108
+ * @package shiyun\middleware
+ */
 class BaseCrossMiddle
 {
+    /**
+     * 自定义跨域
+     */
+    protected array $customerCross = [];
+    public function __construct()
+    {
+        $this->customerCross = syGetConfig('shiyun.app.cross_domain', []);
+    }
     /**
      * 处理跨域请求
      *
@@ -18,7 +32,6 @@ class BaseCrossMiddle
      * @param \Closure $next
      *            return void
      */
-
     public function handle(Request $request, Closure $next): Response
     {
         $maxAge = 1800;
@@ -39,31 +52,16 @@ class BaseCrossMiddle
             'Sec-Fetch-Mode',
             'Sec-Fetch-Dest'
         ];
-
         // 自定义请求方式，解决 无PUT、POST、DELETE 问题
         $headerArr[] = 'x-http-method-override';
         /**
          * 自定义
          */
-        $headerArr[] = 'sy-response-type';
-        $headerArr[] = 'sy-client-uuid';
-        $headerArr[] = 'sy-client-id';
-        $headerArr[] = 'sy-client-platform';
-        // $headerArr[] = 'sy-client-drive';
-        // $headerArr[] = 'sy-client-os';
-
-        // $headerArr[] = 'sy-openapp-project';
-        // $headerArr[] = 'sy-openapp-id';
-        // $headerArr[] = 'sy-openapp-role';
-        // $headerArr[] = 'sy-openapp-token';
-
-        $headerArr[] = 'syOpenAppProject';
-        $headerArr[] = 'syOpenAppId';
-        $headerArr[] = 'syOpenAppRole';
-        $headerArr[] = 'syOpenAppToken';
-
+        if (!empty($this->customerCross) && is_array($this->customerCross)) {
+            $headerArr = array_merge($headerArr, $this->customerCross);
+        }
         /**
-         * 
+         * 兼容旧版本
          */
         $headerStr = implode(",", $headerArr);
         // var_dump('---', $headerStr);

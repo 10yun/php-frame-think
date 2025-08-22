@@ -56,8 +56,8 @@ class Server extends Command
         }
 
         // 自定义服务器入口类
-        if (!empty($this->config['worker_class'])) {
-            $class = (array) $this->config['worker_class'];
+        if (!empty($this->config['process_include_path'])) {
+            $class = (array) $this->config['process_include_path'];
 
             foreach ($class as $server) {
                 $this->startServer($server);

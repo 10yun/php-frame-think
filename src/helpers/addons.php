@@ -25,8 +25,13 @@ function loadAddonsCurrModel($fileDir = null)
 }
 
 /**
+ * @var \shiyun\model\ModelExtCache
  * @param string $service  应用名
  * @param string $class    功能名
+ * @method static \shiyun\libs\Addons getMapInstance($key=null) 获取映射
+ * @method static \shiyun\libs\Addons setType(string $type) 设置类型
+ * @method static \shiyun\libs\Addons checkService(string $service, string $class = '') 验证服务
+ * @method static string getService() 获取服务名称
  */
 function loadAddonsCache($service, $class)
 {
@@ -37,7 +42,9 @@ function loadAddonsCache($service, $class)
             ->getService();
 
         // $classObj = new $className();
-
+        /**
+         * @var \shiyun\model\ModelExtCache
+         */
         $classObj = $className::getMapInstance();
         return $classObj;
     } catch (\Exception $exception) {
@@ -46,6 +53,7 @@ function loadAddonsCache($service, $class)
     }
 }
 /**
+ * @var \shiyun\model\ModelExtend
  * @param string $service  应用名
  * @param string $class    功能名
  */
@@ -56,7 +64,9 @@ function loadAddonsModel($service = '', $class = '')
             ->setType('model')
             ->checkService($service, $class)
             ->getService();
-
+        /**
+         * @var \shiyun\model\ModelExtend
+         */
         $classObj = new $className();
         // $classObj = $className::getMapInstance();
         return $classObj;

@@ -11,7 +11,6 @@ use think\Request;
 
 class FrameBootstrap extends BaseService
 {
-
     public function register()
     {
         /**
@@ -21,24 +20,45 @@ class FrameBootstrap extends BaseService
             $route->get('/csrf_token', "\\shiyun\\extend\CsrfToken@getCsrfToken");
         });
         /**
-         * 注册 事件
+         * 注册中间件
          */
+        $this->app->middleware->import([
+            // 跨域
+            \shiyun\middleware\BaseCrossMiddle::class,
+            // methods处理
+            \shiyun\middleware\CheckRestMiddle::class,
+            // 限流
+            \shiyun\middleware\ThrottleMiddle::class,
+        ]);
         /**
-         * 是否启动事务
+         * 注册事务管理
          */
-        $isDbAutoTA = syGetConfig('shiyun.app.db_auto_transaction');
-        if (!empty($isDbAutoTA)  && ($isDbAutoTA == true || $isDbAutoTA == 'on')) {
-            $this->app->loadEvent([
-                'subscribe' => [
-                    \shiyun\extend\DbAutoTransaction::class,
-                ]
-            ]);
-            /**
-             * 除了get其他事务
-             */
-            $this->app->middleware->import([
-                \shiyun\middleware\CheckRestMiddle::class
-            ]);
+        $this->registerTransaction();
+    }
+    protected function registerTransaction()
+    {
+        // 是否启动事务
+        $isDbTxnAuto = syGetConfig('shiyun.app.db_transaction_auto');
+        // 事务类型
+        $isDbTxnType = syGetConfig('shiyun.app.db_transaction_type');
+        if (app()->runningInConsole() || empty($isDbTxnAuto) || empty($isDbTxnType)) {
+            return;
+        }
+        if (!in_array($isDbTxnAuto, [true, 'on'])) {
+            return;
+        }
+        $typeArr = ['middleware', 'event'];
+        if (!in_array($isDbTxnType, $typeArr)) {
+            return;
+        }
+        // 注册事务管理器
+        $this->app->bind(\shiyun\extend\TransactionManager::class);
+        if ($isDbTxnType == 'middleware') {
+            // 中间件方式
+            $this->app->middleware->add(\shiyun\middleware\AutoTransactionMiddle::class);
+        } else  if ($isDbTxnType == 'event') {
+            // 或事件监听方式
+            $this->app->event->subscribe(\shiyun\extend\TransactionSubscriber::class);
         }
     }
     public function boot()
@@ -60,7 +80,10 @@ class FrameBootstrap extends BaseService
             'MakeServer' => \shiyun\command\make\MakeServer::class,
             'MakeValidate' => \shiyun\command\make\MakeValidate::class,
             'MakeQueue' => \shiyun\command\make\MakeQueue::class,
-
+            /**
+             * 验证 addons
+             */
+            'AddonsCheck' => \shiyun\command\AddonsCheck::class,
 
             /**
              *  队列相关 

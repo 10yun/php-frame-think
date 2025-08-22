@@ -17,7 +17,7 @@ use shiyunQueue\exception\JobMsgNoMoreException;
 use shiyunQueue\exception\JobFailedException;
 use shiyunQueue\libs\JobExceptionOccurred;
 use shiyunQueue\libs\ProcessStopping;
-use shiyunUtils\libs\LibsLogger;
+use shiyun\libs\LibLogger;
 
 trait ProcessWorker
 {
@@ -242,7 +242,7 @@ trait ProcessWorker
             }
             $this->item_logs = trim($this->item_logs);
             if (!empty($this->item_logs)) {
-                LibsLogger::getInstance()->setGroup('queue_redis')->writeInfo($this->item_logs);
+                LibLogger::getInstance()->setGroup('queue_redis')->writeInfo($this->item_logs);
             }
             return $tryState;
             // if (!$consumeJobObj->isDeleted() && !$consumeJobObj->isReleased() && !$consumeJobObj->hasFailedState()) {

@@ -14,36 +14,43 @@
  * 如果商业用途务必到官方购买正版授权, 以免引起不必要的法律纠纷.
  * ============================================================================
  */
-function ctoLanguageToStr($str = '', $type = 'py_xx')
+
+
+/**
+ * 拼音_首字母_大写
+ */
+function cc_lang_dx_szm($str = '', $type = 'py_dx_szm')
 {
     if (empty($str)) {
         return '';
     }
     // $upper_lower = ! empty ( $request_data['upper_lower'] ) ? $request_data['upper_lower'] : 'lower';
     $lang = '';
-    switch ($type) {
-            // 拼音_首字母_大写
-        case 'py_dx_szm':
-            // ===========获取商品编号,格式为 ： 分类拼音首字符 + 商户id + 时间 + 6微随机数
-            $strarr = array();
-            // 分割中文
-            preg_match_all('/[\x{4e00}-\x{9fa5}]/u', $str, $strarr);
-            // preg_match_all("/./u", $str, $arr);
-            foreach ($strarr[0] as $val) {
-                // 转拼音,转大写
-                $pinyin = '';
-                $pinyin = ctoLanguagePinyin($val);
-                $pinyin = strtoupper($pinyin);
-                // 取首字符,拼接编号
-                $lang .= substr($pinyin, 0, 1);
-            }
-            break;
-            // 拼音小写
-        case 'py_xx':
-        default:
-            $lang = ctoLanguagePinyin($str);
-            break;
+    // ===========获取商品编号,格式为 ： 分类拼音首字符 + 商户id + 时间 + 6微随机数
+    $strarr = array();
+    // 分割中文
+    preg_match_all('/[\x{4e00}-\x{9fa5}]/u', $str, $strarr);
+    // preg_match_all("/./u", $str, $arr);
+    foreach ($strarr[0] as $val) {
+        // 转拼音,转大写
+        $pinyin = '';
+        $pinyin = ctoLanguagePinyin($val);
+        $pinyin = strtoupper($pinyin);
+        // 取首字符,拼接编号
+        $lang .= substr($pinyin, 0, 1);
     }
+
+    return $lang;
+}
+/**
+ * 拼音小写
+ */
+function cc_lang_xx(string $str)
+{
+    if (empty($str)) {
+        return '';
+    }
+    $lang = ctoLanguagePinyin($str);
     return $lang;
 }
 /**
@@ -67,7 +74,7 @@ function ctoLanguagePinyin($str, $charset = "utf-8", $ishead = 0)
     if ($slen < 2) {
         return $str;
     }
-    $pinyin_file_path = dirname(__DIR__) . '/fonts/pinyin.dat';
+    $pinyin_file_path = dirname(__DIR__) . '/assets/fonts/pinyin.text';
     $fp = fopen($pinyin_file_path, 'r');
     while (!feof($fp)) {
         $line = trim(fgets($fp));

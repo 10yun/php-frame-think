@@ -90,6 +90,15 @@ trait ModelTraitsCrud
             return false;
         }
     }
+
+    /**
+     * 新版查询单条
+     */
+    public function getOneData($wsql = [])
+    {
+        $wsql['page'] = ctoRequest('page', 'int', 1);
+        return $this->getListData($wsql, 'row');
+    }
     public function getRowData($wsql = [])
     {
         return $this->getListData($wsql, 'row');
@@ -98,9 +107,8 @@ trait ModelTraitsCrud
     {
         return $this->getListData($wsql, 'page');
     }
-    public function getCommonData($wsql = [], $type = '')
-    {
-    }
+    public function getCommonData($wsql = [], $type = '') {}
+
     public function getListData($wsql = [], $type = '')
     {
         // $query =
@@ -145,6 +153,9 @@ trait ModelTraitsCrud
     protected function exParseData($data = null, $type = '')
     {
         $parse_data = array();
+        if (empty($data)) {
+            return [];
+        }
         foreach ($data as $key => $val) {
             $parse_data[$key] = (array) $val->getData();
             ksort($parse_data[$key]);

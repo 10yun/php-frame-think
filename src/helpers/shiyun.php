@@ -11,9 +11,13 @@ function syPathTemplate()
 {
     return _PATH_PROJECT_ . 'vendor/shiyun/php-think/src/template/';
 }
-function syPathStorage()
+function syPathStorage(string|null $str = null)
 {
-    return _PATH_PROJECT_ . 'storage/';
+    if (empty($str)) {
+        return _PATH_PROJECT_ . 'storage/';
+    } else {
+        return _PATH_PROJECT_ . 'storage/' . $str;
+    }
 }
 function syPathRuntime()
 {
@@ -93,73 +97,6 @@ function syGetProjectPath($proStr = '', bool $isForcePathOpen = false)
     }
     return root_path() . '/project/';
 }
-/**
- * 
- */
-function syGetProjectConfig(string $projectName = '', string $configFile = '')
-{
-    $sett_path2 = syGetProjectPath($projectName) . "/{$configFile}.yml";
-    if (file_exists($sett_path2)) {
-        $settArray = yaml_parse_file($sett_path2);
-    }
-    return $settArray;
-}
-
-/**
- * 获取项目配置
- */
-function syGetProjectSett($diy_name = '')
-{
-    if (empty($diy_name)) {
-        return [];
-    }
-    $sett_path2 = syGetProjectPath($diy_name) . '/project.yml';
-    if (file_exists($sett_path2)) {
-        $settArray = yaml_parse_file($sett_path2);
-    }
-    return $settArray;
-}
-/**
- * 获取应用数组
- */
-function syGetAppsArr()
-{
-    $pathStr = syGetProjectPath('*') . '/apps/*';
-    $pathArr = glob($pathStr);
-    $appsArr = [];
-    foreach ($pathArr as $val) {
-        // $appsArr[] = basename($val, '.yml');
-        $appsArr[] = pathinfo($val, PATHINFO_FILENAME);
-    }
-    return $appsArr;
-}
-/**
- * 获取应用配置
- */
-function syGetAppsSett($diy_name = '')
-{
-    if (empty($diy_name)) {
-        return [];
-    }
-    $settArray = [];
-    if (!empty($diy_name)) {
-        $configPath = syGetProjectPath('*') . '/apps/' . $diy_name . '.yml';
-        $configArr = glob($configPath);
-        if (!empty($configArr[0])) {
-            $sett_path = $configArr[0];
-            if (file_exists($sett_path)) {
-                // $xmlFile = file_get_contents($sett_path);
-                // $settArray = \shiyunUtils\libs\LibXml::xmlToArr($xmlFile);
-                $settArray = yaml_parse_file($sett_path);
-                if (empty($settArray)) {
-                    $settArray = [];
-                }
-                unset($settArray['comment']);
-            }
-        }
-    }
-    return $settArray;
-}
 
 function syOpenAppsAuth($key = '')
 {
@@ -176,6 +113,8 @@ function syOpenAppsAuth($key = '')
  */
 function syOpenAppsConfig(?string $name = null)
 {
+
+    // $smsConfig = config_global_single_group('SDK_SMS_CONFIG');
     $data = app('SyOpenAppsConfig')->getSett();
     if (is_null($name)) {
         return $data;

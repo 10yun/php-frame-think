@@ -478,7 +478,7 @@ abstract class RouteAnnotationHandle implements IntfAnnotationHandle
 
     protected static function toLowerArray(array $data)
     {
-        return array_map(fn ($item) => strtolower($item), $data);
+        return array_map(fn($item) => strtolower($item), $data);
     }
 
     /**

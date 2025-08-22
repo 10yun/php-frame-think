@@ -20,12 +20,17 @@ use shiyun\route\annotation\RoutePost;
 use shiyun\route\annotation\RoutePut;
 use shiyun\route\annotation\RoutePatch;
 use shiyun\route\annotation\RouteDelete;
+use shiyun\route\annotation\RouteMiddleware;
 
 /**
  * 根据注解生成 FLAG：url
  */
 class CreateApiFlag extends Command
 {
+    // API、FLAG 的版本
+    protected $apiVersion = 1;
+    // 是否写入到各个模块下
+    protected $moduleApiWrite = false;
     protected function configure()
     {
         $this->setName('CreateApiFlag')
@@ -35,83 +40,90 @@ class CreateApiFlag extends Command
 
     protected function execute(Input $input, Output $output)
     {
-        $version = $input->getOption('ver') ?? 1;
+        $this->apiVersion = $input->getOption('ver') ?? 1;
         // 厂商 + 模块
         $addonsDir1 = glob(_PATH_PROJECT_ . 'addons/*/*/controller/');
         $addonsDir2 = glob(_PATH_PROJECT_ . 'addons/*/controller/');
         $addonsDir = array_merge($addonsDir1, $addonsDir2);
 
         // dd($addonsDir);
-        $baseArr = [];
-        $commonArr = [];
-        $orgArr = [];
-        $businessArr = [];
-        $agentArr = [];
-        $operatorArr = [];
-        $adminArr = [];
-        $ucenterArr = [];
-        $touristArr = [];
-
-        $need_write = false;
+        $need_keys = [
+            'base',
+            'common',
+            'org',
+            'business',
+            'agent',
+            'operator',
+            'admin',
+            'ucenter',
+            'tourist'
+        ];
+        $data_arr = [];
+        foreach ($need_keys as $key_val) {
+            $data_arr["{$key_val}_flag"] = [];
+            $data_arr["{$key_val}_auth"] = [];
+        }
         foreach ($addonsDir as $dirItem) {
             if (!is_dir($dirItem)) {
                 continue;
             }
-            $this->writeAttrApiFlag($baseArr, $dirItem, '', $version, $need_write);
-            $this->writeAttrApiFlag($commonArr, $dirItem, 'common', $version, $need_write);
-            $this->writeAttrApiFlag($orgArr, $dirItem, 'org', $version, $need_write);
-            $this->writeAttrApiFlag($businessArr, $dirItem, 'business', $version, $need_write);
-            $this->writeAttrApiFlag($agentArr, $dirItem, 'agent', $version, $need_write);
-            $this->writeAttrApiFlag($operatorArr, $dirItem, 'operator', $version, $need_write);
-            $this->writeAttrApiFlag($adminArr, $dirItem, 'admin', $version, $need_write);
-            $this->writeAttrApiFlag($ucenterArr, $dirItem, 'ucenter', $version, $need_write);
-            $this->writeAttrApiFlag($touristArr, $dirItem, 'tourist', $version, $need_write);
+            foreach ($need_keys as $key_val) {
+                $dirItemResult = $this->writeAttrApiFlag($dirItem, $key_val);
+                $data_arr["{$key_val}_flag"] = array_merge($data_arr["{$key_val}_flag"], $dirItemResult['flag']);
+                $data_arr["{$key_val}_auth"] = array_merge($data_arr["{$key_val}_auth"], $dirItemResult['auth']);
+            }
         }
-        $this->writeMergeApiFlag('base', $baseArr, $version);
-        $this->writeMergeApiFlag('common', $commonArr, $version);
-        $this->writeMergeApiFlag('org', $orgArr, $version);
-        $this->writeMergeApiFlag('business', $businessArr, $version);
-        $this->writeMergeApiFlag('agent', $agentArr, $version);
-        $this->writeMergeApiFlag('operator', $operatorArr, $version);
-        $this->writeMergeApiFlag('admin', $adminArr, $version);
-        $this->writeMergeApiFlag('ucenter', $ucenterArr, $version);
-        $this->writeMergeApiFlag('tourist', $touristArr, $version);
-        // 
+        foreach ($need_keys as $key_val) {
+            $this->writeMergeApiFlag($key_val, $data_arr["{$key_val}_flag"], $data_arr["{$key_val}_auth"]);
+        }
+
         echo "\n CreateApiFlag ok \n";
     }
     // 写入聚合
-    protected function writeMergeApiFlag($type, $ymlArr, $version = 1)
+    protected function writeMergeApiFlag($type, $flagYmlArr, $authYmlArr = [])
     {
+        $version = $this->apiVersion;
         @mkdir(_PATH_CONFIG_ . "api", 0777);
-        $commonYmlStr = implode("\n", $ymlArr);
-        file_put_contents(_PATH_CONFIG_ . "api/v{$version}/{$type}.yml", $commonYmlStr . "\n");
+        @mkdir(_PATH_CONFIG_ . "api/v{$version}_auth", 0777);
+        file_put_contents(_PATH_CONFIG_ . "api/v{$version}/{$type}.yml", implode("\n", $flagYmlArr) . "\n");
+        file_put_contents(_PATH_CONFIG_ . "api/v{$version}_auth/{$type}.yml", implode("\n", $authYmlArr) . "\n");
 
         echo " CreateApiFlag - {$type} -v{$version} \n";
     }
     // 写入
-    protected function writeAttrApiFlag(&$typeAllArr, $dirItem, $type, $version = 1, $isWrite = true)
+    protected function writeAttrApiFlag($dirItem, $type)
     {
+        $typeDir = $type == 'base' ? '' : $type;
+
         $dirParent = dirname($dirItem);
-        $typeHttp = glob($dirItem . "{$type}/*.php");
+        $typeHttp = glob($dirItem . "{$typeDir}/*.php");
         $typeFlag = $this->parseAttrApiFlag($typeHttp);
+        $typeYmlArr = [];
+        $authYmlArr = [];
         if (!empty($typeFlag)) {
-            $typeYmlArr = [];
             foreach ($typeFlag as $typeItem) {
                 $typeYmlArr[] = "{$typeItem['flag']}: \"{$typeItem['restfule']}\"";
+                $auth_app = !empty($typeItem['auth_app']) ? 'true' : 'false';
+                $auth_token = !empty($typeItem['auth_token']) ? 'true' : 'false';
+                $authYmlArr[] = "{$typeItem['flag']}: \"app={$auth_app},token={$auth_token}\"";
             }
             /**
-             * 写入文件
+             * 是否写入文件到各个模块里
              */
-            if ($isWrite) {
-                $typeYmlStr = implode("\n", $typeYmlArr);
-                @mkdir("{$dirParent}/api", 0777);
-                $typeYmlFile = "{$dirParent}/api/v{$version}-{$type}.yml";
-                file_put_contents($typeYmlFile, $typeYmlStr . "\n");
-            }
-            if (!empty($typeYmlArr)) {
-                $typeAllArr = array_merge($typeAllArr, $typeYmlArr);
+            if ($this->moduleApiWrite) {
+                $version = $this->apiVersion;
+                $baseDir1 = "{$dirParent}/api/v{$version}";
+                $baseDir2 = "{$dirParent}/api/v{$version}_auth";
+                @mkdir($baseDir1, 0777);
+                file_put_contents("$baseDir1/{$type}.yml",  implode("\n", $typeYmlArr) . "\n");
+                @mkdir("$baseDir2", 0777);
+                file_put_contents("$baseDir2/{$type}.yml", implode("\n", $authYmlArr) . "\n");
             }
         }
+        return [
+            'flag' => $typeYmlArr,
+            'auth' => $authYmlArr
+        ];
     }
     // 解析
     protected function parseAttrApiFlag($fileArr = [])
@@ -130,6 +142,9 @@ class CreateApiFlag extends Command
                     $namespace = "\\$namespace";
                 }
                 if (!class_exists($namespace)) {
+                    // print_r(spl_autoload_functions());
+                    // echo file_exists(__DIR__ . '/vendor/autoload.php') ? "Composer autoload 存在" : "Composer autoload 不存在";
+                    echo $namespace . ' 类不存在' . "\n";
                     continue;
                 }
                 // echo $val . "\n";
@@ -137,12 +152,12 @@ class CreateApiFlag extends Command
                 $reflectionClass = new ReflectionClass($namespace);
                 $RouteFlagAttrs = $reflectionClass->getAttributes(RouteFlag::class);
                 $RouteRestfulAttrs = $reflectionClass->getAttributes(RouteRestful::class);
+                $RouteMiddleAttrs = $reflectionClass->getAttributes(RouteMiddleware::class);
                 $RouteGroupAttrs = $reflectionClass->getAttributes(RouteGroup::class);
                 $methods = $reflectionClass->getMethods();
 
-                $classFlagArr = $this->parseFlagClass($RouteFlagAttrs, $RouteRestfulAttrs);
+                $classFlagArr = $this->parseFlagClass($RouteFlagAttrs, $RouteRestfulAttrs, $RouteMiddleAttrs);
                 $methodFlagArr = $this->parseFlagMethod($RouteGroupAttrs, $methods);
-
                 $flagArr = array_merge($flagArr, $classFlagArr, $methodFlagArr);
             }
         } catch (\Throwable $th) {
@@ -153,12 +168,14 @@ class CreateApiFlag extends Command
     }
     // 处理【类级别】的注解
     // 处理【类】上的 RouteFlag 和 RouteRestful 注解
-    protected function parseFlagClass($RouteFlagAttrs, $RouteRestfulAttrs)
+    protected function parseFlagClass($RouteFlagAttrs, $RouteRestfulAttrs, $RouteMiddleAttrs)
     {
         $flagArr = [];
         if (!empty($RouteFlagAttrs) && !empty($RouteRestfulAttrs)) {
             $routeFlagStr = '';
             $routeRestfulStr = '';
+            $routeMiddArr = [];
+            $routeMiddAuth = false;
             foreach ($RouteFlagAttrs as $attribute) {
                 // 拿到一个新的 Route 实例
                 // $route = $attribute->newInstance();
@@ -173,11 +190,25 @@ class CreateApiFlag extends Command
                 $params = $attribute->getArguments();
                 $routeRestfulStr = $params[0] ?? '';
             }
+            foreach ($RouteMiddleAttrs as $attribute) {
+                // 拿到注解上的参数
+                $params = $attribute->getArguments();
+                $routeMiddArr = $params[0] ?? '';
+            }
             if (!empty($routeFlagStr) && !empty($routeRestfulStr)) {
-                $flagArr[] = [
+                $falgItem = [
                     'flag' => $routeFlagStr,
                     'restfule' => $routeRestfulStr
                 ];
+                foreach ($routeMiddArr as $middItem) {
+                    if ($middItem == 'shiyunOpensdk\middleware\SyAuthAppMiddle') {
+                        $falgItem['auth_app'] = true;
+                    }
+                    if ($middItem == 'shiyunOpensdk\middleware\SyAuthTokenMiddle') {
+                        $falgItem['auth_token'] = true;
+                    }
+                }
+                $flagArr[] = $falgItem;
             }
         }
         return $flagArr;

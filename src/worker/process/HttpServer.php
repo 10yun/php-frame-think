@@ -4,14 +4,15 @@ namespace shiyunWorker\process;
 
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
-use shiyunWorker\WorkermanServer;
 use Workerman\Connection\TcpConnection;
 use Workerman\Timer;
-use Workerman\Protocols\Http as WorkerHttp;
 use Workerman\Worker;
-use shiyunWorker\Application;
+use Workerman\Protocols\Http as WorkerHttp;
 use Workerman\Protocols\Http\Request;
 use Workerman\Protocols\Http\Response;
+use shiyunWorker\Application;
+use shiyunWorker\WorkermanServer;
+use shiyunWorker\WorkerCookie;
 use shiyunWorker\protocols\http\RequestExtend;
 
 /**
@@ -41,7 +42,7 @@ class HttpServer extends WorkermanServer
         $this->worker = new Worker('http://' . $host . ':' . $port, $context);
 
         // 设置回调
-        foreach ($this->event as $event) {
+        foreach ($this->workerEvent as $event) {
             if (method_exists($this, $event)) {
                 $this->worker->$event = [$this, $event];
             }
@@ -112,7 +113,7 @@ class HttpServer extends WorkermanServer
         $this->app->workerman = $worker;
 
         $this->app->bind([
-            'think\Cookie' => Cookie::class,
+            'think\Cookie' => WorkerCookie::class,
         ]);
 
         if (0 == $worker->id && $this->monitor) {
@@ -156,7 +157,7 @@ class HttpServer extends WorkermanServer
         $path = $uri['path'] ?? '/';
 
         $file = $this->root . $path;
-
+        $data = [];
         if (!is_file($file)) {
             $this->app->worker($connection, $data, $serverData);
         } else {

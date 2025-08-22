@@ -133,7 +133,7 @@ function ctoFileDirCreate($dir_all, $mode = 0777, $dir_base = '')
     // 项目根目录
     $dir_base = !empty($dir_base) ? $dir_base : _PATH_RUNTIME_;
 
-    if (!str_contains($dir_all, _PATH_RUNTIME_)  && !str_contains($dir_all, _PATH_FILE_)) {
+    if (!str_contains($dir_all, _PATH_RUNTIME_) && !str_contains($dir_all, _PATH_FILE_)) {
         // 是否存在基本该项目中/data和/file文件夹中，如果不是，防止恶意文件，强制移动到 /data文件价下
         $dir_base = _PATH_RUNTIME_;
     }

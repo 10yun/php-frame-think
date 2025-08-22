@@ -17,9 +17,9 @@ use think\Response;
 use function sprintf;
 
 /**
- * 限流
- * 访问频率限制中间件
- * Class Throttle
+ * 【限流】访问频率限制中间件
+ * @author 福州十云科技有限公司
+ * @version 2108
  * @package shiyun\middleware
  */
 class ThrottleMiddle

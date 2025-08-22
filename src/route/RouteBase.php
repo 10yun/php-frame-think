@@ -10,20 +10,22 @@ abstract class RouteBase
     public function getOptions(): array
     {
         $result = [];
-        foreach ([
-            'middleware',
-            'ext',
-            'deny_ext',
-            'https',
-            'domain',
-            'complete_match',
-            'cache',
-            'ajax',
-            'pjax',
-            'json',
-            'filter',
-            'append',
-        ] as $name) {
+        foreach (
+            [
+                'middleware',
+                'ext',
+                'deny_ext',
+                'https',
+                'domain',
+                'complete_match',
+                'cache',
+                'ajax',
+                'pjax',
+                'json',
+                'filter',
+                'append',
+            ] as $name
+        ) {
             if (!isset($this->$name)) {
                 continue;
             }

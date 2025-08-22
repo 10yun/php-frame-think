@@ -55,67 +55,55 @@ class GatewayWorker extends Command
          * 启动 worker
          */
 
+        $option = [];
+
+        //  $option = syGetConfig('shiyun.worker_gateway');
+        $gatewayArr = [];
 
 
-        $option = syGetConfig('shiyun.worker_gateway');
+        foreach ($gatewayArr as $key => $val) {
+            /**
+             * 获取注解
+             */
+            $annoGatewayReggister = [];
+            $annoGatewayBusiness = [];
+            $annoGatewayWorker = [];
 
-        if ($input->hasOption('host')) {
-            $host = $input->getOption('host');
-        } else {
-            $host = !empty($option['host']) ? $option['host'] : '0.0.0.0';
+            // 
+            $workerObj = new \class();
+            $workerObj->start();
+            $registerAddress = !empty($option['registerAddress']) ? $option['registerAddress'] : '127.0.0.1:1236';
+
+            // 启动 register
+            if (!empty($annoGatewayReggister)) {
+                // 分布式部署的时候其它服务器可以关闭register服务
+                // 注意需要设置不同的lanIp
+                $this->register($registerAddress, $annoGatewayReggister);
+            }
+
+            // 启动 businessWorker
+            if (!empty($annoGatewayBusiness)) {
+                $this->businessWorker($registerAddress, $annoGatewayBusiness);
+            }
+
+            // 启动 gateway
+            if (!empty($annoGatewayWorker)) {
+                $this->gateway($registerAddress, $annoGatewayWorker);
+            }
         }
-
-        if ($input->hasOption('port')) {
-            $port = $input->getOption('port');
-        } else {
-            $port = !empty($option['port']) ? $option['port'] : '2347';
-        }
-
-        $this->start($host, (int) $port, $option);
-    }
-
-    /**
-     * 启动
-     * @access public
-     * @param  string   $host 监听地址
-     * @param  integer  $port 监听端口
-     * @param  array    $option 参数
-     * @return void
-     */
-    public function start(string $host, int $port, array $option = [])
-    {
-        $registerAddress = !empty($option['registerAddress']) ? $option['registerAddress'] : '127.0.0.1:1236';
-
-        if (!empty($option['register_deploy'])) {
-            // 分布式部署的时候其它服务器可以关闭register服务
-            // 注意需要设置不同的lanIp
-            $this->register($registerAddress, $option['register_name'] ?? 'Register');
-        }
-
-        // 启动businessWorker
-        if (!empty($option['businessWorker_deploy'])) {
-            $this->businessWorker($registerAddress, $option['businessWorker'] ?? []);
-        }
-
-        // 启动gateway
-        if (!empty($option['gateway_deploy'])) {
-            $this->gateway($registerAddress, $host, $port, $option);
-        }
-
         Worker::runAll();
     }
-
     /**
      * 启动register
      * @access public
      * @param  string   $registerAddress
      * @return void
      */
-    public function register(string $registerAddress, $register_name = '')
+    public function register(string $registerAddress, array $option = [])
     {
         // 初始化register
         $register = new Register('text://' . $registerAddress);
-        $register->name = $register_name;
+        $register->name = $option['name'] ?? 'Register';
     }
 
     /**
@@ -129,12 +117,16 @@ class GatewayWorker extends Command
     {
         // 初始化 bussinessWorker 进程
         $worker = new BusinessWorker();
-
         $this->option($worker, $option);
-
         $worker->registerAddress = $registerAddress;
     }
 
+    /**
+     * 启动
+     * @access public
+     * @param  string   $host 监听地址
+     * @param  integer  $port 监听端口
+     */
     /**
      * 启动gateway
      * @access public
@@ -144,8 +136,12 @@ class GatewayWorker extends Command
      * @param  array   $option 参数
      * @return void
      */
-    public function gateway(string $registerAddress, string $host, int $port, array $option = [])
+    public function gateway(string $registerAddress, array $option = [])
     {
+        $host = !empty($option['host']) ? $option['host'] : '0.0.0.0';
+        $port = !empty($option['port']) ? $option['port'] : '2347';
+
+
         // 初始化 gateway 进程
         if (!empty($option['socket'])) {
             $socket = $option['socket'];
@@ -167,6 +163,9 @@ class GatewayWorker extends Command
         $gateway->pingNotResponseLimit = 0;
         $gateway->pingData             = '{"type":"ping"}';
         $gateway->registerAddress      = $registerAddress;
+        // 'pingInterval'          => 30,
+        // 'pingNotResponseLimit'  => 0,
+        // 'pingData'              => '{"type":"ping"}',
 
         // 全局静态属性设置
         foreach ($option as $name => $val) {

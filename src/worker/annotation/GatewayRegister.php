@@ -15,6 +15,9 @@ class GatewayRegister
         string $socket = ''
     ) {
         // register 服务必须是text协议
+        if (!str_starts_with($socket, 'text://')) {
+            throw new \Exception('register 服务必须是text协议');
+        }
         $register = new Register($socket);
     }
 }

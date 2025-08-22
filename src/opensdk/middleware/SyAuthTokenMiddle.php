@@ -2,7 +2,6 @@
 
 namespace shiyunOpensdk\middleware;
 
-use shiyun\support\Request;
 
 /**
  * token鉴权
@@ -11,16 +10,14 @@ class SyAuthTokenMiddle
 {
     public function handle($request, \Closure $next)
     {
-        $isCheckApi = Request::isCheckApi();
-
         $syAppsAccess = [];
         $SyOpenAppsAuth = app('SyOpenAppsAuth')->getAuthData();
         $syOpenAppToken = $SyOpenAppsAuth['syOpenAppToken'] ?? '';
         if (empty($syOpenAppToken)) {
-            return sendRespCode401($isCheckApi ? '100101' : '100000');
+            return sendRespCode401(100101);
         }
         // 是否自动鉴权
-        $syAppsAccess =  app('SyOpenAppsAccess')->getAccessData();
+        $syAppsAccess = app('SyOpenAppsAccess')->getAccessData();
         /**
          * token过期
          */
@@ -28,15 +25,14 @@ class SyAuthTokenMiddle
             return sendRespCode401(100102);
         }
         if (empty($syAppsAccess)) {
-            return sendRespCode401('100109');
+            return sendRespCode401(100109);
         }
         if (
             $syAppsAccess
             && ($syAppsAccess['account_state'] == 9 || $syAppsAccess['account_state'] == 'disable')
         ) {
-            return sendRespCode200('100400');
+            return sendRespCode401(100910);
         }
-
 
         // 获取全部的禁用用户名单
         // $ucenterBlackDatas = loadAddonsModel('v210916_ucenter', 'Black')->getListData(array(

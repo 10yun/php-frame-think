@@ -44,7 +44,5 @@ class ModelAnalysParse
         }
         return $data;
     }
-    protected function doDataType()
-    {
-    }
+    protected function doDataType() {}
 }

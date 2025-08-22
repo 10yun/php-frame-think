@@ -158,16 +158,6 @@ function xml2json($source)
 }
 
 /**
- * 同 generate_password 默认获取纯数字
- * @param $length
- * @param string $chars
- * @return string
- */
-function strRandom($length, $chars = '0123456789')
-{
-    return __cc_generatePassword($length, $chars);
-}
-/**
  * 格式化内容图片地址
  * @param $content
  * @return mixed

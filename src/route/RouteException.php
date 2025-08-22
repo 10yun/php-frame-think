@@ -14,16 +14,12 @@ class RouteException implements ExceptionHandlerInterface
      * @param Throwable $e
      * @return mixed
      */
-    public function report(Throwable $e)
-    {
-    }
+    public function report(Throwable $e) {}
 
     /**
      * @param Request $request
      * @param Throwable $e
      * @return Response
      */
-    public function render(Request $request, Throwable $e): Response
-    {
-    }
+    public function render(Request $request, Throwable $e): Response {}
 }

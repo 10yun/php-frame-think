@@ -45,13 +45,13 @@ class LoadAppResource
             case 'jpeg':
             case 'gif':
             case 'ico':
-                \shiyunUtils\helper\HelperUI::outputImageFromPath($path);
+                cc_ui_output_imageFromPath($path);
                 break;
             case 'css':
-                \shiyunUtils\helper\HelperUI::outputCssFromPath($path);
+                cc_ui_output_cssFromPath($path);
                 break;
             case 'js':
-                \shiyunUtils\helper\HelperUI::outputJsFromPath($path);
+                cc_ui_output_jsFromPath($path);
                 break;
         }
     }

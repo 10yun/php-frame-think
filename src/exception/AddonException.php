@@ -2,15 +2,14 @@
 
 namespace shiyun\exception;
 
-use think\Exception;
+use shiyun\extend\ExceptionExtend;
 
 /**
  * 插件异常处理类
  * @package think\addons
  */
-class AddonException extends Exception
+class AddonException extends ExceptionExtend
 {
-
     public function __construct($message, $code, $data = '')
     {
         $this->message  = $message;

@@ -1,13 +1,39 @@
 <?php
 
+/**
+ * @title 数组
+ */
 
 /**
- * 重新指定数组的索引
+ * 将二维数组按照指定键的值分组，形成三维数组
+ * 
+ * @param array $array 原始二维数组
+ * @param string $key 用于分组的键名
+ * @return array 分组后的三维数组
+ */
+function cc_array_group_bykey(array $array, string $key): array
+{
+    $result = [];
+
+    foreach ($array as $item) {
+        if (isset($item[$key])) {
+            $groupValue = $item[$key];
+            if (!isset($result[$groupValue])) {
+                $result[$groupValue] = [];
+            }
+            $result[$groupValue][] = $item;
+        }
+    }
+
+    return $result;
+}
+/**
+ * @action 重新指定数组的索引
  * @param array $arr 数组
  * @param string $key 键名
  * @return array
  */
-function _cc_array_reindex($arr, $key)
+function cc_array_reindex($arr, $key)
 {
     if (!is_array($arr) || empty($arr)) {
         return array();
@@ -25,12 +51,12 @@ function _cc_array_reindex($arr, $key)
 }
 
 /**
- * 提取数组某一个key的值
+ * @action 提取数组某一个key的值
  * @param array $arr
  * @param string $extract_key
  * @return array
  */
-function _cc_array_extract($arr, $extract_key)
+function cc_array_extract($arr, $extract_key)
 {
     $res = array();
     if (is_array($arr)) {
@@ -41,16 +67,111 @@ function _cc_array_extract($arr, $extract_key)
 
     return $res;
 }
-
-function _cc_array_ksort($list)
+/**
+ * @action 数组递归排序
+ */
+function cc_array_ksort($list)
 {
     ksort($list);
     foreach ($list as $k => $v) {
         if (is_array($v)) {
-            $list[$k] = _cc_array_ksort($v);
+            $list[$k] = cc_array_ksort($v);
         }
     }
     return $list;
+}
+/**
+ * <二维>数组删除不要的字段
+ * @param array $originalArray 原有的数组
+ * @param array $delKeyArr 需要删除字段数组
+ * @return array 返回删除不需要Key后的新数组
+ * @author ctocode-zhw
+ * @version 2019-03-07
+ */
+function cc_array_columns_del(array $originalArray = [], array $delKeyArr = []): array
+{
+    // 使用array_map()函数处理数组
+    $modifiedArray = array_map(function ($item) use ($delKeyArr) {
+        foreach ($delKeyArr as $field) {
+            unset($item[$field]);
+        }
+        return $item;
+    }, $originalArray);
+    return $modifiedArray;
+}
+/**
+ * 筛选数组需要的字段
+ * @author ctocode-zhw
+ * @version 2017-07-20
+ * @return mixed
+ */
+function cc_array_columns_need($input, $column_keys = null, $index_key = null)
+{
+    $result = array();
+    $keys = $column_keys;
+    if ($input) {
+        foreach ($input as $v) {
+            // 指定返回列
+            if ($keys) {
+                $tmp = array();
+                foreach ($keys as $key) {
+                    $tmp[$key] = !empty($v[$key]) ? $v[$key] : '';
+                }
+            } else {
+                $tmp = $v;
+            }
+            // 指定索引列
+            if (isset($index_key)) {
+                $result[$v[$index_key]] = $tmp;
+            } else {
+                $result[] = $tmp;
+            }
+        }
+    }
+    return $result;
+}
+
+/**
+ * <多维>去除空的
+ * @param string $arr
+ * @return string
+ */
+function cc_array_unset_null($arr = '')
+{
+    if ($arr !== null) {
+        if (is_array($arr)) {
+            if (!empty($arr)) {
+                foreach ($arr as $key => $value) {
+                    if ($value === null) {
+                        $arr[$key] = '';
+                    } else {
+                        $arr[$key] = cc_array_unset_null($value); // 递归再去执行
+                    }
+                }
+            } else {
+                $arr = '';
+            }
+        } else {
+            if ($arr === null) {
+                $arr = '';
+            } // 注意三个等号
+        }
+    } else {
+        $arr = '';
+    }
+    return $arr;
+}
+
+/**
+ * 每列合并  
+ */
+function cc_array_add_merge($oldData = [], $addArr = [])
+{
+    $newArr = [];
+    foreach ($oldData as $val) {
+        $newArr[] = array_merge($val, $addArr);
+    }
+    return $newArr;
 }
 
 /**
@@ -64,7 +185,7 @@ function __cc_arrayIsTwo($array)
         return false;
     }
     $json = __cc_array2json($array);
-    return (bool)__cc_strLeftExists($json, '[');
+    return (bool)cc_str_left_exists($json, '[');
 }
 function __cc_arrayStringRemoveEmpty($arr)
 {
@@ -265,44 +386,6 @@ function array_values_recursive($array, $keyName = 'key', $valName = 'item')
     }
     return $array;
 }
-
-/**
- * 多维数组字母转下划线格式
- * @param $array
- * @return array
- */
-function __cc_arrayKeyToUnderline($array)
-{
-    $newArray = [];
-    foreach ($array as $key => $value) {
-        //如果是数组，递归调用
-        if (is_array($value)) {
-            $value = __cc_arrayKeyToUnderline($value);
-        }
-        $newKey = strtolower(preg_replace('/(?<=[a-z])([A-Z])/', '_$1', $key));
-        $newArray[$newKey] = $value;
-    }
-    return $newArray;
-}
-/**
- * 多维数组字母转驼峰格式
- *
- * @param [type] $array
- * @return array
- */
-function __cc_arrayKeyToCamel($array)
-{
-    $newArray = [];
-    foreach ($array as $key => $value) {
-        //如果是数组，递归调用
-        if (is_array($value)) {
-            $value = __cc_arrayKeyToCamel($value);
-        }
-        $newKey = lcfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $key))));
-        $newArray[$newKey] = $value;
-    }
-    return $newArray;
-}
 /**
  * 获取数组的第几个值
  * @param $arr
@@ -321,4 +404,37 @@ function __cc_getArray($arr, $i = 1)
         $j++;
     }
     return $array;
+}
+
+
+/**
+ * @action <多维>数组排序
+ * @author ctocode-zhw
+ * @version 2017-07-20
+ * @param array  $array            多维数组
+ * @param string $sort_key         二维数组的键名
+ * @param int    $sort_order       排序常量  SORT_ASC || SORT_DESC
+ * @param bool   $caseInsensitive  是否不区分大小写
+ * @return mixed
+ */
+function cc_array_multisort(array $array, string $sort_key = '', int $sort_order = SORT_DESC,  bool $caseInsensitive = true)
+{
+    if (empty($array)) {
+        return [];
+    }
+    // 创建数组副本
+    $sortedArray = $array;
+    // 提取排序键
+    $keys = array_column($sortedArray, $sort_key);
+
+    // 不区分大小写处理
+    if ($caseInsensitive) {
+        $keys = array_map('strtolower', $keys);
+        $sortType = SORT_STRING | SORT_FLAG_CASE;
+    } else {
+        $sortType = SORT_REGULAR;
+    }
+    // 对多个数组或多维数组进行排序
+    array_multisort($keys, $sort_order, $sortType, $sortedArray);
+    return $sortedArray;
 }

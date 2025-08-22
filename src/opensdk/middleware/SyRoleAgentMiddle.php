@@ -2,6 +2,8 @@
 
 namespace shiyunOpensdk\middleware;
 
+use shiyun\exception\AuthException;
+
 /**
  * agent鉴权
  */
@@ -14,14 +16,14 @@ class SyRoleAgentMiddle
     {
         $currAppRole = syOpenAppsAuth('syOpenAppRole');
         if ($currAppRole != 'org-agent') {
-            return sendRespError('角色类型错误~');
+            throw new AuthException('角色类型错误', 100206);
         }
         $currTokenRole = syOpenAccess('token_role');
         if (empty($currTokenRole)) {
-            return sendRespError('角色类型错误~');
+            throw new AuthException('角色类型错误', 100206);
         }
         if ($currAppRole != $currTokenRole) {
-            return sendRespError('角色类型错误~');
+            throw new AuthException('角色类型错误', 100206);
         }
         return $next($request);
     }

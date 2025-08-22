@@ -1,5 +1,6 @@
 <?php
 
+
 /**
  * @todo 只保留字母、英文、数字、下划线、破折号、@
  * @author ctocode-zhw
@@ -146,13 +147,13 @@ function ctoSecurityDelXSS($val)
 /*
  * 功能：用来过滤字符串和字符串数组，防止被挂马和sql注入
  * 参数$data，待过滤的字符串或字符串数组，
- * $force为true，忽略get_magic_quotes_gpc
+ * $force为true
  */
 function ctoSecurityIn($data, $force = false)
 {
     if (is_string($data)) {
         $data = trim(htmlspecialchars($data)); // 防止被挂马，跨站攻击
-        if (($force == true) || (!get_magic_quotes_gpc())) {
+        if (($force == true)) {
             $data = addslashes($data); // 防止sql注入
         }
         return $data;

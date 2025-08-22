@@ -24,7 +24,7 @@ class WorkerAmqp extends WorkermanServer
         //websocket发送过来的消息
         $connection->send('我收到你的信息了:' . $data);
         //rabbitMQ配置
-        $options = syGetConfig('shiyun.queue.connection.AMQP');
+        $options = syGetConfig('shiyun.process_queue.connection.AMQP');
         (new Client($options))->connect()->then(function (Client $client) {
             return $client->channel();
         })->then(function (Channel $channel) {

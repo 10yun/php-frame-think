@@ -16,8 +16,7 @@
         "amqp",
         "event-loop",
         "php",
-        "workerman",
-        "utils"
+        "workerman"
     ],
     "authors": [
         {
@@ -63,12 +62,10 @@
         "rodneyrehm/plist": "^2.0",
         "firebase/php-jwt": "^5.4",
         "phpunit/phpunit": "^6.2",
-        "mockery/mockery": "^1.2",
-        "topthink/think-migration": "^3.0.0"
+        "mockery/mockery": "^1.2"
     },
     "autoload": {
         "psr-4": {
-            "shiyunHelpers\\": "src\\helpers",
             "shiyunLibs\\": "src\\libs",
             "shiyunOpensdk\\": "src\\opensdk",
             "shiyunQueue\\": "src\\queue",
@@ -91,17 +88,15 @@
                 "shiyunWorker\\Bootstrap"
             ],
             "config": {
-                "shiyun/annotation": "src/config/annotation.php",
                 "shiyun/app": "src/config/app.php",
+                "shiyun/route": "src/config/route.php",
                 "shiyun/connection": "src/config/connection.php",
                 "shiyun/throttle": "src/config/throttle.php",
-                "shiyun/queue": "src/config/queue.php",
+                "shiyun/process_crontab": "src/config/process_crontab.php",
+                "shiyun/process_queue": "src/config/process_queue.php",
+                "shiyun/rpc": "src/config/rpc.php",
                 "shiyun/worker_worker": "src/config/worker_worker.php",
-                "shiyun/worker_server": "src/config/worker_server.php",
-                "shiyun/worker_gateway": "src/config/worker_gateway.php",
-                "shiyun/rpc_client": "src/config/rpc_client.php",
-                "shiyun/rpc_server_statistics": "src/config/rpc_server_statistics.php",
-                "shiyun/rpc_server": "src/config/rpc_server.php"
+                "shiyun/worker_server": "src/config/worker_server.php"
             }
         }
     },

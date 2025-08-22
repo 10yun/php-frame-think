@@ -129,17 +129,13 @@ class JsonRpcServer extends WorkermanServer
      * 当连接建立时触发的回调函数
      * @param $connection
      */
-    public function onConnect($connection)
-    {
-    }
+    public function onConnect($connection) {}
 
     /**
      * 当连接断开时触发的回调函数
      * @param $connection
      */
-    public function onClose($connection)
-    {
-    }
+    public function onClose($connection) {}
 
     /**
      * 当客户端的连接上发生错误时触发

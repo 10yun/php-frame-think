@@ -2,6 +2,8 @@
 
 namespace shiyunOpensdk\middleware;
 
+use shiyun\exception\AuthException;
+
 /**
  * 用户鉴权
  */
@@ -11,14 +13,14 @@ class SyRoleUserMiddle
     {
         $currAppRole = syOpenAppsAuth('syOpenAppRole');
         if ($currAppRole != 'general-user') {
-            return sendRespError('用户角色类型错误~');
+            throw new AuthException('用户角色类型错误', 100206);
         }
         $currTokenRole = syOpenAccess('token_role');
         if (empty($currTokenRole)) {
-            return sendRespError('用户角色类型错误~');
+            throw new AuthException('用户角色类型错误', 100206);
         }
         if ($currAppRole != $currTokenRole) {
-            return sendRespError('用户角色类型错误~');
+            throw new AuthException('用户角色类型错误', 100206);
         }
         return $next($request);
     }
@@ -26,7 +28,7 @@ class SyRoleUserMiddle
     protected function userCrudAll()
     {
         // if (syOpenAppsAuth('syOpenAppId') !== 'console-user') {
-        //     return sendRespError('syOpenAppId 错误~');
+        //     return sendRespError('syOpenAppId 错误');
         // }
         $request_data = request()->param();
         $request_data['account_id'] = syOpenAccess('account_id');

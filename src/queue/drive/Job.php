@@ -256,8 +256,8 @@ abstract class Job
         // $encrypt = !empty($consumeJobMsg['encrypt']) ? $consumeJobMsg['encrypt'] : false;
         // $excuteData = !empty($consumeJobMsg['data']) ? $consumeJobMsg['data'] : []; //执行数据
         // if ($encrypt === true) {
-        //     // $xxxx = \shiyunUtils\libs\LibEncryptArr::encrypt($jobData);
-        //     $excuteData = \shiyunUtils\libs\LibEncryptArr::decrypt($excuteData);
+        //     // $xxxx = \shiyun\libs\LibEncryptArr::encrypt($jobData);
+        //     $excuteData = \shiyun\libs\LibEncryptArr::decrypt($excuteData);
         // }
         // if (!empty($infoData) && json_validate($excuteData)) {
         //     $excuteData = json_decode($excuteData, true);

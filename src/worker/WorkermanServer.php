@@ -63,6 +63,14 @@ abstract class WorkermanServer
         $this->worker->count = $count;
         return $this;
     }
+    public function startWorker(Worker $worker)
+    {
+        // 在这里可以检测条件并重启自身
+        if (/* 某些条件 */false) {
+            posix_kill($worker->getPId(), SIGUSR2); // 重启当前Worker进程
+        }
+        // posix_getpid()
+    }
     public function start()
     {
         Worker::runAll();

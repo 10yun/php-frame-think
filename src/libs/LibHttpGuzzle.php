@@ -6,40 +6,40 @@ use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Exception\TransferException;
+use GuzzleHttp\Client as GuzzleHttpClient;
+use shiyun\libs\TraitModeInstance;
 
 class LibHttpGuzzle
 {
-    protected static $baseUrl = '';
-    protected static $header = [];
-    public static function setHeader($option = [])
+    use TraitModeInstance;
+    protected string $baseUrl = '';
+    protected array $header = [];
+    public function setHeader($option = [])
     {
-        $self = (new self());
-        self::$header = $option ?? [];
-        return $self;
+        $this->header = $option ?? [];
+        return $this;
     }
-    public static function setOption($option = [])
+    public function setOption($option = [])
     {
-        $self = (new self());
-        return $self;
+        return $this;
     }
-    public static function setBaseUrl($baseUrl = '')
+    public function setBaseUrl($baseUrl = '')
     {
-        $self = (new self());
-        self::$baseUrl = $baseUrl ?? '';
-        return $self;
+        $this->baseUrl = $baseUrl ?? '';
+        return $this;
     }
-    public static function httpGet($url = '', $data = [])
+    public function httpGet($url = '', $data = [])
     {
         try {
-            $client = new \GuzzleHttp\Client(
+            $client = new GuzzleHttpClient(
                 [
-                    'base_url' => self::$baseUrl,
+                    'base_url' => $this->baseUrl,
                 ]
             );
             $res = $client->request('GET', $url, [
                 // 'auth' => ['user', 'pass']
                 'query' => $data,
-                'headers' => self::$header
+                'headers' => $this->header
             ]);
             $bodyData = $res->getBody();
             $jsonData = json_decode($bodyData, true);
@@ -65,18 +65,18 @@ class LibHttpGuzzle
             ];
         }
     }
-    public static function httpPost(string $url = '', array $data = [])
+    public function httpPost(string $url = '', array $data = [])
     {
         try {
-            $client = new \GuzzleHttp\Client(
+            $client = new GuzzleHttpClient(
                 [
-                    'base_uri' => self::$baseUrl,
+                    'base_uri' => $this->baseUrl,
                 ]
             );
             $res = $client->request('POST', $url, [
                 // 'auth' => ['user', 'pass']
                 'form_params' => $data,
-                'headers' => self::$header
+                'headers' => $this->header
             ]);
             $bodyData = $res->getBody();
             $jsonData = json_decode($bodyData, true);
@@ -102,5 +102,5 @@ class LibHttpGuzzle
             ];
         }
     }
-    public static function httpPut($url = '', $data = []) {}
+    public function httpPut($url = '', $data = []) {}
 }

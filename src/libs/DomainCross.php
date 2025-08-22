@@ -1,5 +1,6 @@
 <?php
 
+namespace shiyun\libs;
 
 class DomainCross
 {

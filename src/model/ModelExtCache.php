@@ -31,7 +31,7 @@ class ModelExtCache
      * @param $diyKey key
      * @param needField 需要的字段
      */
-    public function sCacheGet(int $needId = null, array $needField = [])
+    public function sCacheGet(int|null $needId = null, array $needField = [])
     {
         if (empty($needId)) {
             $className = (new \ReflectionClass($this))->getShortName();
@@ -67,7 +67,7 @@ class ModelExtCache
     /**
      * 设置缓存
      */
-    public function sCacheSet(int $needId = null, array|string|int $data = null)
+    public function sCacheSet(int|null $needId = null, array|string|int $data = null)
     {
         if (empty($needId)) {
             $className = (new \ReflectionClass($this))->getShortName();
@@ -88,7 +88,7 @@ class ModelExtCache
     /**
      * 刷新一条缓存
      */
-    public function sCacheRefresh(int $needId = null)
+    public function sCacheRefresh(int|null $needId = null)
     {
         if (empty($needId)) {
             $className = (new \ReflectionClass($this))->getShortName();
@@ -107,7 +107,7 @@ class ModelExtCache
         }
         return $cacheData;
     }
-    protected function getCurrCacheData(int $needId = null)
+    protected function getCurrCacheData(int|null $needId = null)
     {
         throw new ModelCacheException("  请实现 getCurrCacheData");
         return [];

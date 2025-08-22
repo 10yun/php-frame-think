@@ -25,16 +25,24 @@ use think\facade\Db;
  * @return \think\Model
  * @method void getPrimary() 获取主键
  * @method void setPrimary($newPrimary) 设置主键
- * @method void setWhere($wsql) 设置参数
  * @method void setLimit($wsql) 设置分页
  * @method void getSelect($wsql) 获取多条
  * @method void getCount($wsql) 获取数量
  * @method void getFind($wsql) 获取单条
+ *
  */
 class ModelExtend extends Model
 {
-    use ModelTraitsCrud, ModelTraitCheck, ModelTraitParse;
-    protected $table = ''; // 当前模型.表单名称
+    // /**
+    //  * @var ModelTraitParse
+    //  */
+    use ModelTraitsCrud, ModelTraitParse;
+    // protected $connection = '';
+    // protected $table = ''; // 当前模型.表单名称
+    // protected $pk = '';
+    /**
+     * 
+     */
     protected $tabConnect = '';
     protected $tableType = '';
     protected $tableName = ''; // 当前模型.除开后缀的名字
@@ -48,37 +56,16 @@ class ModelExtend extends Model
     // 【字段】根据数据表-和表单提交的数据，处理解析数据
     protected $_fieldParseData = array();
     // 文件资源路径,指向ms下的file文件夹
-    protected $page = 1;
-    protected $pagesize = 10;
+
     /* 数据库连接对象 */
     protected $exDb = null;
-    // 扩展where
-    protected $whereArr = array();
     /**
      * 
      * @param array $data
      */
     public function __construct(array $data = [])
     {
-        if (!empty($this->tableName)) {
-            $this->table = $this->tableName;
-            // $this->table = $this->dbprefix . $this->tableName;
-        }
-        if (!empty($this->tablePrimary)) {
-            $this->pk = $this->tablePrimary;
-        }
-        if (!empty($this->connection)) {
-            $this->tabConnect = $this->connection . '.' . $this->tableName;
-        } else {
-            $this->tabConnect = $this->tableName;
-        }
         parent::__construct($data);
-
-        $this->page = !empty($data['page']) ? $data['page'] : 1;
-        if (!empty($data['pagesize'])) {
-            $this->pagesize = $data['pagesize'];
-        }
-
         // $model = new static ();
         $this->exDb = $this->db();
         // 控制器初始化
@@ -86,6 +73,32 @@ class ModelExtend extends Model
             $this->_initialize();
         }
     }
+    protected function init(): void
+    {
+        if (!empty($this->tableName)) {
+            $this->setOption('table',  $this->tableName);
+        }
+        if (!empty($this->tablePrimary)) {
+            $this->setOption('pk',  $this->tablePrimary);
+        }
+        if (!empty($this->connection)) {
+            $this->tabConnect = $this->connection . '.' . $this->tableName;
+        } else {
+            $this->tabConnect = $this->tableName;
+        }
+    }
+    // protected function getOptions(): array
+    // {
+    //     $options = parent::getOptions();
+    //     if (!empty($this->tableName)) {
+    //         $options['table'] = $this->tableName;
+    //     }
+    //     if (!empty($this->tablePrimary)) {
+    //         $options['pk'] = $this->tablePrimary;
+    //     }
+    //     return $options;
+    // }
+
     // 获取主键
     public function getPrimary()
     {
@@ -100,19 +113,15 @@ class ModelExtend extends Model
     /**
      * @action 初始化
      */
-    public function _initialize()
-    {
-    }
+    public function _initialize() {}
     public function getLastId()
     {
         return $this->id;
     }
-
     public function orderBy($key, $sort)
     {
         return self::order($key, $sort);
     }
-
     public function selectArray()
     {
         return self::select()->toArray();

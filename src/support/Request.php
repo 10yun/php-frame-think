@@ -133,22 +133,27 @@ class Request extends Facade
     }
 
     // 是否接口请求
-    public static function isCheckApi()
+    public static function isCheckHtml()
     {
         $CONTENT_TYPE = self::server('CONTENT_TYPE');
         $HTTP_ACCEPT = self::server('HTTP_ACCEPT');
         $HTTP_X_REQUESTED_WITH = self::server('HTTP_X_REQUESTED_WITH');
-
+        $HEADER_ACCPET = self::header('Accept');
+        $HEADER_CONTENT_TYPE = self::header('Content-Type');
+        $HEADER_X_REQUESTED_WITH = self::header('X-Requested-With');
 
         if (
             str_contains($HTTP_ACCEPT, 'text/html') ||  str_contains($CONTENT_TYPE, 'text/html')
         ) {
-            return false;
+            return true;
         } else if (
+            // str_contains(Request::header("Accept"), "application/json") ||
+            // str_contains($HEADER_CONTENT_TYPE, 'application/json') ||
+            // str_contains($HEADER_X_REQUESTED_WITH, 'XMLHttpRequest') ||
             str_contains($CONTENT_TYPE, 'application/json')
             || (isset($HTTP_X_REQUESTED_WITH) && strtolower($HTTP_X_REQUESTED_WITH) == 'xmlhttprequest')
         ) {
-            return true;
+            return false;
         }
     }
 }

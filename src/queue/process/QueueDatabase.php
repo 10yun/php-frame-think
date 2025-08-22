@@ -14,7 +14,7 @@ class QueueDatabase
     public function createQueueTable()
     {
         // 数据库驱动时，数据库名称-即交换机名称
-        $databaseConfig = syGetConfig('shiyun.queue.connections.database');
+        $databaseConfig = syGetConfig('shiyun.process_queue.connections.database');
         $table  = $databaseConfig['table'];
         $table  = $databaseConfig['exchange_name'];
 

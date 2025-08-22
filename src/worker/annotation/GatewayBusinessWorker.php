@@ -8,8 +8,6 @@ use Attribute;
 use \Workerman\Worker;
 use \GatewayWorker\Gateway;
 use \GatewayWorker\BusinessWorker;
-use \Workerman\Autoloader;
-use \shiyunWorker\WebServer;
 
 #[Attribute(Attribute::TARGET_CLASS | Attribute::TARGET_PARAMETER | Attribute::IS_REPEATABLE)]
 class GatewayBusinessWorker
@@ -17,7 +15,8 @@ class GatewayBusinessWorker
     public function __construct(
         string $address = '',
         string $name = '',
-        int $count = 1
+        int $count = 1,
+        string $eventHandler = ''
     ) {
         // bussinessWorker 进程
         $worker = new BusinessWorker();
@@ -29,5 +28,7 @@ class GatewayBusinessWorker
         $worker->count = $count;
         // 服务注册地址
         $worker->registerAddress = $address;
+
+        $worker->$eventHandler =  !empty($name) ? $name : $className::class;
     }
 }

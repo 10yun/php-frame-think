@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace shiyun\middleware;
+namespace shiyun\validate\annotation;
 
 /**
  * 路由-自动验证表单

@@ -12,8 +12,6 @@ use think\console\Input;
 use think\console\input\Argument;
 use think\console\input\Option;
 use think\console\Output;
-use shiyun\route\annotation\RouteFlag;
-use shiyun\route\annotation\RouteRestful;
 use shiyun\libs\TranslateYoudao;
 use Exception;
 

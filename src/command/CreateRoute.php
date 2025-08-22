@@ -4,6 +4,4 @@
 /**
  * 生成路由
  */
-class CreateRoute
-{
-}
+class CreateRoute {}

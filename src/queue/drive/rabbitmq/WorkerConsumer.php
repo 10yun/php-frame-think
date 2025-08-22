@@ -18,7 +18,7 @@ class AmqpConsumer extends WorkermanServer
      */
     public function onWorkerStart($worker)
     {
-        $options = syGetConfig('shiyun.queue.connection.AMQP');
+        $options = syGetConfig('shiyun.process_queue.connection.AMQP');
 
         (new Client($options))->connect()->then(function (Client $client) {
             return $client->channel();

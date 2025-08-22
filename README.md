@@ -12,9 +12,6 @@ php,消息队列,mqtt,rabbitmq,redis
 
 workerman,rpc,定时器,http,websocket,tcp
 
-
-php工具包
-
 ### 功能
 
 - rpc客户端

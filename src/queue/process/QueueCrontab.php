@@ -4,16 +4,15 @@ namespace shiyunQueue\process;
 
 use shiyunWorker\WorkermanServer;
 use shiyunWorker\WorkermanCrontab;
-use shiyunUtils\libs\LibsLogger;
+use shiyun\libs\LibLogger;
 use shiyunQueue\exception\CrontabException;
 
 /**
  * 队列
  * 系统定时任务，限制内网访问
  * Crontab 定时器
- * crontab定时任务(每分钟检查运行脚本【分，时，日，月，周】)
+ * Crontab 定时任务(每分钟检查运行脚本【分，时，日，月，周】)
  */
-// class QueueTasks 
 class QueueCrontab extends WorkermanServer implements InterfaceProcess
 {
     protected $processes    = 1;
@@ -33,7 +32,7 @@ class QueueCrontab extends WorkermanServer implements InterfaceProcess
      */
     public function __construct()
     {
-        $this->config = syGetConfig('shiyun.crontab');
+        $this->config = syGetConfig('shiyun.process_crontab');
         if (
             !empty($this->config)
             && !empty($this->config['process_open'])
@@ -53,7 +52,7 @@ class QueueCrontab extends WorkermanServer implements InterfaceProcess
             parent::__construct();
         }
     }
-    //在进程开启之时
+    // 在进程开启之时
     public function onWorkerStart()
     {
         try {
@@ -85,7 +84,7 @@ class QueueCrontab extends WorkermanServer implements InterfaceProcess
     protected function queueLog(string $type = '', string $msg = '')
     {
         $log = str_pad("__{$type}__", 30, " ") . $msg;
-        LibsLogger::getInstance()->setGroup('queue_crontab')->writeError($log);
+        LibLogger::getInstance()->setGroup('queue_crontab')->writeError($log);
     }
     public function dealInit($consumeClassOpt = []) {}
     public function dealItemCheck($file)

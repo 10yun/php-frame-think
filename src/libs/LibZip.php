@@ -6,7 +6,6 @@ use Exception;
 use ZipArchive;
 use RecursiveIteratorIterator;
 use RecursiveDirectoryIterator;
-use shiyunUtils\base\TraitModeInstance;
 
 /**
  * 使用 ZipArchive 打包目录中的文件

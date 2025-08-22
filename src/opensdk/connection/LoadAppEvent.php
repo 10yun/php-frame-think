@@ -123,7 +123,7 @@ class LoadAppEvent
         $diyProConf = [];
         $diyProFlag = request()->header('syOpenAppProject') ?: '';
 
-        $diyProFlag_str = \think\helper\Str::snake($diyProFlag);
+        $diyProFlag_str = cc_str_tf_snake($diyProFlag);
 
         // $xxx = syOpenAppsAuth();
         var_dump('--222--', $diyProFlag, $diyProFlag_str);

@@ -1,5 +1,7 @@
 <?php
 
+namespace shiyun\libs;
+
 class HelperDbMysql
 {
     /**

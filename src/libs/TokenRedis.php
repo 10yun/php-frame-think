@@ -16,7 +16,7 @@ class TokenRedis extends RedisCache
      */
     public function getToken()
     {
-        $aesObj = new \shiyunUtils\libs\LibsSymmAES();
+        $aesObj = new \shiyun\libs\LibsSymmAES();
         $token = $aesObj->encrypt($this->cache_key);
         return $token;
     }
@@ -25,7 +25,7 @@ class TokenRedis extends RedisCache
      */
     public function checkToken($token = '')
     {
-        $aesObj = new \shiyunUtils\libs\LibsSymmAES();
+        $aesObj = new \shiyun\libs\LibsSymmAES();
         $this->cache_key = $aesObj->decrypt($token);
         return $this;
     }

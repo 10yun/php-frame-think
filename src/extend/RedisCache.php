@@ -2,8 +2,6 @@
 
 namespace shiyun\extend;
 
-use shiyunUtils\helper\HelperRandom;
-use shiyunUtils\helper\HelperArr;
 use shiyun\support\Cache;
 
 class RedisCache
@@ -60,7 +58,7 @@ class RedisCache
     public function setKey($key = '')
     {
         if (empty($key)) {
-            $temp_key = HelperRandom::doLetterBase(12);
+            $temp_key = cc_random_letter(12);
             $this->key_flag = $temp_key . time();
         } else {
             $this->key_flag = $key;
@@ -88,14 +86,14 @@ class RedisCache
         if (!empty($data)) {
 
             if (is_array($data)) {
-                if (HelperArr::isArrayObject($data)) {
+                if (cc_array_is_dimension($data)) {
                     $data['__cache_date__'] = date('Y-m-d H:i:s', time());
                 }
                 ksort($data);
                 $last_data = json_encode($data, true);
-            } else if (is_string($data) && _cc_is_json($data)) {
+            } else if (is_string($data) && json_validate($data)) {
                 $data = json_decode($data, true);
-                if (HelperArr::isArrayObject($data)) {
+                if (cc_array_is_dimension($data)) {
                     $data['__cache_date__'] = date('Y-m-d H:i:s', time());
                 }
                 ksort($data);

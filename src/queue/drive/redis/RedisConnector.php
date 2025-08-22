@@ -284,7 +284,7 @@ class RedisConnector extends Connector
     public function newConnection()
     {
         // 连接本地的Redis 服务
-        $config = syGetConfig('shiyun.queue.connection.redis');
+        $config = syGetConfig('shiyun.process_queue.connection.redis');
         /**
          * 方式1，tp的redis
          */

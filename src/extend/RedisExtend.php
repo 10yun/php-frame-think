@@ -42,9 +42,7 @@ class RedisExtend
     /**
      * @action 初始化
      */
-    public function initialize()
-    {
-    }
+    public function initialize() {}
     /**
      * 获取配置
      * @return object db_redis

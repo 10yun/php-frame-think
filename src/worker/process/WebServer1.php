@@ -73,8 +73,3 @@ function exec_php_file($file)
     }
     return \ob_get_clean();
 }
-
-// 如果不是在根目录启动，则运行runAll方法
-if (!defined('GLOBAL_START')) {
-    Worker::runAll();
-}

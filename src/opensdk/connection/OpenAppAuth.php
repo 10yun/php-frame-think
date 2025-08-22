@@ -10,9 +10,7 @@ class OpenAppAuth
      * @author ctocode
      */
     public $authData = [];
-    public function __construct()
-    {
-    }
+    public function __construct() {}
     public function initAuthData()
     {
         $fwParam = [];
@@ -43,11 +41,10 @@ class OpenAppAuth
          * 处理 syOpenAppProject
          * 如果没有header数据，获取 $reqParam['syOpenAppProject'] 数据
          */
-
         if ($project = \shiyun\libs\Console::getInstance()->getOption('syOpenAppProject')) {
             return $project;
         }
-        $reqVal = request()->param('syOpenAppProject');
+        $reqVal = request()->param('syOpenAppProject') ?? request()->param('sy_open_app_project');
         $headVal = request()->header('syOpenAppProject') ?: '';
         $lastVal = $headVal ?: ($reqVal ?? '');
         return $lastVal;
@@ -63,7 +60,7 @@ class OpenAppAuth
          * 处理 syOpenAppId
          * 如果没有header数据，获取 $reqParam['syOpenAppId'] 数据
          */
-        $reqVal = request()->param('syOpenAppId');
+        $reqVal = request()->param('syOpenAppId') ?? request()->param('sy_open_app_id');
         $headVal = request()->header('syOpenAppId') ?: '';
         $lastVal = $headVal ?: ($reqVal ?? '');
         return $lastVal;
@@ -79,7 +76,7 @@ class OpenAppAuth
          * 处理 syOpenAppSecret
          * 如果没有header数据，获取 $reqParam['syOpenAppSecret'] 数据
          */
-        $reqVal = request()->param('syOpenAppSecret');
+        $reqVal = request()->param('syOpenAppSecret') ?? request()->param('sy_open_app_secret');
         $headVal = request()->header('syOpenAppSecret') ?: '';
         $lastVal = $headVal ?: ($reqVal ?? '');
         return $lastVal;
@@ -95,7 +92,7 @@ class OpenAppAuth
          * 处理 syOpenAppRole
          * 如果没有header数据，获取 $reqParam['syOpenAppRole'] 数据
          */
-        $reqVal = request()->param('syOpenAppRole');
+        $reqVal = request()->param('syOpenAppRole') ?? request()->param('sy_open_app_role');
         $headVal = request()->header('syOpenAppRole') ?: '';
         $lastVal = $headVal ?: ($reqVal ?? '');
         return $lastVal;
@@ -106,7 +103,7 @@ class OpenAppAuth
          * 处理 syOpenAppToken
          * 如果没有header数据，获取 $reqParam['syOpenAppToken'] 数据
          */
-        $reqVal = request()->param('syOpenAppToken');
+        $reqVal = request()->param('syOpenAppToken') ?? request()->param('sy_open_app_token');
         $headVal = request()->header('syOpenAppToken') ?: '';
         $lastVal = $headVal ?: ($reqVal ?? '');
         return $lastVal;

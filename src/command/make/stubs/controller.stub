@@ -34,7 +34,7 @@ class {%className%}
     }
     public function getData()
     {
-        $wsql = \app\common\RequestExtend::getDataParam();
+        $wsql = request_param_common();
         $wsql['business_id'] = syOpenAccess('business_id');
         $wsql['xxxx_id'] = ctoRequest('xxxx_id', 'int');
         $result_data = loadAddonsModel('xxxxxxxxxx', '{%className%}')->getListData($wsql);

@@ -8,8 +8,6 @@ class {%className%}Model extends ModelExtend
 {
     protected $tableName = 'table_name';
     protected $tablePrimary = 'table_id';
-    protected $pagesize = 10;
-    protected $bids = '';
 
     public function getListData($wsql = [], $type = '')
     {
@@ -34,14 +32,12 @@ class {%className%}Model extends ModelExtend
 
         if ($type == 'row') {
             $sql_limit = " LIMIT 0,1; ";
-            // 获取数据
             $sql_all = $sql_select . $sql_from . $sql_where . $sql_order . $sql_limit;
             $sql_all_result = $this->sqlRead($sql_all);
             $data['data'] = $this->parseListData($sql_all_result);
         } else {
-            $sql_limit = $this->parseSqlLimit($wsql);
+            $sql_limit = $this->limitParse($wsql);
             $sql_limit = "";
-            // 获取数据
             $sql_all = $sql_select . $sql_from . $sql_where . $sql_order . $sql_limit;
             $sql_all_result = $this->sqlRead($sql_all);
             $data['data'] = $this->parseListData($sql_all_result);

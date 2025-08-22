@@ -15,17 +15,16 @@ use shiyun\support\Request;
  */
 class CheckCsrfMiddle
 {
+    protected $jumpMethods = ['GET', 'HEAD', 'OPTIONS'];
     /**
      * @param \think\Request $request
      * @param \Closure $next
-     *            return void
+     * @return void
      */
     public function handle($request, \Closure $next)
     {
         // 过滤掉不需要csrf验证的请求
-        if (in_array($request->method(), [
-            'GET', 'HEAD', 'OPTIONS'
-        ], true)) {
+        if (in_array($request->method(), $this->jumpMethods, true)) {
             return $next($request);
         }
         // Header验证
@@ -38,9 +37,7 @@ class CheckCsrfMiddle
             $value = frameCacheGet('default', $key);
             $origToken = $key . $value;
             if ($origToken === $token) {
-                //验证通过
-
-                // 防止重复提交
+                // 验证通过 , 防止重复提交
                 // Cache::delete($key);
             } else {
                 // 验证不通过

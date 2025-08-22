@@ -2,9 +2,10 @@
 
 namespace shiyun\ffi;
 
-use app\exceptions\ApiException;
 // use App\Models\User;
+use shiyun\exception\ApiException;
 use shiyun\support\Cache;
+use shiyun\support\Db;
 use Carbon\Carbon;
 use FFI;
 
@@ -80,7 +81,7 @@ class ShiyunSO
         $array = __cc_json2array(self::chartToString(self::get_ffi_instance()->license() ?? ''));
 
         if (empty($array['ip'])) {
-            $array['ip'] = __cc_ip_getAddr();
+            $array['ip'] = cc_ip_getAddr();
         }
 
         if (empty($array['people'])) {
@@ -95,14 +96,14 @@ class ShiyunSO
         $ips = explode(",", $array['ip']);
         $array['ip'] = [];
         foreach ($ips as $ip) {
-            if (__cc_ip_is_ipv4($ip)) {
+            if (cc_is_ip_ipv4($ip)) {
                 $array['ip'][] = $ip;
             }
         }
         $domains = explode(",", $array['domain'] ?? '');
         $array['domain'] = [];
         foreach ($domains as $domain) {
-            if (__cc_is_domain($domain)) {
+            if (cc_is_domain_url($domain)) {
                 $array['domain'][] = $domain;
             }
         }
@@ -110,7 +111,7 @@ class ShiyunSO
         $macs = explode(",", $array['mac'] ?? '');
         $array['mac'] = [];
         foreach ($macs as $mac) {
-            if (__cc_isMac($mac)) {
+            if (cc_is_mac_address($mac)) {
                 $array['mac'][] = $mac;
             }
         }
@@ -118,7 +119,7 @@ class ShiyunSO
         $emails = explode(",", $array['email'] ?? '');
         $array['email'] = [];
         foreach ($emails as $email) {
-            if (__cc_isEmail($email)) {
+            if (cc_check_email($email)) {
                 $array['email'][] = $email;
             }
         }
@@ -242,10 +243,10 @@ class ShiyunSO
         if (__base_isError($data)) {
             throw new ApiException($data['msg'] ?: '注册失败');
         }
-        if (\DB::transactionLevel() > 0) {
+        if (Db::transactionLevel() > 0) {
             try {
-                \DB::commit();
-                \DB::beginTransaction();
+                Db::commit();
+                Db::beginTransaction();
             } catch (\Throwable) {
                 // do nothing
             }
@@ -311,7 +312,7 @@ class ShiyunSO
         $macs = explode(",", self::chartToString(self::get_ffi_instance()->macs()));
         $array = [];
         foreach ($macs as $mac) {
-            if (__cc_isMac($mac)) {
+            if (cc_is_mac_address($mac)) {
                 $array[] = $mac;
             }
         }
@@ -338,7 +339,7 @@ class ShiyunSO
     {
         try {
             if (empty($passphrase)) {
-                throw \Exception('pgpGenerateKeyPair $passphrase 不能为空');
+                throw new \Exception('pgpGenerateKeyPair $passphrase 不能为空');
             }
             //code...
             return __cc_json2array(self::chartToString(self::get_ffi_instance()->pgpGenerateKeyPair($name, $email, $passphrase)));

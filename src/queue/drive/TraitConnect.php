@@ -59,7 +59,7 @@ trait TraitConnect
      */
     public function setConnectName($name = '')
     {
-        $connectArr = syGetConfig('shiyun.queue.connections');
+        $connectArr = syGetConfig('shiyun.process_queue.connections');
         if (!empty($connectArr[$name]) && $connectItem = $connectArr[$name]) {
             $this->setConnectHost($connectItem['connect_host']);
             $this->setConnectPort($connectItem['connect_port']);

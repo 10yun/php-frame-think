@@ -49,7 +49,7 @@ class JwtAuth
     // 用户ID
     private $uid;
     // jwt密钥 ,签名密钥
-    private $secrect = '';
+    private $secrect = '*&%$@#@#!#!^&^%*^vdSxSQjAXcE32STE6kD';
 
     // jwt参数
     private $_config = [
@@ -63,9 +63,7 @@ class JwtAuth
      * 单例模式 禁止该类在外部被new
      * JwtAuth constructor.
      */
-    private function __construct()
-    {
-    }
+    private function __construct() {}
     /**
      * 单例模式 禁止外部克隆
      */
@@ -75,10 +73,12 @@ class JwtAuth
     }
     public function init($secrect = '')
     {
-        if (empty($secrect)) {
-            throw new \Exception('secrect 不存在');
+        // if (empty($secrect)) {
+        //     throw new \Exception('secrect 不存在');
+        // }
+        if (!empty($secrect)) {
+            $this->secrect = $secrect;
         }
-        $this->secrect = $secrect;
         // $key = InMemory::base64Encoded($this->secrect);
         $key = InMemory::plainText($this->secrect);
         $this->jwtContainer = Configuration::forSymmetricSigner(

@@ -27,14 +27,11 @@ trait TraitModeInstance
             self::$instance = new static();
         }
         return self::$instance;
-
         // if (is_null(static::$instance)) {
         //     static::$instance = new static();
-        // }
-        // return static::$instance;
-        // if (is_null(static::$instance)) {
         //     static::$instance = new static;
         // }
+        // return static::$instance;
         // if (static::$instance instanceof Closure) {
         //     return (static::$instance)();
         // }
@@ -46,7 +43,11 @@ trait TraitModeInstance
     {
         return new static();
     }
-
+    // public static function __callStatic($method, $params)
+    // {
+    //     $query = new self();
+    //     return call_user_func_array([$query, $method], $params);
+    // }
     public static function getMapInstance($key = null)
     {
         if (empty($key)) {

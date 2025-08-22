@@ -34,11 +34,10 @@ class AnnotationBootstrap extends BaseService
     public function getConfig(): array
     {
         // // 获取配置
-        $configOpt = syGetConfig('shiyun.annotation');
+        $configOpt = syGetConfig('shiyun.route');
         $config = array_merge($this->defaultConfig, $configOpt);
         return $config;
     }
-
     function is_cli()
     {
         return preg_match("/cli/i", php_sapi_name()) ? true : false;
@@ -53,7 +52,7 @@ class AnnotationBootstrap extends BaseService
             // 获取配置
             $config = $this->getConfig();
             if (!empty($config['route']['load_type']) && $config['route']['load_type'] == 'current') {
-                if (!$this->is_cli()) {
+                if (!$this->is_cli() && !app()->runningInConsole()) {
                     $config['include_paths'] = '';
                     $supportCommon = new \shiyun\support\Common($this->app);
                     $include_paths = $supportCommon->getRoutePath();

@@ -12,7 +12,7 @@ use ZipArchive;
  * 插件服务
  * @package think\addons
  */
-class Service
+class AppUtils
 {
     /**
      * 远程下载插件

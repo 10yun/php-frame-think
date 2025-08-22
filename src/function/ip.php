@@ -17,6 +17,7 @@ use Carbon\Carbon;
  * 如果商业用途务必到官方购买正版授权, 以免引起不必要的法律纠纷.
  * ============================================================================
  */
+
 /**
  * 获取IP地址
  * @author zhw ip 
@@ -25,7 +26,7 @@ use Carbon\Carbon;
  * @param string $param 参数
  * @return string
  */
-function __cc_ip_getAddr()
+function cc_ip_getAddr()
 {
     $ip = '';
     if (!isset($ip)) {
@@ -71,7 +72,7 @@ function __cc_ip_getAddr()
     $ipArr = explode(',', $ip);
     foreach ($ipArr as $ipItem) {
         $ipItem = trim($ipItem);
-        if ($ipItem != 'unknown' && ctoIpCheckValid($ipItem)) {
+        if ($ipItem != 'unknown' && cc_is_ip_extranet($ipItem)) {
             $realip = $ipItem;
             break;
         }
@@ -85,55 +86,61 @@ function __cc_ip_getAddr()
     unset($ips);
     return $ip;
 }
-/**
- * 判断字符串是否IP获取子掩码IP
- * @param $cidr
- * @return bool
- */
-function __cc_ip_is_cidr($cidr = '')
-{
-    if (str_contains($cidr, '/')) {
-        list($cidr, $netmask) = explode('/', $cidr, 2);
-        if ($netmask > 32 || $netmask < 0 || trim($netmask) == '') {
-            return false;
-        }
-    }
-    return filter_var($cidr, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) !== false;
-}
-/**
- * 判断是否内网IP
- * @param string $ip
- * @return bool
- */
-function __cc_ip_is_internal($ip = '')
-{
-    if (!filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
-        return false;
-    }
-    $ip = ip2long($ip);
-    if (!$ip) {
-        return false;
-    }
-    $net_l = ip2long('127.255.255.255') >> 24;          //127.x.x.x
-    $net_a = ip2long('10.255.255.255') >> 24;           //A类网预留ip的网络地址
-    $net_b = ip2long('172.31.255.255') >> 20;           //B类网预留ip的网络地址
-    $net_c = ip2long('192.168.255.255') >> 16;          //C类网预留ip的网络地址
-    return $ip >> 24 === $net_l || $ip >> 24 === $net_a || $ip >> 20 === $net_b || $ip >> 16 === $net_c;
-}
 
 /**
- * 判断是否外网IP
- * @param string $ip
- * @return bool
+ * @action 获取城市
+ * @author ctocode-zhw
+ * @param string $type 类别
+ * @param string $param 参数
+ * @return mixed <string, unknown>
+ * @version 2017-08-09
  */
-function __cc_is_ip_extranet($ip = '')
+function cc_ip_getCity($ip = '', $type = 'taobao', $param = '')
 {
-    if (!filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
-        return false;
+    if (empty($ip)) {
+        $ip = cc_ip_getAddr();
     }
-    return !__cc_ip_is_internal($ip);
+    if (cc_is_ip_valid($ip) !== TRUE || cc_is_ip_extranet($ip) !== TRUE) {
+        return array(
+            'ip' => $ip,
+            'info' => '未知_本地'
+        );
+    }
+    switch ($type) {
+        case 'sina': // 获取新浪api
+            $apiUrl = 'http://int.dpool.sina.com.cn/iplookup/iplookup.php?format=js&ip=';
+            $apiRe = @file_get_contents($apiUrl . $ip);
+            if (!empty($apiRe)) {
+                $jsonMatches = array();
+                preg_match('#\{.+?\}#', $apiRe, $jsonMatches);
+                if (isset($jsonMatches[0])) {
+                    $apiReData = json_decode($jsonMatches[0], true);
+                    if (isset($apiReData['ret']) && $apiReData['ret'] == 1) {
+                        $apiReData['ip'] = $ip;
+                        $apiReData['info'] = $apiReData['country'] . '_' . $apiReData['province'] . '_' . $apiReData['city'];
+                        return $apiReData;
+                    }
+                }
+            }
+            break;
+        case 'taobao': // 获取淘宝接口
+            $apiUrl = 'http://ip.taobao.com/service/getIpInfo.php?ip=';
+            $apiRe = @file_get_contents($apiUrl . $ip);
+            $apiRe = json_decode($apiRe, true);
+            $apiReData = array();
+            if (!empty($apiRe['data'])) {
+                $apiReData = $apiRe['data'];
+                $apiReData['ip'] = $ip;
+                $apiReData['info'] = $apiReData['country'] . '_' . $apiReData['region'] . '_' . $apiReData['city'] . '_' . $apiReData['isp'];
+                return $apiReData;
+            }
+            break;
+    }
+    return array(
+        'ip' => $ip,
+        'info' => '未知_本地'
+    );
 }
-
 /**
  * 取ip前3段
  * @param $ip
@@ -154,10 +161,10 @@ function __cc_ip_getIp3Pre($ip = '')
  * @param string $ip
  * @return int
  */
-function __cc_ip_isCnIp($ip = '')
+function cc_is_ip_china($ip = '')
 {
     if (empty($ip)) {
-        $ip = __cc_ip_getAddr();
+        $ip = cc_ip_getAddr();
     }
     $cacheKey = "isCnIp::" . md5($ip);
     //
@@ -185,15 +192,6 @@ function __cc_ip_isCnIp($ip = '')
     }
     //
     return intval($result);
-}
-/**
- * 判断IP是否正确
- * @param string $ip
- * @return bool
- */
-function __cc_ip_is_ipv4($ip = '')
-{
-    return filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) !== false;
 }
 
 /**
@@ -245,90 +243,6 @@ function __cc_ipInRange($ip = '', $range = '')
         }
         return false;
     }
-}
-// 判断IP 是否合法
-function ctoIpCheck($ip)
-{
-    $reg = '/^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$/';
-    // $reg2 = '/\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\/';
-    // $reg3 = '/^((?:(?:25[0-5]|2[0-4]\d|((1\d{2})|([1-9]?\d)))\.){3}(?:25[0-5]|2[0-4]\d|((1\d{2})|([1-9]?\d))))$/'
-    if (!preg_match($reg, $ip)) {
-    }
-    $arr = explode('.', $ip);
-    if (count($arr) != 4) {
-        return false;
-    } else {
-        for ($i = 0; $i < 4; $i++) {
-            if (($arr[$i] < '0') || ($arr[$i] > '255')) {
-                return false;
-            }
-        }
-    }
-    return true;
-}
-function ctoIpCheckValid($ip)
-{
-    if (empty($ip)) {
-        return false;
-    }
-    if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 | FILTER_FLAG_NO_PRIV_RANGE)) {
-        return true;
-    }
-    return false;
-}
-/**
- * @action 获取城市
- * @author ctocode-zhw
- * @param string $type 类别
- * @param string $param 参数
- * @return mixed <string, unknown>
- * @version 2017-08-09
- */
-function ctoIpCity($ip = '', $type = 'taobao', $param = '')
-{
-    if (empty($ip)) {
-        $ip = __cc_ip_getAddr();
-    }
-    if (ctoIpCheck($ip) !== TRUE || ctoIpCheckValid($ip) !== TRUE) {
-        return array(
-            'ip' => $ip,
-            'info' => '未知_本地'
-        );
-    }
-    switch ($type) {
-        case 'sina': // 获取新浪api
-            $apiUrl = 'http://int.dpool.sina.com.cn/iplookup/iplookup.php?format=js&ip=';
-            $apiRe = @file_get_contents($apiUrl . $ip);
-            if (!empty($apiRe)) {
-                $jsonMatches = array();
-                preg_match('#\{.+?\}#', $apiRe, $jsonMatches);
-                if (isset($jsonMatches[0])) {
-                    $apiReData = json_decode($jsonMatches[0], true);
-                    if (isset($apiReData['ret']) && $apiReData['ret'] == 1) {
-                        $apiReData['ip'] = $ip;
-                        $apiReData['info'] = $apiReData['country'] . '_' . $apiReData['province'] . '_' . $apiReData['city'];
-                        return $apiReData;
-                    }
-                }
-            }
-            break;
-        case 'taobao': // 获取淘宝接口
-            $apiUrl = 'http://ip.taobao.com/service/getIpInfo.php?ip=';
-            $apiRe = @file_get_contents($apiUrl . $ip);
-            $apiRe = json_decode($apiRe, true);
-            $apiReData = array();
-            if (!empty($apiRe['data'])) {
-                $apiReData = $apiRe['data'];
-                $apiReData['ip'] = $ip;
-                $apiReData['info'] = $apiReData['country'] . '_' . $apiReData['region'] . '_' . $apiReData['city'] . '_' . $apiReData['isp'];
-                return $apiReData;
-            }
-            break;
-    }
-    return array(
-        'ip' => $ip,
-        'info' => '未知_本地'
-    );
 }
 /** 
  * 使用PHP检测能否ping通IP或域名 

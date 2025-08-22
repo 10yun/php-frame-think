@@ -26,6 +26,7 @@ namespace shiyunOpensdk\connection;
  */
 class OpenAppAccess
 {
+    public $accessData = [];
     protected $setCacheStore = 'CACHE_STORES_REDIS';
     protected $setCacheKey = '_token_';
     protected $setCacheTime =  (60 * 60 * 24) * 3; // 缓存3天
@@ -45,10 +46,8 @@ class OpenAppAccess
         $key_project = syOpenAppsAuth('syOpenAppProject');
         $key_apps = syOpenAppsAuth('syOpenAppId');
         $cacheKey = $key_project . ':' . $key_apps . ':' . $setCacheKey . $diyKey;
-        frameCacheSet('CACHE_STORES_RD2', $cacheKey, $data, (60 * 60 * 24 * 3));
+        frameCacheSet('CACHE_STORES_RD2', $cacheKey, $data, $this->setCacheTime);
     }
-
-    public $accessData = [];
     public function setAccessData($data = [])
     {
         $token_access = syOpenAppsAuth('syOpenAppToken');
@@ -60,13 +59,12 @@ class OpenAppAccess
         $token_access = syOpenAppsAuth('syOpenAppToken');
 
         $tokenCache = $this->sCacheGet(md5($token_access));
-        $accessData = analysJsonDecode($tokenCache) ?? [];
+        $accessData = cc_json_decode($tokenCache) ?? [];
 
         $accessData[$key] = $val;
         $this->sCacheSet(md5($token_access), json_encode($accessData));
         $this->accessData = $accessData;
     }
-
     // 根据token  
     public function getAccessData()
     {
@@ -77,14 +75,14 @@ class OpenAppAccess
          * 是否解密token
          */
         if (!true) {
-            $aes = new \shiyunUtils\libs\LibsSymmAES();
+            $aes = new \shiyun\libs\LibsSymmAES();
             $token_access = $aes->decrypt(syOpenAppsAuth('syOpenAppToken'));
         }
         $tokenCache = $this->sCacheGet(md5($token_access));
         if (empty($tokenCache)) {
             return [];
         }
-        $this->accessData = analysJsonDecode($tokenCache) ?? [];
+        $this->accessData = cc_json_decode($tokenCache) ?? [];
         if (!empty($this->accessData) && is_array($this->accessData)) {
             $this->accessData['account_id'] = $this->accessData['account_id'] ?? 0;
             return $this->accessData;

@@ -6,6 +6,9 @@ namespace shiyunWorker\annotation;
 
 use Attribute;
 
+/**
+ * gateway 进程
+ */
 #[Attribute(Attribute::TARGET_CLASS | Attribute::TARGET_PARAMETER | Attribute::IS_REPEATABLE)]
 class GatewayGateway
 {
@@ -29,6 +32,5 @@ class GatewayGateway
         public ?array       $pattern = null,
         public array        $append = [],
         public ?string      $ext = null,
-    ) {
-    }
+    ) {}
 }

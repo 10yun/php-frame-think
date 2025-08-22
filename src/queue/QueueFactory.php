@@ -6,10 +6,10 @@ namespace shiyunQueue;
 
 use shiyun\support\Config;
 use shiyunQueue\drive\Connector;
-use shiyunQueue\exception\DriverException;
 use shiyunQueue\drive\database\DatabaseConnector;
 use shiyunQueue\drive\redis\RedisConnector;
 use shiyunQueue\drive\rabbitmq\RabbitmqConnector;
+use shiyunQueue\exception\DriverException;
 use InvalidArgumentException;
 
 /**
@@ -38,7 +38,7 @@ class QueueFactory
      */
     public function getDefaultDriver()
     {
-        return syGetConfig('shiyun.queue.default');
+        return syGetConfig('shiyun.process_queue.default');
     }
     /**
      * 获取驱动实例
@@ -65,7 +65,7 @@ class QueueFactory
              * 创建驱动实例
              */
             // 获取驱动参数配置
-            $driverConfig = syGetConfig("shiyun.queue.connections.{$name}");
+            $driverConfig = syGetConfig("shiyun.process_queue.connections.{$name}");
             // 获取驱动类型
             $driverType = $driverConfig['connect_type'] ?? 'sync';
             switch ($driverType) {
@@ -97,7 +97,7 @@ class QueueFactory
     protected function getValues($data)
     {
         // if ($this->jobFunc != $this->_defaultDo) {
-        //     // $prefix = syGetConfig('shiyun.queue.xxx.prefix', 'ctocode_');
+        //     // $prefix = syGetConfig('shiyun.process_queue.xxx.prefix', 'ctocode_');
         //     // $this->jobServer .= '@' . $prefix . $this->jobFunc;
         // } 
     }

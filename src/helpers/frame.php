@@ -44,7 +44,11 @@ function frameCacheGet($store = 'default', $key = '', $defVal = null)
     if (!empty($defVal)) {
         Cache::store($store)->get($key, $defVal);
     }
-    return Cache::store($store)->get($key);
+    $cacheData = Cache::store($store)->get($key);
+    if (is_object($cacheData) || is_array($cacheData)) {
+        return json_decode(json_encode($cacheData), true);
+    }
+    return $cacheData;
 }
 function frameCacheSet($store = 'default', $key = '', $val = '', $time = null)
 {

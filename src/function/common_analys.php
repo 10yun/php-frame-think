@@ -6,24 +6,13 @@
  * 
  */
 
-/**
- * 分割符号，转字符串
- */
-function analysDelimiterToStr($oldStr, $del = ",")
-{
-    $delArr =   explode($del, $oldStr);
-    $newAr = [];
-    foreach ($delArr as $val) {
-        $newAr[] = "'{$val}'";
-    }
-    return join(",", $newAr);
-}
+
 /**
  * 轮播图
  */
 function analysImgsParse($imgsJson = '',)
 {
-    $imgsArr = analysJsonDecode($imgsJson);
+    $imgsArr = cc_json_decode($imgsJson);
     $newArr = [];
     if (!empty($imgsArr)) {
         foreach ($imgsArr as $key2 => $val2) {
@@ -38,6 +27,10 @@ function analysImgsParse($imgsJson = '',)
     }
     return $newArr;
 }
+function analysTags(string $tags = '')
+{
+    return  array_unique(array_filter(array_map('trim', explode(',', $tags))));
+}
 /**
  * 图片路径转换解析
  * @param string $img 图片路径
@@ -48,7 +41,7 @@ function analysImgDoTrnas($img = '', $default = '')
     // $items['link'] = analysImgDoTrnas($val2['url']);
     // $items['link'] = str_replace ( "file///", "file/", $items['link'] );
     // $items['link'] = str_replace ( "file//", "file/", $items['link'] );
-    $curr_file_url = syOpenAppsConfig('GB_OSS_FILE_URL');
+    $curr_file_url = syOpenAppsConfig('SDKS_FILE_CDNURL');
     // $curr_file_signatrue = syOpenAppsConfig('GB_OSS_FILE_SIGNATRUE');
     $curr_file_signatrue = '';
     // $is_url = preg_match ( "/^http(s)?:\\/\\/.+/", $val['per_avatar'] );
@@ -60,12 +53,12 @@ function analysImgDoTrnas($img = '', $default = '')
         }
     } else {
         if (empty($default)) {
-            return $curr_file_url . 'default/default.png';
+            return 'https://10ui.cn/default/default.png';
         } else {
             if (preg_match('/(http:\/\/)|(https:\/\/)/i', $default)) {
                 return $default; // 直接粘贴地址
             } else {
-                return $curr_file_url . $default;
+                return 'https://10ui.cn/' . $default;
             }
         }
     }
@@ -105,34 +98,6 @@ function analysTimeToDate($value = 0, $format = '')
     $format = !empty($format) ? $format : 'Y-m-d H:i';
     return $value > 0 ? date($format, $value) : '';
 }
-/**
- * 判断字符串是否为 Json 格式
- * @param  string  $data  Json 字符串
- * @param  bool    $assoc 是否返回关联数组。默认返回对象
- * @return array|bool|object 成功返回转换后的对象或数组，失败返回 false
- */
-function _cc_is_json($data = '', $assoc = false)
-{
-    $data = json_decode($data, $assoc);
-    if (($data && is_object($data)) || (is_array($data) && !empty($data))) {
-        return true;
-    }
-    return false;
-}
-function analysIsJson($json_str, $flag = true)
-{
-    $json_str = str_replace('＼＼', '', $json_str);
-    $out_arr = array();
-    preg_match('/{.*}/', $json_str, $out_arr);
-    // dd($out_arr);
-    if (!empty($out_arr)) {
-        $result = json_decode($out_arr[0], $flag);
-        return true;
-    } else {
-        return false;
-    }
-    return true;
-}
 function analysJsonToArray($str)
 {
     if (is_string($str))
@@ -151,7 +116,7 @@ function analysJsonToArray($str)
     return $arr;
 }
 // json 转 array
-function analysJsonDecode($str = '', $flag = true)
+function cc_json_decode($str = '', $flag = true)
 {
     $arr = '';
     try {
@@ -161,14 +126,6 @@ function analysJsonDecode($str = '', $flag = true)
         $arr = analysMbUnserialize($str);
     }
     return $arr;
-}
-/**
- * array 转 json
- * @return string
- */
-function analysJsonEncode(array $data = [])
-{
-    return json_encode($data);
 }
 
 /**
@@ -196,35 +153,6 @@ function analysEmojiDe($msg)
         return base64_decode($r[1]);
     }, $msg);
     return $msg;
-}
-// 富文本
-/**
- * 转译
- */
-function analysRichTextEn($text = '') {}
-/**
- * 解除 转译
- */
-function analysRichTextDe($text = '')
-{
-    // $article_content = mb_strcut ( strip_tags ( $val['article_content'] ), 0, 100, 'utf-8' ) . '...';
-    // $article_content = analysEmojiDe ( $article_content);
-    // $article_content= str_replace ( "\n", "<br/>", $article_content );
-    // $article_content = strip_tags ( htmlspecialchars_decode ( $article_content) );
-    // $article_content= ctoStrStrcut ( htmlspecialchars_decode ($article_content ), 50 );
-    // $article_content= str_replace ( "&nbsp;", "",$article_content);
-    // $article_content = str_replace ( "&nbsp;", "", strip_tags ( $article_content ) );
-
-    // 提问内容涉及表情包的处理
-
-    /**
-     *
-    if(! empty ($text) && preg_match ( '/<span.*?>/is', htmlspecialchars_decode ($text) )){
-    }
-     */
-    $text_last = '';
-    $text_last = htmlspecialchars_decode($text);
-    return $text_last;
 }
 
 function analysMbUnserialize($str)
@@ -297,7 +225,6 @@ function analysDistance(float $longitude1 = 0, float $latitude1 = 0, float $long
 
     return round($distance, $decimal);
 }
-
 /**
  * @action 金额 小数 转换 int
  * @version 2016-08-08 
@@ -335,7 +262,7 @@ function ctoValueMoneyDe($money = null)
     return $int_money;
 }
 /**
- *  转换金额,防止金额为空的时候
+ * 转换金额,防止金额为空的时候
  * @param string $arr
  * @param string $value
  * @param string $default

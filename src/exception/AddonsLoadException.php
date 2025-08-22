@@ -2,14 +2,13 @@
 
 namespace shiyun\exception;
 
-use Exception;
-use RuntimeException;
+use shiyun\extend\ExceptionExtend;
 
 /**
  * 插件异常处理类
  * @package shiyun\exception
  */
-class AddonsLoadException extends \Exception
+class AddonsLoadException extends ExceptionExtend
 {
     /**
      * 保存异常页面显示的额外Debug数据

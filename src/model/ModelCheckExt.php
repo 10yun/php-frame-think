@@ -15,7 +15,7 @@ class ModelCheckExt extends Model
     /**
      * 当前验证场景
      */
-    protected string $checkCurrentScene;
+    protected string $checkCurrentScene = '';
     protected array $checkOnly = [];
     protected array $checkAppend = [];
     protected array $checkRemove = [];
@@ -31,18 +31,6 @@ class ModelCheckExt extends Model
         return $this->checkError;
     }
     /**
-     * 设置验证场景
-     * @access public
-     * @param string $name 场景名
-     * @return $this
-     */
-    public function scene(string $name)
-    {
-        // 设置当前场景
-        $this->checkCurrentScene = $name;
-        return $this;
-    }
-    /**
      * 数据自动验证
      * @access public
      * @param array $data  数据
@@ -53,6 +41,7 @@ class ModelCheckExt extends Model
     {
         $this->checkProperty();
         $this->checkError = [];
+
 
         if ($this->checkCurrentScene) {
             $this->getScene($this->checkCurrentScene);
@@ -80,33 +69,37 @@ class ModelCheckExt extends Model
             }
             $currentWhere = $this->checkWhere[$this->checkCurrentScene];
         }
-        $dbObj = $this->db();
-        // 增加 where
-        foreach ($currentWhere as $whereField => $whereSign) {
-            if (!empty($data[$whereField])) {
-                $dbObj->where([
-                    ["{$whereField}", $whereSign, $data[$whereField]],
-                ]);
-            }
-        }
         $onlyKeys = array_keys($this->checkOnly);
+
         foreach ($rules as $key => $rule) {
             // 场景检测
             if (!empty($this->checkOnly) && !in_array($key, $onlyKeys)) {
                 continue;
             }
+
+            $dbObj = $this->db();
+            // 增加 where
+            foreach ($currentWhere as $whereField => $whereSign) {
+                if (!empty($data[$whereField])) {
+                    $dbObj->where([
+                        ["{$whereField}", $whereSign, $data[$whereField]],
+                    ]);
+                }
+            }
+
             $itemRules = $rule;
             $onlySign = $onlyKeys[$key] ?? '=';
-
             foreach ($itemRules as $itemKey => $itemVal) {
                 if (empty($data[$key])) {
                     continue;
                 }
+
                 // 不重复
                 if ($itemVal == 'repeat') {
                     // $isExist = $dbObj->where([["{$key}", $onlySign, $data[$key]]])->fetchSql()->find();
                     // dd($isExist);
                     $isExist = $dbObj->where([["{$key}", $onlySign, $data[$key]]])->field("{$key}")->find();
+                    // var_dump(["{$key}", $onlySign, $data[$key]], $isExist, '<br>');
                     if (!empty($isExist)) {
                         $currMesage = " {$key} repeat ";
                         if (!empty($this->checkMessage[$key]['repeat'])) {
@@ -157,11 +150,23 @@ class ModelCheckExt extends Model
     {
         $this->checkOnly = $this->checkAppend = $this->checkRemove = [];
 
-        if (method_exists($this, 'scene' . $scene)) {
-            call_user_func([$this, 'scene' . $scene]);
+        if (method_exists($this, 'setScene' . $scene)) {
+            call_user_func([$this, 'setScene' . $scene]);
         } elseif (isset($this->checkScene[$scene])) {
             // 如果设置了验证适用场景
             $this->checkOnly = $this->checkScene[$scene];
         }
+    }
+    /**
+     * 设置验证场景
+     * @access public
+     * @param string $name 场景名
+     * @return $this
+     */
+    public function setScene(string $name = '')
+    {
+        // 设置当前场景
+        $this->checkCurrentScene = $name;
+        return $this;
     }
 }

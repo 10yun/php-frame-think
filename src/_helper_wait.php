@@ -70,7 +70,7 @@ function ctoStrSubstring($str, $len, $dot = '')
         return $str;
 
     // 迁移到方法库
-    // $str = HelperStr::htmlcodeToSymbol($str);
+    // $str = cc_htmlcodeToSymbol($str);
 
 
     $rs = '';
@@ -123,7 +123,7 @@ function ctoStrSubstring($str, $len, $dot = '')
     }
     // 迁移到方法库
     $rs = '';
-    // $rs = HelperStr::symbolToHtmlcode($str); 
+    // $rs = cc_symbolToHtmlcode($str); 
     return $rs . $dot;
 
     if ($_glb['web_lang'] == 'UTF-8') {

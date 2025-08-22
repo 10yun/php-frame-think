@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace shiyun\middleware;
+namespace shiyun\validate\annotation;
 
 /**
  * https://www.cnblogs.com/luojie-/p/12963872.html

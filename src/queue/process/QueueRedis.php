@@ -4,7 +4,7 @@ namespace shiyunQueue\process;
 
 use Exception;
 use shiyunWorker\WorkermanServer;
-use shiyunUtils\libs\LibsLogger;
+use shiyun\libs\LibLogger;
 use shiyunQueue\libs\ProcessWorker;
 use shiyunQueue\exception\QueueException;
 
@@ -29,13 +29,13 @@ class QueueRedis extends WorkermanServer
      */
     public function __construct()
     {
-        $this->config = syGetConfig('shiyun.queue');
+        $this->config = syGetConfig('shiyun.process_queue');
         if (
             !empty($this->config)
             && !empty($this->config['process_open'])
             && $this->config['process_open'] == true
         ) {
-            $annoPath = syGetConfig('shiyun.queue.annotation_include_path');
+            $annoPath = syGetConfig('shiyun.process_queue.annotation_include_path');
             $this->annoHandle = new \shiyunQueue\annotation\AnnotationParse();
             $annoArr = $this->annoHandle->getDir($annoPath);
             $this->_consumerDir = $annoArr;
@@ -49,7 +49,7 @@ class QueueRedis extends WorkermanServer
             parent::__construct();
         }
     }
-    //在进程开启之时
+    // 在进程开启之时
     public function onWorkerStart()
     {
         try {
@@ -80,13 +80,13 @@ class QueueRedis extends WorkermanServer
     }
     protected function queueLogError(string $type = '', string $msg = '')
     {
-        $log = str_pad("__{$type}__", 40, " ") . $msg;
-        LibsLogger::getInstance()->setGroup('queue_redis')->writeError($log);
+        $log = str_pad("{$type}", 40, " ") . $msg;
+        LibLogger::getInstance()->setGroup('queue_redis')->writeError($log);
     }
     protected function queueLogInfo(string $type = '', string $msg = '')
     {
-        $log = str_pad("__{$type}__", 40, " ") . $msg;
-        LibsLogger::getInstance()->setGroup('queue_redis')->writeInfo($log);
+        $log = str_pad("{$type}", 40, " ") . $msg;
+        LibLogger::getInstance()->setGroup('queue_redis')->writeInfo($log);
     }
     /**
      * 处理-=普通模式
@@ -163,7 +163,10 @@ class QueueRedis extends WorkermanServer
                 \Workerman\Timer::add(
                     $execute_timing,
                     function () use ($that, $consumeClassObj, $consumeClassOpt, $consumeQeObj) {
-                        return $that->dealItemData($consumeClassObj, $consumeClassOpt, $consumeQeObj);
+                        $xxx = $that->dealItemData($consumeClassObj, $consumeClassOpt, $consumeQeObj);
+                        // var_dump($xxx);
+                        // return $xxx ? 1 : 0;
+                        // return $xxx;
                     }
                 );
                 // \Workerman\Timer::add(intval($execute_timing), [$consumeClassObj, 'onQueueMessage'], [

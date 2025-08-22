@@ -13,6 +13,5 @@ class RouteHead extends AnnotationAbstract
     protected string|array $methods = ['OPTIONS', 'HEAD'];
     public function __construct(
         public string|array $prefix = '',
-    ) {
-    }
+    ) {}
 }

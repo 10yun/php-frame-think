@@ -44,29 +44,22 @@ class OpenAppConfig
     // 设置应用标示
     public function setFlag($diyApp = '')
     {
-        $defAppConf = [];
-        if (!empty($diyApp)) {
-            $defAppConf = syGetAppsSett($diyApp);
-        }
-        //
+        /**
+         * 获取项目配置
+         */
         $syOpenAppProject = syOpenAppsAuth('syOpenAppProject');
-        $diyProFlag = $syOpenAppProject;
-        $diyProConf = syGetProjectSett($diyProFlag);
-        //
+        $projectConfig = config_global_single_kv(projectSign: $syOpenAppProject);
+        /**
+         * 获取商家配置
+         */
+        /**
+         * 获取应用配置
+         */
         $syOpenAppId = syOpenAppsAuth('syOpenAppId');
         $diyAppFlag = !empty($diyApp) ? $diyApp : $syOpenAppId;
-        $diyAppConf = syGetAppsSett($diyAppFlag);
-
-        $cacheData =  array_merge($defAppConf, $diyProConf, $diyAppConf);
-        $cacheKey = 'auth_app_' . $diyAppFlag;
-        // $cacheData = Cache::get ( $cacheKey );
-        // 缓存不存在的话
-        if (empty($cacheData)) {
-            // sendRespError('联系管理员');
-            // $cacheData = array_merge($defData, $cacheData);
-            // Cache::set($cacheKey, $cacheData);
-        }
-        $this->sdkData = $cacheData;
+        $applicationConfig = [];
+        $configAll = array_merge($projectConfig, $applicationConfig);
+        $this->sdkData = $configAll;
     }
     public function getSett()
     {

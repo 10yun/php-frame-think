@@ -95,4 +95,17 @@ class ValidateExtend extends Validate
         }
         return true;
     }
+    protected function checkSignStr($value, $rule, $data = [])
+    {
+        // 正则表达式模式，匹配包含小写英文字母、下划线和中杠的字符串  
+        $pattern = '/^[a-z_-]+$/';
+        if (empty($value)) {
+            return false;
+        }
+        // 使用 preg_match 函数进行匹配  
+        if (preg_match($pattern, $value)) {
+            return true;
+        }
+        return false;
+    }
 }

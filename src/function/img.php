@@ -52,34 +52,6 @@ function ctoImgCheck($img_path = '')
         'imgData' => $imgData
     );
 }
-/*
- * 图片上传
- * $save_path 保存路径
- */
-function ctoImgDoPath($save_path, $save_type = 1)
-{
-    // 存储路径,保存类别 ,默认： 根路径/年/月日
-    if ($save_type == 1) {
-        $patharr = array(
-            $save_path
-        );
-    } elseif ($save_type == 2) {
-        $patharr = array(
-            $save_path
-        );
-        $return_path = $patharr[0];
-    }
-    // 如果路径不存在,创建文件夹
-    foreach ($patharr as $val) {
-        if (!file_exists($val)) {
-            if (!mkdir($val, 0777, true)) { // 如果指定文件夹不存在，则创建文件夹,权限0777
-                exit('创建保存文件目录失败,请联系管理员检查目录权限');
-            }
-        }
-    }
-    return true;
-}
-
 // 远程下载2
 function ctoImgRemoteDown2($url, $path = 'images/')
 {
