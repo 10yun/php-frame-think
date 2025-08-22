@@ -1,4 +1,4 @@
-name: Update Packagist
+name: Submit & Update Packagist
 
 on:
   push:
@@ -11,7 +11,9 @@ jobs:
   update-packagist:
     runs-on: ubuntu-latest
     steps:
-      - name: Notify Packagist
+      - name: Submit or Update package on Packagist
         run: |
-          curl -XPOST -u "${{ secrets.PACKAGIST_USERNAME}}:${{ secrets.PACKAGIST_TOKEN }}" \
-            https://packagist.org/api/update-package?package=shiyun/php-think
+          curl -XPOST \
+            -H 'Content-Type: application/json' \
+            -d '{"repository":{"url":"https://github.com/10yun/php-frame-think"}}' \
+            "https://packagist.org/api/update-package?username=${{ secrets.PACKAGIST_USERNAME }}&apiToken=${{ secrets.PACKAGIST_MAIN_TOKEN }}"
