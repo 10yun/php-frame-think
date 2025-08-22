@@ -3,9 +3,9 @@ name: Update Packagist
 on:
   push:
     branches:
-      - main # 或者 master，看你项目默认分支
+      - main # 或 master，看你默认分支
     tags:
-      - "*" # 每次打 tag（发布新版本）也会触发
+      - "*" # 打 tag 时也会触发
 
 jobs:
   update-packagist:
@@ -13,5 +13,7 @@ jobs:
     steps:
       - name: Notify Packagist
         run: |
-          curl -XPOST -u "${{ secrets.PACKAGIST_USERNAME}}:${{ secrets.PACKAGIST_SAFE_TOKEN }}" \
-            https://packagist.org/api/update-package?package=shiyun/php-think
+          curl -X POST \
+            -H "Content-Type: application/json" \
+            "https://packagist.org/api/update-package?username=${{ secrets.PACKAGIST_USERNAME }}&apiToken=${{ secrets.PACKAGIST_API_TOKEN }}" \
+            -d '{"repository":"https://github.com/shiyun/php-think"}'
