@@ -16,7 +16,8 @@
         "amqp",
         "event-loop",
         "php",
-        "workerman"
+        "workerman",
+        "utils"
     ],
     "authors": [
         {
@@ -44,7 +45,6 @@
         "ext-json": "*",
         "php": "^8",
         "revolt/event-loop": "^1.0",
-        "shiyun/php-utils": "@dev",
         "workerman/crontab": "^1.0",
         "workerman/workerman": "^5",
         "workerman/gateway-worker": "^3",
